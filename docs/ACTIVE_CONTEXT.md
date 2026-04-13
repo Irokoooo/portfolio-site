@@ -1,13 +1,23 @@
 # Active Context — 当前工作焦点
 
-> 最后更新：2026-04-13（第七十三轮）
+> 最后更新：2026-04-13（第七十四轮）
 > 历史开发记录请查看 `docs/PROGRESS.md`
 
 ---
 
 ## 当前状态
 
+已修复生产构建失败问题：`components/ui/ChinaProvinceMap.tsx` 中不兼容的 `projectionConfig.translate` 已移除，`npm run build` 现已通过，等待重新推送后触发 Vercel 新生产部署。
+
 Next Destination 中 Erasmus 条目图标已替换为欧洲旗帜，避免与 Area Studies 条目图标重复。
+
+---
+
+## 最近完成（第七十四轮）
+
+### ✅ 生产构建失败修复
+1. `components/ui/ChinaProvinceMap.tsx`：移除 `projectionConfig` 中不被当前类型接受的 `translate` 字段
+2. 本地校验：`npm run build` 已通过，说明最新提交可以重新部署到 Vercel
 
 ---
 

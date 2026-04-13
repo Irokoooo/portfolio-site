@@ -5,6 +5,13 @@
 
 ---
 
+## 第七十四轮（2026-04-13）— 生产构建失败修复
+
+- [x] `components/ui/ChinaProvinceMap.tsx`：移除不兼容的 `projectionConfig.translate`
+- [x] 本地 `npm run build` 验证通过，生产部署可重新触发
+
+---
+
 ## 第七十三轮（2026-04-13）— Erasmus 图标去重
 
 - [x] `components/sections/NextDestSection.tsx`：`Academic Anchor` 图标由 `🌍` 调整为 `🇪🇺`

@@ -258,7 +258,6 @@ export function ChinaProvinceMap({ onBack }: Props) {
                 rotate: [-104.5, 0, 0],
                 center: [0, 35],
                 scale: 545,
-                translate: [400, 212],
               }}
               width={800}
               height={400}

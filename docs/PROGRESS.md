@@ -5,6 +5,183 @@
 
 ---
 
+## 第七十三轮（2026-04-13）— Erasmus 图标去重
+
+- [x] `components/sections/NextDestSection.tsx`：`Academic Anchor` 图标由 `🌍` 调整为 `🇪🇺`
+- [x] 保持原有结构与文案不变，仅优化视觉识别，避免与 `Area Studies & Global South` 图标重复
+
+---
+
+## 第七十二轮（2026-04-13）— Next Destination 新增航向 + 省图点亮扩展
+
+- [x] `components/ui/ChinaProvinceMap.tsx`：新增 `500000` 重庆（旅游）与 `520000` 贵州（旅游·贵阳）点亮配置
+- [x] `components/sections/NextDestSection.tsx`：新增 `🌍 Area Studies & Global South` 航向条目
+- [x] 补充中文副标题“区域国别与全球发展”及完整目标描述文案
+
+---
+
+## 第七十一轮（2026-04-13）— 小民快跑角色文案精简
+
+- [x] `content/career/internships/xiaomin-kuaipao.md`：移除 `role` 中的“从 0 到 1”
+- [x] 仅保留“市场营销与产品运营实习生 · 创业孵化”
+
+---
+
+## 第七十轮（2026-04-13）— Career 默认项 + 时间排序 + 侧边栏文案调整
+
+- [x] `components/sections/CareerSection.tsx`：Career 默认详情改为首个实习项，避免进入后先落到香港岭南大学
+- [x] `components/sections/gallery/AcademicResearchClient.tsx`：社会实践卡按时间升序重排，`SheNicest` 更新为 `2026.03`
+- [x] `components/sections/SideWorksSection.tsx`：社会实践列表按时间升序重排，`SheNicest` 更新为 `2026.03`
+- [x] `app/page.tsx`：侧边栏 Research 文案改为 `Academic & Practice`
+
+---
+
+## 第六十九轮（2026-04-13）— 小民快跑实习条目接入
+
+- [x] 新增 `content/career/internships/xiaomin-kuaipao.md`，完整写入用户提供的企业与实习内容
+- [x] 将 `个人资料/作品（待分类）/小民快跑.jpg` 复制为 `public/assets/icons/xiaomin-kuaipao.jpg`
+- [x] `components/sections/CareerSection.tsx`：新增 `prefix` 字段支持，确保 `<24h` 可正确显示
+- [x] 保持 Career 实习列表与详情页渲染逻辑不变，仅新增内容与资源
+
+---
+
+## 第六十八轮（2026-04-13）— 中央民族大学引言文案更新
+
+- [x] `components/sections/CareerSection.tsx`：将 `minzu` 条目 quote 更新为“国际经贸底色，科研量化研究起点。在这里踏上了属于自己的大学之旅”
+- [x] 仅文案替换，不涉及交互/样式逻辑变更
+
+---
+
+## 第六十七轮（2026-04-13）— Career 详情占位卡移除 + 教育卡内容修复
+
+- [x] `components/sections/CareerSection.tsx`：删除详情区顶部机构名称信息卡（占位卡）
+- [x] `components/sections/CareerSection.tsx`：修复 `useEffect` 里将教育卡强制重置为实习卡的逻辑
+- [x] 浏览器验证：点击 `香港岭南大学` / `中央民族大学` 后正文（Highlights/Skills）正常显示
+- [x] 保持实习卡与教育卡主列表结构不变
+
+---
+
+## 第六十六轮（2026-04-13）— 中国省级地图位置微调（顶部裁切）
+
+- [x] `components/ui/ChinaProvinceMap.tsx`：`projectionConfig` 新增 `translate: [400, 212]`
+- [x] 省图整体轻微下移，修复顶部被截断问题
+- [x] 保持省份高亮、港澳 marker、图例与 tooltip 交互不变
+
+---
+
+## 第六十五轮（2026-04-13）— 中国省级地图根因修复（缩点/失真）
+
+- [x] `components/ui/ChinaProvinceMap.tsx`：新增 `reverseGeometryRings`，统一 Polygon/MultiPolygon ring 方向，修复 d3 下“全球补面”导致的地图缩点与失真
+- [x] `components/ui/ChinaProvinceMap.tsx`：省级 feature 过滤增加兜底（`level=province` 不足时回退 `adcode` 规则）
+- [x] `components/ui/ChinaProvinceMap.tsx`：`filteredGeo` 改为 `useMemo` 稳定计算，减少渲染抖动与输入波动
+- [x] `components/ui/ChinaProvinceMap.tsx`：投影参数调整为稳定中国视角（`rotate + center + scale`）
+- [x] 浏览器复核：省图轮廓恢复正常显示，足迹高亮/图例/港澳锚点正常
+
+---
+
+## 第六十四轮（2026-04-13）— Academic Energy 抽屉 md 映射修复
+
+- [x] 新增 `app/api/academic-content/route.ts`：提供 academic md 正文读取接口
+- [x] `components/sections/gallery/AcademicResearchClient.tsx`：支持按 `contentFile` 异步加载抽屉正文（含加载态/失败提示）
+- [x] `components/sections/gallery/AcademicResearchClient.tsx`：保留 `content` 直出优先级，空内容时自动回退到 md 加载
+- [x] 验证：`/api/academic-content?file=uhv-power-transmission.md` 返回正文成功
+- [x] 校验：`AcademicResearchClient.tsx`、`academic-content/route.ts`、文档文件无错误
+
+---
+
+## 第六十三轮（2026-04-13）— Luma 播放速度调整 + 中国省图港澳可见性修复
+
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：Luma Flow 视频默认播放速度设置为 `0.75x`
+- [x] `components/ui/ChinaProvinceMap.tsx`：调整省图投影参数（`center/scale`）以提升版图显示稳定性
+- [x] `components/ui/ChinaProvinceMap.tsx`：省份描边由 `1.2` 下调至 `0.65`，减少微小区域被描边覆盖
+- [x] `components/ui/ChinaProvinceMap.tsx`：新增港澳 Marker 锚点，修复“澳门 hover 命中但视觉空白”体验
+- [x] 校验：`AIPracticeClient.tsx`、`ChinaProvinceMap.tsx`、文档文件无错误
+
+---
+
+## 第六十二轮（2026-04-13）— Next Destination 足迹版图双 bug 修复
+
+- [x] `components/ui/ClassicalMap.tsx`：世界地图 hover tooltip 去除数字编码回退，未收录国家显示友好文案
+- [x] `components/ui/ChinaProvinceMap.tsx`：省级地图过滤规则改为仅保留合法省级 feature（`level=province` + 6 位 `adcode`）
+- [x] `components/ui/ChinaProvinceMap.tsx`：`getCode` 兼容 `adcode/id`，降低 geo 属性差异导致的渲染异常
+- [x] 校验：`ClassicalMap.tsx`、`ChinaProvinceMap.tsx` 无错误，Next Destination 页面可正常下钻
+
+---
+
+## 第六十一轮（2026-04-13）— 中国省级地图修复 + 足迹版图尺寸调整
+
+- [x] `components/ui/ChinaProvinceMap.tsx`：修复省级地图空白 + 九段线遮挡问题
+  - 根本原因：GeoJSON 中聚合要素 adcode 为字符串 `"100000_JD"`，之前 `!== 100000`（数字比较）永远不生效
+  - 修复：改为 `!String(adcode).startsWith("100000")` 字符串比较，正确过滤掉该遮挡层
+  - 验证：35 个 feature → 过滤后 34 个省份，所有省份正常渲染
+- [x] `components/ui/ClassicalMap.tsx` + `ChinaProvinceMap.tsx`：世界地图与省级地图尺寸统一
+  - 外层容器从 `max-w-2xl`（672px）调整为 `max-w-3xl`（768px），两个视图保持完全一致
+  - `ComposableMap` SVG 比例固定（800×400），由容器宽度自适应缩放
+
+---
+
+## 第六十一轮（2026-04-13）— Vibe 右侧封面流加载稳定性修复
+
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：封面路径策略改为 slug 精确映射，避免候选路径偏差导致不出图
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：`VibeCoverThumb` 新增切换重置逻辑（`idx/failed/loaded`）
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：新增加载占位与淡入过渡，避免短时空白感
+- [x] 浏览器验证：Vibe 右栏封面流 `imgCount=12`，`broken=0`
+
+---
+
+## 第六十轮（2026-04-13）— Vibe 优雅动效升级 + Luma GitHub/视频接入
+
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：右侧封面流改为贴合视口底部的长条展示（`h-[calc(100vh-2.4rem)]`）
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：封面流主轨道减速（`34s -> 58s`）并新增轻微视差波动
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：卡片点击时新增高亮脉冲反馈，增强“打开抽屉”触发感
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：新增 Vibe 区域金箔漂浮层，视觉与主页面更统一
+- [x] `content/vibe-coding/index.ts`：为 `luma-flow` 新增 `githubUrl`
+- [x] 新增资源文件：`public/works/vibe/luma-flow.mp4`（由用户素材目录同步）
+- [x] 校验：`AIPracticeClient.tsx`、`content/vibe-coding/index.ts`、文档文件均无错误
+
+---
+
+## 第五十九轮（2026-04-13）— Vibe Coding 时间倒序 + 双列动效布局
+
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：新增时间倒序排序逻辑（`date` 最新优先）
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：重构为双列布局（左侧项目卡片，右侧封面流）
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：卡片点击新增金粉扩散反馈效果
+- [x] `components/sections/gallery/AIPracticeClient.tsx`：新增右侧竖向循环封面流（持续滚动 + 轻微波动）
+- [x] 校验：`components/sections/gallery/AIPracticeClient.tsx` 无错误
+
+---
+
+## 第五十八轮（2026-04-13）— 实习成果滚动栏优化 + 维护规则文档
+
+- [x] `components/sections/CareerSection.tsx`：成果图滚动栏卡片尺寸放大（`w-64 h-40`）
+- [x] `components/sections/CareerSection.tsx`：滚动速度降低（动画时长 `20s -> 36s`）
+- [x] `components/sections/CareerSection.tsx`：实习详情顶部公司名称占位卡移除（教育经历仍保留）
+- [x] 新建 `docs/CAREER_INTERNSHIP_MD_RULES.md`，记录实习 md 新增规则与 galleryImages 可选配置
+
+---
+
+## 第五十七轮（2026-04-13）— 好未来实习成果图接入
+
+- [x] 从 `个人资料/作品（待分类）` 复制 3 张图片到 `public/works/internships/tal/`
+- [x] 将图片统一重命名为 `tal-01.jpg`、`tal-02.jpg`、`tal-03.jpg`
+- [x] `content/career/internships/tal-education-group.md`：新增 `galleryImages` 配置
+- [x] 生效结果：好未来实习详情末尾展示自动滚动成果图栏
+
+---
+
+## 第五十六轮（2026-04-13）— Career 实习 md 化 + 可选图片滚动栏
+
+- [x] 新增 `content/career/internships/tal-education-group.md`（好未来实习）
+- [x] 新增 `content/career/internships/funcat.md`（函数猫实习）
+- [x] 新增 `content/career/internships/_template.md`（后续新增实习模板）
+- [x] 新增 `app/api/career-internships/route.ts`：读取 `content/career/internships/*.md` 并解析 frontmatter + markdown
+- [x] `components/sections/CareerSection.tsx`：实习数据改为 API 拉取，教育经历保持原有配置
+- [x] `components/sections/CareerSection.tsx`：详情支持渲染 md 正文
+- [x] `components/sections/CareerSection.tsx`：新增可选自动滚动成果图栏（仅配置 `galleryImages` 时显示）
+- [x] 按用户要求：函数猫不添加图片滚动占位
+
+---
+
 ## 第五十五轮（2026-04-13）— Vibe 新增 Luma Flow 卡片
 
 - [x] `content/vibe-coding/index.ts`：新增 `luma-flow` 项目（标题、描述、标签、类型、日期、正文文件映射）

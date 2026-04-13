@@ -4,7 +4,7 @@
 // 抽屉：Notion 风格封面 + 彩色标签 + 清晰排版
 
 import { createPortal } from "react-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -25,24 +25,180 @@ function encodePublicFilePath(url: string) {
 
 // ── 封面候选路径（支持多后缀 fallback）──
 function getCoverCandidates(slug: string) {
-  if (slug === "lawflaw-ai-assistant") {
-    return [
+  const exactMap: Record<string, string[]> = {
+    "lawflaw-ai-assistant": [
       "/works/covers/vibe/lawflaw-ai-assistant.jpg",
       "/works/covers/vibe/LawFlaw.jpg",
       "/works/covers/vibe/lawflaw-ai-assistant.png",
-    ];
-  }
-  if (slug === "luma-flow") {
-    return [
+    ],
+    "luma-flow": [
       "/works/covers/vibe/Luma Flow.jpg",
       "/works/covers/vibe/luma-flow.jpg",
       "/works/covers/vibe/luma-flow.png",
-    ];
+    ],
+    "student-evaluation-system": [
+      "/works/covers/vibe/student-evaluation-system.png",
+      "/works/covers/vibe/student-evaluation-system.jpg",
+    ],
+    "portfolio-early-version": [
+      "/works/covers/vibe/portfolio-early-version.png",
+      "/works/covers/vibe/portfolio-early-version.jpg",
+    ],
+    "agrimind-eco-platform": [
+      "/works/covers/vibe/agrimind-eco-platform.jpg",
+      "/works/covers/vibe/agrimind-eco-platform.png",
+    ],
+    "challenge-cup-website": [
+      "/works/covers/vibe/challenge-cup-website.png",
+      "/works/covers/vibe/challenge-cup-website.jpg",
+    ],
+  };
+
+  if (exactMap[slug]) {
+    return exactMap[slug];
   }
   return [
     `/works/covers/vibe/${slug}.jpg`,
     `/works/covers/vibe/${slug}.png`,
   ];
+}
+
+function parseYearMonth(dateText: string) {
+  const match = dateText.match(/(\d{4})[-.](\d{1,2})/);
+  if (match) {
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    return year * 100 + month;
+  }
+  const ts = Date.parse(dateText);
+  return Number.isNaN(ts) ? 0 : ts;
+}
+
+function VibeCoverThumb({ slug, className = "" }: { slug: string; className?: string }) {
+  const candidates = getCoverCandidates(slug);
+  const [idx, setIdx] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    // 切换卡片或热更新后重置状态，避免一次失败长期停留在占位态
+    setIdx(0);
+    setFailed(false);
+    setLoaded(false);
+  }, [slug]);
+
+  const handleError = () => {
+    if (idx + 1 < candidates.length) {
+      setIdx((i) => i + 1);
+      setLoaded(false);
+      return;
+    }
+    setFailed(true);
+  };
+
+  if (failed) {
+    return (
+      <div
+        className={`w-full h-full ${className}`}
+        style={{ background: "linear-gradient(135deg, rgba(74,87,64,0.22) 0%, rgba(63,46,47,0.34) 100%)" }}
+      />
+    );
+  }
+
+  return (
+    <>
+      {!loaded && (
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(135deg, rgba(245,237,220,0.7) 0%, rgba(232,224,209,0.88) 100%)" }}
+        />
+      )}
+      <img
+        key={`${slug}-${idx}`}
+        src={encodePublicFilePath(candidates[idx])}
+        alt=""
+        className={`w-full h-full object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"} ${className}`}
+        onLoad={() => setLoaded(true)}
+        onError={handleError}
+      />
+    </>
+  );
+}
+
+function SectionGoldFoil() {
+  const particles = Array.from({ length: 16 }, (_, i) => ({
+    id: i,
+    left: 5 + (i * 6.1) % 92,
+    top: (i * 37) % 88,
+    size: i % 3 === 0 ? 5 : i % 3 === 1 ? 4 : 3,
+    delay: i * 0.28,
+    duration: 8 + (i % 5),
+  }));
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+      {particles.map((p) => (
+        <motion.span
+          key={p.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${p.left}%`,
+            top: `${p.top}%`,
+            width: p.size,
+            height: p.size,
+            background: p.id % 2 === 0 ? "rgba(212,175,55,0.45)" : "rgba(240,196,94,0.34)",
+            boxShadow: "0 0 8px rgba(212,175,55,0.3)",
+          }}
+          animate={{ y: [0, -16, 0], x: [0, 2, -1, 0], opacity: [0.12, 0.38, 0.16], scale: [1, 1.08, 1] }}
+          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function VerticalCoverTicker({ posts }: { posts: VibeCodingPost[] }) {
+  const trackPosts = [...posts, ...posts];
+
+  return (
+    <div className="rounded-xl overflow-hidden border border-seed-shadow/12 bg-milk-white/40 p-2.5">
+      <p className="text-[10px] uppercase tracking-widest text-seed-shadow/35 mb-2 px-1">Vibe Covers · 纵向循环封面流</p>
+      <div className="relative h-[calc(100vh-2.4rem)] overflow-hidden rounded-lg">
+        <div className="absolute inset-x-0 top-0 h-8 z-10 pointer-events-none bg-gradient-to-b from-milk-white to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-8 z-10 pointer-events-none bg-gradient-to-t from-milk-white to-transparent" />
+
+        <motion.div
+          className="flex flex-col gap-2.5"
+          animate={{ y: ["0%", "-50%"] }}
+          transition={{ duration: 58, ease: "linear", repeat: Infinity }}
+        >
+          {trackPosts.map((item, i) => {
+            const sizeClass = i % 4 === 0
+              ? "h-28"
+              : i % 4 === 1
+                ? "h-36"
+                : i % 4 === 2
+                  ? "h-24"
+                  : "h-32";
+
+            return (
+              <motion.div
+                key={`${item.slug}-${i}`}
+                className={`relative overflow-hidden rounded-md border border-seed-shadow/10 ${sizeClass}`}
+                animate={{ x: [0, 5, 0, -4, 0], y: [0, -2, 0, 1, 0], scale: [1, 1.012, 1] }}
+                transition={{ duration: 7.4, repeat: Infinity, ease: "easeInOut", delay: (i % posts.length) * 0.28 }}
+              >
+                <VibeCoverThumb slug={item.slug} />
+                <div className="absolute inset-x-0 bottom-0 px-2 py-1" style={{ background: "linear-gradient(to top, rgba(20,16,13,0.55), transparent)" }}>
+                  <p className="text-[10px] text-white/95 truncate">{item.title}</p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
+    </div>
+  );
 }
 
 // ── 媒体类型标签中文 ──
@@ -99,11 +255,18 @@ function DrawerCoverImg({ slug }: { slug: string }) {
 }
 
 export function AIPracticeClient({ posts }: AIPracticeClientProps) {
+  const listContainerRef = useRef<HTMLDivElement>(null);
   const [selectedPost, setSelectedPost] = useState<VibeCodingPost | null>(null);
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [selectedContent, setSelectedContent] = useState("");
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [showLawflawManualPreview, setShowLawflawManualPreview] = useState(false);
   const [videoUnavailable, setVideoUnavailable] = useState(false);
+  const [burst, setBurst] = useState<{ key: number; x: number; y: number } | null>(null);
+
+  const orderedPosts = useMemo(() => {
+    return [...posts].sort((a, b) => parseYearMonth(b.date) - parseYearMonth(a.date));
+  }, [posts]);
 
   // 内容加载
   useEffect(() => {
@@ -150,22 +313,76 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
   }, [selectedPost]);
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6 overflow-hidden">
+      <SectionGoldFoil />
+
       {/* ── 板块标题 ── */}
-      <div>
+      <div className="relative z-10">
         <h2 className="text-2xl font-serif text-seed-shadow mb-1">Vibe Coding</h2>
         <p className="text-xs text-seed-shadow/40 mb-6">用 AI 工具链从零构建产品原型 — 点击卡片展开详情</p>
       </div>
 
-      {/* ── 项目卡片列表 ── */}
-      <div className="space-y-3">
-        {posts.map((item, i) => {
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* ── 左列：项目卡片列表 ── */}
+        <div ref={listContainerRef} className="relative lg:col-span-8 space-y-3">
+          <AnimatePresence>
+            {burst && (
+              <motion.div key={burst.key} className="absolute inset-0 pointer-events-none z-20">
+                {Array.from({ length: 14 }).map((_, idx) => {
+                  const angle = (Math.PI * 2 * idx) / 14;
+                  const radius = 26 + (idx % 4) * 8;
+                  const dx = Math.cos(angle) * radius;
+                  const dy = Math.sin(angle) * radius;
+                  const size = idx % 3 === 0 ? 6 : 4;
+                  return (
+                    <motion.span
+                      key={idx}
+                      className="absolute rounded-full"
+                      style={{
+                        left: burst.x,
+                        top: burst.y,
+                        width: size,
+                        height: size,
+                        background: idx % 2 === 0 ? "rgba(196,164,96,0.9)" : "rgba(255,228,165,0.95)",
+                        boxShadow: "0 0 8px rgba(196,164,96,0.5)",
+                      }}
+                      initial={{ x: 0, y: 0, opacity: 0.95, scale: 1 }}
+                      animate={{ x: dx, y: dy, opacity: 0, scale: 0.6 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.45, ease: "easeOut" }}
+                    />
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+        {orderedPosts.map((item, i) => {
           const tc = typeColor[item.type] ?? defaultTypeColor;
           return (
             <motion.button
               key={item.slug}
-              onClick={() => setSelectedPost(item)}
-              whileHover={{ y: -2, scale: 1.005 }}
+              onClick={(event) => {
+                const container = listContainerRef.current;
+                if (container) {
+                  const rect = container.getBoundingClientRect();
+                  setBurst({
+                    key: Date.now(),
+                    x: event.clientX - rect.left,
+                    y: event.clientY - rect.top,
+                  });
+                  window.setTimeout(() => setBurst(null), 500);
+                }
+                setSelectedSlug(item.slug);
+                setSelectedPost(item);
+                window.setTimeout(() => setSelectedSlug(null), 520);
+              }}
+              whileHover={{ y: -2, scale: 1.006 }}
+              whileTap={{ scale: 0.996 }}
+              animate={selectedSlug === item.slug ? {
+                boxShadow: ["0 1px 6px rgba(63,46,47,0.05)", "0 0 0 1px rgba(212,175,55,0.35), 0 10px 24px rgba(196,164,96,0.22)", "0 1px 6px rgba(63,46,47,0.05)"],
+                borderColor: ["rgba(63,46,47,0.12)", "rgba(212,175,55,0.45)", "rgba(63,46,47,0.12)"],
+              } : {}}
               transition={{ duration: 0.18, ease: "easeOut" }}
               className="w-full text-left rounded-xl overflow-hidden group"
               style={{
@@ -244,6 +461,12 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
             </motion.button>
           );
         })}
+        </div>
+
+        {/* ── 右列：竖向循环封面流 ── */}
+        <div className="lg:col-span-4 lg:sticky lg:top-4">
+          <VerticalCoverTicker posts={orderedPosts} />
+        </div>
       </div>
 
       {/* ── Drawer（Portal 到 body） ── */}
@@ -344,6 +567,21 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                           </span>
                         );
                       })}
+                      {selectedPost.githubUrl && (
+                        <a
+                          href={selectedPost.githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
+                          style={{
+                            background: "rgba(58,90,64,0.09)",
+                            color: "rgba(38,74,52,0.95)",
+                            border: "1px solid rgba(58,90,64,0.26)",
+                          }}
+                        >
+                          GitHub Repo
+                        </a>
+                      )}
                     </div>
 
                     {/* Project Overview 信息框 */}
@@ -378,6 +616,9 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                             controls
                             preload="metadata"
                             className="w-full bg-black block"
+                            onLoadedMetadata={(event) => {
+                              event.currentTarget.playbackRate = selectedPost.slug === "luma-flow" ? 0.75 : 1;
+                            }}
                             onError={() => setVideoUnavailable(true)}
                           >
                             <source src={encodePublicFilePath(`/works/vibe/${selectedPost.slug}.mp4`)} type="video/mp4" />

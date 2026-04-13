@@ -175,7 +175,7 @@ export function ClassicalMap() {
   const [view, setView] = useState<MapView>("world");
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full max-w-3xl">
       {/* ── 标题行 ── */}
       <div className="mb-3 flex items-baseline gap-3">
         <p
@@ -228,7 +228,8 @@ function WorldMapView({ onChinaClick }: { onChinaClick: () => void }) {
     } else if (names) {
       setTooltipContent(`${names.en} · ${names.zh}`);
     } else {
-      setTooltipContent(geoId);
+      // 避免向用户暴露纯数字国家编码（如 578），改为友好兜底文案
+      setTooltipContent("Unknown territory · 未收录地区");
     }
   }, []);
 

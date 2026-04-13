@@ -10,6 +10,7 @@ export interface VibeCodingPost {
   mediaType: VibeMediaType;
   sourceFiles: string[];
   contentFile: string;
+  githubUrl?: string;
   content?: string;
 }
 
@@ -33,8 +34,9 @@ export const vibeCodingPosts: VibeCodingPost[] = [
     tags: ["Vibe Coding", "Language Learning", "Google AI Studio", "Product Architecture"],
     type: "Product Prototype",
     mediaType: "video",
-    sourceFiles: ["luma-flow.mp4（待上传）"],
+    sourceFiles: ["luma-flow.mp4"],
     contentFile: "luma-flow.md",
+    githubUrl: "https://github.com/Irokoooo/Luma-Flow",
   },
   {
     slug: "portfolio-early-version",

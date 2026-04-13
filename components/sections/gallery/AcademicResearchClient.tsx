@@ -3,7 +3,7 @@
 // 左列：科研项目 + 调研项目（可交互）
 // 右列：社会实践（非交互卡片）+ 自学笔记（可交互）
 import { createPortal } from "react-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -209,13 +209,6 @@ interface FieldExperience {
 
 const fieldExperiences: FieldExperience[] = [
   {
-    title: "北京国际短片节 (BISFF)",
-    role: "国际组联络志愿者",
-    tags: ["国际交流", "双语宣发", "媒体统筹"],
-    desc: "统筹现场执行与国际文化交流，负责双语媒体宣传，展现跨文化沟通与媒体统筹能力。",
-    period: "2025.10 — 2025.12",
-  },
-  {
     title: "深圳国际世博会 (Shenzhen Expo)",
     role: "外事协调组志愿者",
     tags: ["跨文化沟通", "外宾接待", "现场统筹"],
@@ -223,21 +216,77 @@ const fieldExperiences: FieldExperience[] = [
     period: "2024.09 — 2025.06",
   },
   {
+    title: "北京国际短片节 (BISFF)",
+    role: "国际组联络志愿者",
+    tags: ["国际交流", "双语宣发", "媒体统筹"],
+    desc: "统筹现场执行与国际文化交流，负责双语媒体宣传，展现跨文化沟通与媒体统筹能力。",
+    period: "2025.10 — 2025.12",
+  },
+  {
     title: "SheNicest 深圳黑客松 (Hackathon)",
     role: "统筹志愿者 & 软件组参与者",
     tags: ["GenAI 赋能", "Prompt 调优", "跨界参与"],
     desc: "统筹赛事现场执行与流程推进，同时作为参赛团队外部伙伴提供 AI Prompt 调优与应用建议指导。",
-    period: "2024",
+    period: "2026.03",
   },
 ];
 
 export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
   const [selectedPost, setSelectedPost] = useState<AcademicResearchPost | null>(null);
+  const [selectedContent, setSelectedContent] = useState("");
+  const [isLoadingContent, setIsLoadingContent] = useState(false);
   const isDrawerOpen = selectedPost !== null;
 
   // 分离科研/调研与自学笔记
   const researchAndFieldwork = posts.filter((p) => p.category === "research" || p.category === "fieldwork");
   const learningNotes = posts.filter((p) => p.category === "learning");
+
+  useEffect(() => {
+    if (!selectedPost) {
+      setSelectedContent("");
+      setIsLoadingContent(false);
+      return;
+    }
+
+    if (selectedPost.content && selectedPost.content.trim().length > 0) {
+      setSelectedContent(selectedPost.content);
+      setIsLoadingContent(false);
+      return;
+    }
+
+    if (!selectedPost.contentFile) {
+      setSelectedContent("");
+      setIsLoadingContent(false);
+      return;
+    }
+
+    const contentFile = selectedPost.contentFile;
+
+    let cancelled = false;
+
+    async function loadMarkdown() {
+      setIsLoadingContent(true);
+      try {
+        const res = await fetch(`/api/academic-content?file=${encodeURIComponent(contentFile)}`);
+        if (!res.ok) throw new Error("failed");
+        const data = (await res.json()) as { content?: string };
+        if (!cancelled) {
+          setSelectedContent(data.content ?? "正文暂未同步，请检查学术 md 文件。");
+        }
+      } catch {
+        if (!cancelled) {
+          setSelectedContent("加载正文失败，请检查 academic content API 与 md 文件映射。");
+        }
+      } finally {
+        if (!cancelled) setIsLoadingContent(false);
+      }
+    }
+
+    loadMarkdown();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPost]);
 
   return (
     <div className="relative">
@@ -610,7 +659,12 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                     </p>
                   </div>
 
-                  {selectedPost.content && (
+                  {isLoadingContent ? (
+                    <div className="flex items-center gap-2 py-4">
+                      <div className="w-4 h-4 border-2 border-seed-shadow/20 border-t-seed-shadow/60 rounded-full animate-spin" />
+                      <p className="text-sm text-seed-shadow/40">正在加载正文...</p>
+                    </div>
+                  ) : selectedContent ? (
                     <div className="prose prose-sm max-w-none
                       prose-headings:font-serif prose-headings:text-seed-shadow
                       prose-h2:text-lg prose-h3:text-base
@@ -622,9 +676,11 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                       prose-li:text-seed-shadow/70 prose-li:leading-relaxed
                       prose-hr:border-seed-shadow/8">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {selectedPost.content}
+                        {selectedContent}
                       </ReactMarkdown>
                     </div>
+                  ) : (
+                    <p className="text-sm text-seed-shadow/45">该条目暂未配置正文内容。</p>
                   )}
                 </div>
               </div>

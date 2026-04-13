@@ -35,10 +35,10 @@ export function NextDestSection() {
         {/* 三个志向条目 */}
         <ul className="space-y-4">
 
-          {/* 🌍 Academic Anchor */}
+          {/* 🇪🇺 Academic Anchor */}
           <li className="border border-gray-100 p-4 space-y-1.5 hover:border-gray-200 transition-colors">
             <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-base leading-none">🌍</span>
+              <span className="text-base leading-none">🇪🇺</span>
               <h3 className="text-sm font-semibold text-gray-900 font-serif">
                 Academic Anchor
               </h3>
@@ -82,6 +82,20 @@ export function NextDestSection() {
             </div>
             <p className="text-xs text-gray-600 leading-relaxed">
               伴海而生，以此为志。我的人生终极目标是投身太平洋塑料治理，清除海洋生态污染，还生灵一片纯净海域。
+            </p>
+          </li>
+
+          {/* 🌍 Area Studies & Global South */}
+          <li className="border border-gray-100 p-4 space-y-1.5 hover:border-gray-200 transition-colors">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-base leading-none">🌍</span>
+              <h3 className="text-sm font-semibold text-gray-900 font-serif">
+                Area Studies &amp; Global South
+              </h3>
+              <span className="text-xs text-gray-400">区域国别与全球发展</span>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              致力于解码“全球南方”的增长逻辑。结合国际经贸专业背景，深度调研中国经验（如特高压基建）在不同国别环境下的落地差异。通过田野调查与实证分析，探索东南亚及非洲乡村转型的多元路径，为全球治理贡献来自一线的数据洞察。
             </p>
           </li>
 

@@ -2,14 +2,6 @@
 export function SideWorksSection() {
   const works = [
     {
-      emoji: "🎬",
-      title: "北京国际短片节 (BISFF)",
-      role: "国际组联络志愿者",
-      tags: ["国际交流", "双语宣发", "媒体统筹"],
-      desc: "统筹现场执行与国际文化交流，负责双语媒体宣传，展现跨文化沟通与媒体统筹能力。",
-      period: "2025.10 — 2025.12",
-    },
-    {
       emoji: "🌍",
       title: "深圳国际世博会 (Shenzhen Expo)",
       role: "外事协调组志愿者",
@@ -18,20 +10,28 @@ export function SideWorksSection() {
       period: "2024.09 — 2025.06",
     },
     {
-      emoji: "⚡",
-      title: "SheNicest 深圳黑客松 (Hackathon)",
-      role: "统筹志愿者 & 软件组参与者",
-      tags: ["GenAI 赋能", "Prompt 调优", "跨界参与"],
-      desc: "统筹赛事现场执行与流程推进，同时作为参赛团队外部伙伴提供 AI Prompt 调优与应用建议指导。",
-      period: "2024",
-    },
-    {
       emoji: "🌾",
       title: "北京密云产销合作调研",
       role: "田野调查核心队员",
       tags: ["Python 可视化", "田野调查", "策略报告"],
       desc: "深入乡村一线，运用 Python 进行产销图谱可视化，并主笔 5000 字数字化推广策略报告。",
       period: "2025.06 — 2025.08",
+    },
+    {
+      emoji: "🎬",
+      title: "北京国际短片节 (BISFF)",
+      role: "国际组联络志愿者",
+      tags: ["国际交流", "双语宣发", "媒体统筹"],
+      desc: "统筹现场执行与国际文化交流，负责双语媒体宣传，展现跨文化沟通与媒体统筹能力。",
+      period: "2025.10 — 2025.12",
+    },
+    {
+      emoji: "⚡",
+      title: "SheNicest 深圳黑客松 (Hackathon)",
+      role: "统筹志愿者 & 软件组参与者",
+      tags: ["GenAI 赋能", "Prompt 调优", "跨界参与"],
+      desc: "统筹赛事现场执行与流程推进，同时作为参赛团队外部伙伴提供 AI Prompt 调优与应用建议指导。",
+      period: "2026.03",
     },
   ];
 

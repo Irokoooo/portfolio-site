@@ -6,6 +6,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView, type Variants } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // ─────────────────────────────────────────
 // 类型定义
@@ -14,6 +16,7 @@ import { motion, AnimatePresence, useInView, type Variants } from 'framer-motion
 interface MetricCard {
   label: string;
   value: string;    // 数字部分（如 "500", "33.3"）
+  prefix?: string;
   unit?: string;
   suffix?: string;  // 数字后缀（如 "+", "%"）
 }
@@ -34,6 +37,8 @@ interface Experience {
   quote?: string;
   bullets: string[];
   skills?: string[];
+  markdownContent?: string;
+  galleryImages?: string[];
 }
 
 interface HonorItem {
@@ -59,52 +64,7 @@ const HONOR_ICONS = [
 // 数据
 // ─────────────────────────────────────────
 
-const experiences: Experience[] = [
-  {
-    id: 'tal',
-    type: 'internship',
-    org: '好未来教育集团',
-    orgEn: 'TAL Education Group',
-    role: '数字化教研产品实习生 · AI Workflow',
-    direction: 'Think Kids 海外业务 (国际数学竞赛教研)',
-    period: '2025.11 — 至今',
-    periodShort: '2025.11 —',
-    logoSrc: '/assets/icons/tal.svg',
-    tag: 'AI 工程',
-    metrics: [
-      { label: 'SOP 手册沉淀', value: '30', suffix: '+', unit: '份' },
-      { label: '翻译校对总词量', value: '50', suffix: '+', unit: '万词' },
-      { label: '错误率降低', value: '80', suffix: '%' },
-    ],
-    bullets: [
-      '1 周内完成 36 本数学教材、共计 50 万+词的本地化翻译与校对，较传统人工模式提效 500% 以上。',
-      '自研交互式教具网站，历经 20+ 个版本迭代，覆盖坐标轴、几何展开图等 8 类高频数学教研场景。',
-      '通过多 Agent 并行评分与格式审查架构，将场景化翻译错误率降低 80%。',
-      '针对新场景从 0 到 1 沉淀 30+ 份 SOP 手册，覆盖 Agent 复用、题库标签等全流程。',
-    ],
-    skills: ['AI Workflow', 'Multi-Agent', 'PRD 撰写', 'SOP 标准化'],
-  },
-  {
-    id: 'func',
-    type: 'internship',
-    org: '上海函数猫有限公司',
-    orgEn: 'Shanghai FuncCat Co.',
-    role: '产品运营实习生 · UX 优化 / 需求转化',
-    period: '2025.07 — 2025.09',
-    periodShort: '2025 夏',
-    logoSrc: '/assets/icons/fc.svg',
-    tag: '产品设计',
-    metrics: [
-      { label: '结构化 PRD', value: '20', suffix: '+', unit: '条' },
-      { label: '原始用户评价', value: '1000', suffix: '+', unit: '条' },
-      { label: '高保真落地', value: '100', suffix: '%' },
-    ],
-    bullets: [
-      '将模糊痛点精准转化为 20+ 条结构化需求清单（PRD），确保功能 100% 高保真落地。',
-      '在用户反馈闭环建设中，利用 SQL/Python 对 1000+ 条原始用户评价进行特征提取与聚类分析。',
-    ],
-    skills: ['SQL', 'Python', 'PRD', '用户研究'],
-  },
+const educationExperiences: Experience[] = [
   {
     id: 'lingnan',
     type: 'education',
@@ -133,7 +93,7 @@ const experiences: Experience[] = [
     periodShort: '2024 —',
     logoSrc: '/assets/icons/muc.svg',
     tag: '主校',
-    quote: '国际经贸底色，量化研究起点。在这里完成了从传统经济学到 AI 辅助研究的思维跨越。',
+    quote: '国际经贸底色，科研量化研究起点。在这里踏上了属于自己的大学之旅',
     bullets: [
       '主修国际经济与贸易。',
       '积极参与学校各类活动，包括学术科研、创赛商赛，探索不同场景下对于个人能力的要求，争做一体机。',
@@ -142,6 +102,10 @@ const experiences: Experience[] = [
     skills: ['经济学', '国际贸易', 'Stata', 'Python', '学术写作'],
   },
 ];
+
+interface InternshipsApiResponse {
+  internships: Experience[];
+}
 
 // 横向时间轴真实数据（按时间倒序）
 // iconSrc 按 HONOR_ICONS 循环分配：award → medal → star → award → ...
@@ -437,6 +401,8 @@ function ExperienceCard({ exp, isActive, onClick }: ExperienceCardProps) {
 // ─────────────────────────────────────────
 
 function DetailPanel({ exp }: { exp: Experience }) {
+  const hasMarkdown = typeof exp.markdownContent === 'string' && exp.markdownContent.length > 0;
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -449,37 +415,6 @@ function DetailPanel({ exp }: { exp: Experience }) {
       >
         {/* paper-panel 类使用真实羊皮纸纹理（parchment.jpg），详见 globals.css */}
         <div className="paper-panel rounded-2xl h-full p-6 flex flex-col gap-5">
-
-          {/* 顶部：机构 Logo + 名称 + 日期 */}
-          <div className="flex items-start justify-between gap-3 pb-4 border-b border-seed-shadow/6">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                {/* 大尺寸机构 Logo */}
-                <OrgLogo src={exp.logoSrc} size="lg" />
-                <div>
-                  <h3 className="text-xl font-serif font-semibold text-seed-shadow leading-tight">{exp.org}</h3>
-                  <p className="text-xs text-seed-shadow/40">{exp.orgEn}</p>
-                </div>
-              </div>
-              <p className="text-sm text-seed-shadow/70 mt-1.5 font-medium">{exp.role}</p>
-              {exp.direction && (
-                <p className="text-sm text-seed-shadow/60 mt-1">{exp.direction}</p>
-              )}
-            </div>
-            <div className="shrink-0 text-right">
-              <span className="inline-block bg-strawberry-jam/8 text-strawberry-jam text-xs font-semibold px-3 py-1.5 rounded-lg border border-strawberry-jam/15">
-                {exp.period}
-              </span>
-              <div className="mt-1.5">
-                <span className={[
-                  'inline-block text-[10px] px-2 py-0.5 rounded-full font-medium',
-                  exp.type === 'internship' ? 'bg-leaf-green/12 text-leaf-green' : 'bg-seed-shadow/8 text-seed-shadow/60',
-                ].join(' ')}>
-                  {exp.type === 'internship' ? '实习经历' : '教育背景'}
-                </span>
-              </div>
-            </div>
-          </div>
 
           {/* 指标看板（含 Odometer）或 Ink Reveal Quote */}
           {exp.metrics && exp.metrics.length > 0 ? (
@@ -498,6 +433,11 @@ function DetailPanel({ exp }: { exp: Experience }) {
                     >
                       <p className="text-[10px] text-seed-shadow/50 mb-1 leading-snug">{m.label}</p>
                       <p className="text-xl font-serif font-bold text-leaf-green leading-none">
+                        {m.prefix && (
+                          <span className="text-xs font-sans font-normal text-seed-shadow/40 mr-0.5 align-middle">
+                            {m.prefix}
+                          </span>
+                        )}
                         <Odometer
                           target={numVal}
                           decimals={isDecimal ? 1 : 0}
@@ -526,19 +466,45 @@ function DetailPanel({ exp }: { exp: Experience }) {
             </div>
           ) : null}
 
-          {/* 核心职责 */}
+          {/* 核心职责 / Markdown 正文 */}
           <div className="flex-1">
-            <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2.5">
-              Highlights · 核心职责
-            </p>
-            <ul className="space-y-2.5">
-              {exp.bullets.map((b, i) => (
-                <li key={i} className="flex items-start gap-2.5 group/item">
-                  <span className="mt-1 shrink-0 w-1.5 h-1.5 rounded-full bg-leaf-green/60 group-hover/item:bg-leaf-green transition-colors duration-200" />
-                  <span className="text-xs text-seed-shadow/70 leading-relaxed group-hover/item:text-seed-shadow transition-colors duration-200">{b}</span>
-                </li>
-              ))}
-            </ul>
+            {hasMarkdown ? (
+              <div>
+                <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2.5">
+                  Experience Notes · 经历正文
+                </p>
+                <div className="prose prose-sm max-w-none
+                  prose-headings:font-serif prose-headings:text-seed-shadow
+                  prose-h2:text-base prose-h3:text-sm
+                  prose-p:text-seed-shadow/70 prose-p:leading-relaxed
+                  prose-strong:text-seed-shadow prose-strong:font-medium
+                  prose-code:text-seed-shadow/70 prose-code:bg-cream-pour/60 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+                  prose-pre:bg-cream-pour/40 prose-pre:border prose-pre:border-seed-shadow/8 prose-pre:rounded-lg
+                  prose-blockquote:border-l-leaf-green/40 prose-blockquote:text-seed-shadow/55
+                  prose-table:text-xs prose-th:bg-cream-pour/50 prose-th:text-seed-shadow/70 prose-th:font-medium
+                  prose-td:text-seed-shadow/60
+                  prose-a:text-leaf-green prose-a:underline prose-a:underline-offset-2
+                  prose-li:text-seed-shadow/70 prose-li:leading-relaxed
+                  prose-hr:border-seed-shadow/8"
+                >
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{exp.markdownContent}</ReactMarkdown>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2.5">
+                  Highlights · 核心职责
+                </p>
+                <ul className="space-y-2.5">
+                  {exp.bullets.map((b, i) => (
+                    <li key={i} className="flex items-start gap-2.5 group/item">
+                      <span className="mt-1 shrink-0 w-1.5 h-1.5 rounded-full bg-leaf-green/60 group-hover/item:bg-leaf-green transition-colors duration-200" />
+                      <span className="text-xs text-seed-shadow/70 leading-relaxed group-hover/item:text-seed-shadow transition-colors duration-200">{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
 
           {/* 技能标签 */}
@@ -553,6 +519,28 @@ function DetailPanel({ exp }: { exp: Experience }) {
                     {s}
                   </span>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* 可选：自动滚动成果图（仅当 md frontmatter 配置 galleryImages 时显示） */}
+          {exp.type === 'internship' && exp.galleryImages && exp.galleryImages.length > 0 && (
+            <div className="pt-3 border-t border-seed-shadow/6">
+              <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2">
+                Work Showcase · 成果图片滚动栏
+              </p>
+              <div className="relative overflow-hidden rounded-lg border border-seed-shadow/10 bg-milk-white/45 py-4">
+                <motion.div
+                  className="flex items-center gap-4"
+                  animate={{ x: ['0%', '-50%'] }}
+                  transition={{ duration: 36, ease: 'linear', repeat: Infinity }}
+                >
+                  {[...exp.galleryImages, ...exp.galleryImages].map((src, i) => (
+                    <div key={`${src}-${i}`} className="w-64 h-40 shrink-0 rounded-md overflow-hidden border border-seed-shadow/10 bg-cream-pour/40">
+                      <img src={src} alt="工作成果图" className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </motion.div>
               </div>
             </div>
           )}
@@ -688,7 +676,8 @@ function TimelineNode({ honor, index }: { honor: HonorItem; index: number }) {
 // ─────────────────────────────────────────
 
 export function CareerSection() {
-  const [activeExp, setActiveExp] = useState<Experience>(experiences[0]);
+  const [internshipExperiences, setInternshipExperiences] = useState<Experience[]>([]);
+  const [activeExp, setActiveExp] = useState<Experience | null>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const honorsSectionRef = useRef<HTMLDivElement>(null);
   const guideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -698,6 +687,44 @@ export function CareerSection() {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadInternships() {
+      try {
+        const response = await fetch('/api/career-internships');
+        if (!response.ok) return;
+        const data = (await response.json()) as InternshipsApiResponse;
+        if (!mounted) return;
+        setInternshipExperiences(data.internships ?? []);
+      } catch {
+        if (mounted) setInternshipExperiences([]);
+      }
+    }
+
+    loadInternships();
+
+    // 预热接口缓存，减少用户首次点开时的等待感
+    void fetch('/api/career-internships', { cache: 'force-cache' }).catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (internshipExperiences.length === 0) return;
+    const allExperiences = [...internshipExperiences, ...educationExperiences];
+    const stillExists = activeExp ? allExperiences.some((item) => item.id === activeExp.id) : false;
+    if (!activeExp) {
+      setActiveExp(internshipExperiences[0]);
+      return;
+    }
+    if (!stillExists) {
+      setActiveExp(internshipExperiences[0]);
+    }
+  }, [internshipExperiences, activeExp]);
 
   function onMouseDown(e: React.MouseEvent) {
     if (!timelineRef.current) return;
@@ -793,15 +820,15 @@ export function CareerSection() {
           <motion.p variants={itemVariants} className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest px-1 mb-0.5">
             Internships · 核心实习
           </motion.p>
-          {experiences.filter(e => e.type === 'internship').map(exp => (
-            <ExperienceCard key={exp.id} exp={exp} isActive={activeExp.id === exp.id} onClick={() => handleExperienceSelect(exp)} />
+          {internshipExperiences.map(exp => (
+            <ExperienceCard key={exp.id} exp={exp} isActive={activeExp?.id === exp.id} onClick={() => handleExperienceSelect(exp)} />
           ))}
 
           <motion.p variants={itemVariants} className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest px-1 mt-2 mb-0.5">
             Education · 教育背景
           </motion.p>
-          {experiences.filter(e => e.type === 'education').map(exp => (
-            <ExperienceCard key={exp.id} exp={exp} isActive={activeExp.id === exp.id} onClick={() => handleExperienceSelect(exp)} />
+          {educationExperiences.map(exp => (
+            <ExperienceCard key={exp.id} exp={exp} isActive={activeExp?.id === exp.id} onClick={() => handleExperienceSelect(exp)} />
           ))}
         </motion.div>
 
@@ -811,7 +838,13 @@ export function CareerSection() {
           className="lg:col-span-7 lg:sticky lg:top-8 lg:self-start"
           style={{ minHeight: '420px' }}
         >
-          <DetailPanel exp={activeExp} />
+          {activeExp ? (
+            <DetailPanel exp={activeExp} />
+          ) : (
+            <div className="paper-panel rounded-2xl h-full min-h-[420px] p-6 flex items-center justify-center text-seed-shadow/40">
+              正在加载实习数据...
+            </div>
+          )}
         </motion.div>
       </div>
 

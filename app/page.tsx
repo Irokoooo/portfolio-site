@@ -63,7 +63,7 @@ const navItems: NavItem[] = [
   { key: "about",     icon: "/assets/icons/about.svg",             label: "About me",           sublabel: "关于我",     watermark: "XY",      hasDrilldown: false },
   { key: "career",    icon: "/assets/icons/career.svg",            label: "Career journey",     sublabel: "教育与经历", watermark: "JOURNEY" },
   { key: "sideworks", icon: "/assets/icons/sideworks.svg",         label: "Side works",         sublabel: "作品集",     watermark: "CRAFT",   hasDrilldown: true },
-  { key: "projects",  icon: "/assets/icons/project-highlights.svg", label: "Research",          sublabel: "学术与实践", watermark: "RESEARCH" },
+  { key: "projects",  icon: "/assets/icons/project-highlights.svg", label: "Academic & Practice", sublabel: "学术与实践", watermark: "RESEARCH" },
   { key: "interests", icon: "/assets/icons/interests.svg",         label: "My interests",       sublabel: "兴趣领域",   watermark: "IDEAS" },
   { key: "nextdest",  icon: "/assets/icons/destination.svg",       label: "Next destination",   sublabel: "申请规划",   watermark: "NEXT" },
 ];

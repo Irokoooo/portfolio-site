@@ -1,0 +1,230 @@
+
+================================================================================
+                    PDF FILES INFORMATION REPORT
+              Directory: E:\portfolio-site\个人资料\作品（待分类）
+================================================================================
+
+EXECUTIVE SUMMARY
+-----------------
+Total PDF Files: 13
+Total Size: 168621.51 KB (164.67 MB)
+Total Pages: 331 pages
+Average Pages per Document: 25.5
+
+DETAILED FILE LIST
+-------------------
+
+[1] FILE: CDA_1级知识点汇总.pdf
+    Pages: 37
+    Size: 30935.60 KB
+    First Page Summary: 
+    📕
+CDA 1级知识点汇总
+第⼀章：数据分析思维
+⾼度概括当前及未来社会的商业环境特征词汇：
+VUCA
+Volatility;Uncertainty;Complexity;Ambiguity
+指对客观
+    
+
+[2] FILE: Finance group project.pdf
+    Pages: 9
+    Size: 939.62 KB
+    First Page Summary: 
+    Exchange Rate Project
+Testing Exchange Rate Theories: PPP and MAER
+MARK TSUN YIN (4300680)
+ORTIZ PAR
+    
+
+[3] FILE: Individual assignment.pdf
+    Pages: 4
+    Size: 1397.93 KB
+    First Page Summary: 
+    [No text extracted]
+    
+
+[4] FILE: International Business Mgt(1).pdf
+    Pages: 41
+    Size: 9300.58 KB
+    First Page Summary: 
+    PLANNING Business
+The Complete Journey:
+Navigating High Value & High Complexity
+Presented by: Seraph
+    
+
+[5] FILE: LawFlaw AI使用手册.pdf
+    Pages: 4
+    Size: 17807.67 KB
+    First Page Summary: 
+    智能合规系统使⽤⼿册
+LawFlaw AI
+*⽂档版本：V1.3
+*更新⽇期：2025年11⽉16⽇
+LawFlow AI 是⾯向涉外法律实务领域的智能合规问答与合同审
+核平台，服务于企业、法律从业者
+    
+
+[6] FILE: 从交易中介到多层级供应链服务商：中国钢铁贸易产业转型升级研究(2).pdf
+    Pages: 21
+    Size: 2037.82 KB
+    First Page Summary: 
+    [No text extracted]
+    
+
+[7] FILE: 北京密云区农产品产销合作调研报告.pdf
+    Pages: 91
+    Size: 6400.63 KB
+    First Page Summary: 
+    [No text extracted]
+    
+
+[8] FILE: 国际商务分析temu案例节选.pdf
+    Pages: 14
+    Size: 2141.72 KB
+    First Page Summary: 
+    Chapter 4 Theoretical Foundation
+4.1 Overall Analytical Framework: "Diagnostic" Three-Layer Perspect
+    
+
+[9] FILE: 小民快跑ppt.pdf
+    Pages: 20
+    Size: 5914.95 KB
+    First Page Summary: 
+    中央民族大学第三届“经创杯”
+校园拼车出行新模式
+经创杯 小民快跑队
+    
+
+[10] FILE: 本科创意组-新文科-巧愿·学者芸窗：以文化书吧实体IP赋能文娱社交app的运营创业实践(1).pdf
+    Pages: 27
+    Size: 19902.00 KB
+    First Page Summary: 
+    ⻘年创意孵化 × 社区服务 × 银发经济
+窗
+芸
+者
+学
+·
+愿
+巧
+巧愿·
+学者芸窗
+以⽂化书吧实体IP赋能⽂娱社交app的运营创业实践
+中国传媒⼤学、中央⺠族⼤学
+    
+
+[11] FILE: 烽智安新——全场景具身智能消防机器人系统.pdf
+    Pages: 26
+    Size: 3896.42 KB
+    First Page Summary: 
+    第十六届全国大学生电子商务“创新、创意、创业”挑战赛作品
+城市末端消防“最后一公里”守护者
+焱盾智创（中央民族大学）
+    
+
+[12] FILE: 特高压输电ppt.pdf
+    Pages: 12
+    Size: 65619.60 KB
+    First Page Summary: 
+    能源新基建对生产性服务业
+精准赋能效应研究:
+基于特高压工程与数字化依赖的视角
+数字化依赖 特高压输电工程 能源新基建 生产性服务业 能源-算力融合
+答辩/主撰稿人：史心怡
+24级国际经济与贸易
+    
+
+[13] FILE: 特高压输电论文.pdf
+    Pages: 25
+    Size: 2326.97 KB
+    First Page Summary: 
+    Energy-Computing Synergy: How UHV Projects and Digital
+Dependence Empower Producer Services
+YuequnCa
+    
+
+================================================================================
+STRUCTURED DATA (JSON FORMAT)
+================================================================================
+[
+  {
+    "name": "CDA_1级知识点汇总.pdf",
+    "pages": 37,
+    "size_kb": 30935.6,
+    "first_page_summary": "📕\nCDA 1级知识点汇总\n第⼀章：数据分析思维\n⾼度概括当前及未来社会的商业环境特征词汇：\nVUCA\nVolatility;Uncertainty;Complexity;Ambiguity\n指对客观"
+  },
+  {
+    "name": "Finance group project.pdf",
+    "pages": 9,
+    "size_kb": 939.62,
+    "first_page_summary": "Exchange Rate Project\nTesting Exchange Rate Theories: PPP and MAER\nMARK TSUN YIN (4300680)\nORTIZ PAR"
+  },
+  {
+    "name": "Individual assignment.pdf",
+    "pages": 4,
+    "size_kb": 1397.93,
+    "first_page_summary": ""
+  },
+  {
+    "name": "International Business Mgt(1).pdf",
+    "pages": 41,
+    "size_kb": 9300.58,
+    "first_page_summary": "PLANNING Business\nThe Complete Journey:\nNavigating High Value & High Complexity\nPresented by: Seraph"
+  },
+  {
+    "name": "LawFlaw AI使用手册.pdf",
+    "pages": 4,
+    "size_kb": 17807.67,
+    "first_page_summary": "智能合规系统使⽤⼿册\nLawFlaw AI\n*⽂档版本：V1.3\n*更新⽇期：2025年11⽉16⽇\nLawFlow AI 是⾯向涉外法律实务领域的智能合规问答与合同审\n核平台，服务于企业、法律从业者"
+  },
+  {
+    "name": "从交易中介到多层级供应链服务商：中国钢铁贸易产业转型升级研究(2).pdf",
+    "pages": 21,
+    "size_kb": 2037.82,
+    "first_page_summary": ""
+  },
+  {
+    "name": "北京密云区农产品产销合作调研报告.pdf",
+    "pages": 91,
+    "size_kb": 6400.63,
+    "first_page_summary": ""
+  },
+  {
+    "name": "国际商务分析temu案例节选.pdf",
+    "pages": 14,
+    "size_kb": 2141.72,
+    "first_page_summary": "Chapter 4 Theoretical Foundation\n4.1 Overall Analytical Framework: \"Diagnostic\" Three-Layer Perspect"
+  },
+  {
+    "name": "小民快跑ppt.pdf",
+    "pages": 20,
+    "size_kb": 5914.95,
+    "first_page_summary": "中央民族大学第三届“经创杯”\n校园拼车出行新模式\n经创杯 小民快跑队"
+  },
+  {
+    "name": "本科创意组-新文科-巧愿·学者芸窗：以文化书吧实体IP赋能文娱社交app的运营创业实践(1).pdf",
+    "pages": 27,
+    "size_kb": 19902.0,
+    "first_page_summary": "⻘年创意孵化 × 社区服务 × 银发经济\n窗\n芸\n者\n学\n·\n愿\n巧\n巧愿·\n学者芸窗\n以⽂化书吧实体IP赋能⽂娱社交app的运营创业实践\n中国传媒⼤学、中央⺠族⼤学"
+  },
+  {
+    "name": "烽智安新——全场景具身智能消防机器人系统.pdf",
+    "pages": 26,
+    "size_kb": 3896.42,
+    "first_page_summary": "第十六届全国大学生电子商务“创新、创意、创业”挑战赛作品\n城市末端消防“最后一公里”守护者\n焱盾智创（中央民族大学）"
+  },
+  {
+    "name": "特高压输电ppt.pdf",
+    "pages": 12,
+    "size_kb": 65619.6,
+    "first_page_summary": "能源新基建对生产性服务业\n精准赋能效应研究:\n基于特高压工程与数字化依赖的视角\n数字化依赖 特高压输电工程 能源新基建 生产性服务业 能源-算力融合\n答辩/主撰稿人：史心怡\n24级国际经济与贸易"
+  },
+  {
+    "name": "特高压输电论文.pdf",
+    "pages": 25,
+    "size_kb": 2326.97,
+    "first_page_summary": "Energy-Computing Synergy: How UHV Projects and Digital\nDependence Empower Producer Services\nYuequnCa"
+  }
+]

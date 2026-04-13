@@ -1,0 +1,137 @@
+# .cursorrules — Cursor / GitHub Copilot 项目规则
+
+## ⚠️ 强制要求：接手项目前必须阅读
+
+在对本项目进行任何修改前，请先阅读以下文件：
+1. `CLAUDE.md` — 项目核心记忆（架构、技术栈、禁止行为）
+2. `docs/PROJECT_SPEC.md` — 完整功能需求规范
+3. `docs/ACTIVE_CONTEXT.md` — 当前工作焦点
+4. `docs/PROGRESS.md` — 已完成进度
+
+---
+
+## 项目基本信息
+
+**项目类型**：个人作品集网站（Next.js 14 + Tailwind CSS + MDX）
+**部署平台**：Vercel
+**开发模式**：Vibe Coding（人类架构师 + AI 执行者）
+
+---
+
+## 技术栈约束
+
+### 必须使用
+- Next.js 14（App Router）
+- TypeScript（所有文件必须是 .ts / .tsx）
+- Tailwind CSS（样式全部用 Tailwind 类）
+- MDX（内容管理）
+
+### 绝对禁止
+- Redux / Zustand（状态过于简单，不需要全局状态管理）
+- GraphQL（无后端，不需要）
+- 重型 UI 库（Material UI / Ant Design / Chakra UI）
+- 内联 style 属性（`style={{}}` 除非无法避免）
+- 额外的 `.css` / `.scss` 文件（除 `globals.css`）
+
+---
+
+## 代码规范
+
+### 文件命名
+- React 组件：`PascalCase.tsx`（如 `HeroSection.tsx`）
+- 工具函数：`camelCase.ts`（如 `mdxUtils.ts`）
+- 页面文件：`page.tsx`（Next.js 规范）
+- 布局文件：`layout.tsx`（Next.js 规范）
+
+### 组件规范
+```typescript
+// ✅ 正确：有明确类型定义
+interface HeroSectionProps {
+  title: string;
+  subtitle?: string;
+}
+
+export function HeroSection({ title, subtitle }: HeroSectionProps) {
+  return <div>...</div>;
+}
+
+// ❌ 错误：缺少类型
+export function HeroSection({ title, subtitle }) {
+  return <div>...</div>;
+}
+```
+
+### 注释规范
+- 关键业务逻辑用**中文**注释
+- 简单的技术实现可不加注释
+- 组件功能在文件顶部用一行中文说明
+
+### Server vs Client Components
+- **默认使用 Server Components**（无 `'use client'`）
+- 只有以下情况才加 `'use client'`：
+  - 需要 `useState` / `useEffect` 等 Hooks
+  - 需要事件监听（onClick、onChange 等）
+  - 需要访问浏览器 API
+
+---
+
+## 目录结构
+
+```
+app/           → Next.js 页面（遵循 App Router 规范）
+components/    → 可复用组件
+  ui/          → 基础 UI 组件（无业务逻辑）
+  sections/    → 页面区块（有业务内容）
+  layout/      → 导航栏、Footer 等
+content/       → MDX 内容文件（作者维护）
+  projects/    → 项目详情 .mdx
+  blog/        → 学习日志 .mdx
+  lab/         → AI 实验室 .mdx
+lib/           → 工具函数（纯 TypeScript）
+public/        → 静态资源
+docs/          → 项目文档（不要修改，除非被要求）
+github/        → GitHub Skills 参考（只读，绝对不要修改）
+```
+
+---
+
+## 设计规范
+
+### Notion 极简风格
+- 白色背景 `bg-white`
+- 深色文字 `text-gray-900`
+- 细边框 `border border-gray-100`
+- 克制动画（仅 hover 和入场）
+- 大量留白（`py-16`, `py-24` 等）
+
+### 字体（必须使用，不得替换）
+- 标题：`font-serif`（Instrument Serif）
+- 正文：`font-sans`（Geist Sans）
+- 代码：`font-mono`（Geist Mono）
+
+### 禁止使用的字体
+- Inter, Roboto, Arial, Space Grotesk（太通用，缺乏个性）
+
+### 颜色约束
+- 不使用紫色渐变（`from-purple-500 to-blue-500` 等典型 AI 生成风格）
+- 不使用超过 3 种颜色
+- 强调色保持低饱和度
+
+---
+
+## 完成工作后必须执行
+
+每次完成一批修改后：
+1. 更新 `docs/ACTIVE_CONTEXT.md` — 记录完成了什么、下一步是什么
+2. 更新 `docs/PROGRESS.md` — 勾选已完成的开发项
+
+---
+
+## 可用技能参考文档
+
+位于 `github/skills/skills/` 目录（只读参考，不要修改）：
+- `frontend-design/SKILL.md` — 前端设计美学规范
+- `claude-api/SKILL.md` — Claude API 使用规范
+- `pptx/SKILL.md` — PowerPoint 文件处理
+- `pdf/SKILL.md` — PDF 文件处理
+- `canvas-design/SKILL.md` — Canvas 图形设计

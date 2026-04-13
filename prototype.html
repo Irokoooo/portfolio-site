@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Me Bento · 参数调试原型</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    body { font-family: "Times New Roman", "SimSun", "宋体", serif; }
+    .bento-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(63,46,47,0.10);
+      border-radius: var(--card-radius);
+      padding: var(--card-padding);
+      gap: var(--card-gap);
+      font-size: var(--card-font-size);
+      box-shadow: 0 1px 4px rgba(63,46,47,0.06);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .bento-card:hover { box-shadow: 0 6px 24px rgba(63,46,47,0.10); transform: translateY(-2px); }
+    .bento-warm {
+      background: linear-gradient(135deg, #fdf6e8 0%, #f5e6d0 100%);
+    }
+    .grid-bento {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--card-gap);
+    }
+    .col-span-2 { grid-column: span 2; }
+    input[type=range] { accent-color: #3A5A40; width: 100%; }
+    .pill {
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid;
+      font-weight: 500;
+    }
+    .lang-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: var(--card-font-size);
+    }
+    .preset-btn {
+      padding: 5px 14px;
+      border-radius: 6px;
+      border: 1px solid #d1c9b0;
+      font-size: 12px;
+      cursor: pointer;
+      background: white;
+      transition: background 0.15s, color 0.15s;
+    }
+    .preset-btn.active, .preset-btn:hover {
+      background: #3A5A40;
+      color: white;
+      border-color: #3A5A40;
+    }
+    /* scrollbar hide */
+    .hide-scroll { scrollbar-width: none; }
+    .hide-scroll::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-[#faf8f3] min-h-screen" x-data="bentoPrototype()" x-init="applyPreset('comfort')" x-cloak>
+
+<!-- ═══ 顶部工具栏 ═══ -->
+<div class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-stone-200 px-6 py-3 flex items-center gap-6 flex-wrap">
+  <span class="font-bold text-stone-700 text-sm shrink-0">🎛 Bento 调参原型</span>
+
+  <!-- 预设切换 -->
+  <div class="flex gap-2">
+    <button class="preset-btn" :class="{ active: currentPreset === 'compact' }" @click="applyPreset('compact')">紧凑</button>
+    <button class="preset-btn" :class="{ active: currentPreset === 'comfort' }" @click="applyPreset('comfort')">舒适（推荐）</button>
+    <button class="preset-btn" :class="{ active: currentPreset === 'spacious' }" @click="applyPreset('spacious')">宽松</button>
+  </div>
+
+  <div class="flex-1"></div>
+
+  <!-- 导出按钮 -->
+  <button
+    @click="exportParams()"
+    class="px-4 py-2 rounded-lg bg-[#3A5A40] text-white text-xs font-medium hover:bg-[#2d4733] transition-colors"
+  >
+    📋 导出参数 JSON
+  </button>
+
+  <!-- 复制成功提示 -->
+  <span x-show="copied" x-transition class="text-green-600 text-xs font-medium">✓ 已复制到剪贴板！</span>
+</div>
+
+<div class="flex min-h-screen">
+
+  <!-- ═══ 左侧：Bento 预览 ═══ -->
+  <main class="flex-1 p-8 overflow-auto">
+    <h2 class="text-2xl text-stone-700 mb-1">About Me</h2>
+    <p class="text-xs text-stone-400 mb-6">关于我</p>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <!-- Bento Box 左栏 -->
+      <div class="lg:col-span-7">
+        <div class="grid-bento" :style="cssVars">
+
+          <!-- 卡片1：核心定位（暖色，全宽） -->
+          <div class="bento-card bento-warm col-span-2 relative overflow-hidden" :style="cssVars" :draggable="dragMode" @dragstart="dragStart(0)" @dragover.prevent @drop="dragDrop(0)">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="uppercase tracking-widest text-stone-400 mb-2" style="font-size:9px">Who I Am</p>
+                <p class="text-stone-700 leading-relaxed" :style="{ fontSize: params.fontSize + 'px' }">
+                  国际经贸底色 × AI 工具链落地 × 多语种跨文化——我是连接业务洞察与技术落地的
+                  <strong>「翻译官」</strong>，擅长将模糊的一线痛点转化为清晰的功能需求与可交付产物。
+                </p>
+                <div class="flex flex-wrap gap-1.5 mt-3">
+                  <span v-for="tag in ['经济学本科','IELTS 8.0','法语 B1+','Vibe Coder']" class="pill" style="border-color:rgba(63,46,47,0.15);color:rgba(63,46,47,0.70);background:white">经济学本科</span>
+                  <span class="pill" style="border-color:rgba(63,46,47,0.15);color:rgba(63,46,47,0.70);background:white">IELTS 8.0</span>
+                  <span class="pill" style="border-color:rgba(63,46,47,0.15);color:rgba(63,46,47,0.70);background:white">法语 B1+</span>
+                  <span class="pill" style="border-color:rgba(63,46,47,0.15);color:rgba(63,46,47,0.70);background:white">Vibe Coder</span>
+                </div>
+              </div>
+              <template x-if="dragMode">
+                <span class="text-stone-300 text-lg cursor-grab ml-3 shrink-0">⠿</span>
+              </template>
+            </div>
+          </div>
+
+          <!-- 卡片2：业务桥梁 -->
+          <div class="bento-card" :style="cssVars" :draggable="dragMode" @dragstart="dragStart(1)" @dragover.prevent @drop="dragDrop(1)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(63,46,47,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12.01"/><path d="M2 12h20"/></svg>
+            <p class="font-medium text-stone-700 mt-2 mb-1" :style="{ fontSize: params.fontSize + 'px' }">业务与技术桥梁</p>
+            <p class="text-stone-500 leading-relaxed" :style="{ fontSize: (params.fontSize - 1) + 'px' }">经济学数理逻辑 + GenAI 场景落地能力，充当业务与技术之间的翻译官角色。</p>
+          </div>
+
+          <!-- 卡片3：数据驱动 -->
+          <div class="bento-card" :style="cssVars" :draggable="dragMode" @dragstart="dragStart(2)" @dragover.prevent @drop="dragDrop(2)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(63,46,47,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+            <p class="font-medium text-stone-700 mt-2 mb-1" :style="{ fontSize: params.fontSize + 'px' }">数据驱动与流程优化</p>
+            <p class="text-stone-500 leading-relaxed" :style="{ fontSize: (params.fontSize - 1) + 'px' }">熟练运用 Python 与 Stata 完成复杂面板数据清洗与实证分析，主导端到端工作流自动化。</p>
+          </div>
+
+          <!-- 卡片4：商业级交付 -->
+          <div class="bento-card" :style="cssVars" :draggable="dragMode" @dragstart="dragStart(3)" @dragover.prevent @drop="dragDrop(3)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(63,46,47,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><path d="M5 12l-2-2 9-9 9 9-2 2"/><path d="M12 21V3"/><path d="M3 21h18"/></svg>
+            <p class="font-medium text-stone-700 mt-2 mb-1" :style="{ fontSize: params.fontSize + 'px' }">商业级交付能力</p>
+            <p class="text-stone-500 leading-relaxed" :style="{ fontSize: (params.fontSize - 1) + 'px' }">敏锐商业洞察 + 极强田野调研能力，多线程压力下保持敏捷执行。</p>
+          </div>
+
+          <!-- 卡片5：Languages -->
+          <div class="bento-card" :style="cssVars">
+            <p class="uppercase tracking-widest text-stone-400 mb-3" style="font-size:9px">Languages · 语言能力</p>
+            <div class="flex flex-col gap-2">
+              <div class="lang-row">
+                <div class="w-5 h-3.5 rounded-sm shrink-0" style="background:#C6314A;opacity:0.8"></div>
+                <div class="flex-1 min-w-0">
+                  <span class="font-medium text-stone-700">中文</span>
+                  <span class="text-stone-400 text-[9px] ml-1.5">普通话二乙</span>
+                </div>
+                <span class="pill shrink-0" style="color:#C6314A;border-color:#C6314A40;background:#C6314A0a">母语</span>
+              </div>
+              <div class="lang-row">
+                <div class="w-5 h-3.5 rounded-sm shrink-0" style="background:#3A5A40;opacity:0.8"></div>
+                <div class="flex-1 min-w-0">
+                  <span class="font-medium text-stone-700">English</span>
+                  <span class="text-stone-400 text-[9px] ml-1.5">IELTS 8.0 · 六级 605</span>
+                </div>
+                <span class="pill shrink-0" style="color:#3A5A40;border-color:#3A5A4040;background:#3A5A400a">C1</span>
+              </div>
+              <div class="lang-row">
+                <div class="w-5 h-3.5 rounded-sm shrink-0" style="background:#4A6FA5;opacity:0.8"></div>
+                <div class="flex-1 min-w-0">
+                  <span class="font-medium text-stone-700">Français</span>
+                  <span class="text-stone-400 text-[9px] ml-1.5">持续学习中</span>
+                </div>
+                <span class="pill shrink-0" style="color:#4A6FA5;border-color:#4A6FA540;background:#4A6FA50a">B1+</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片6：Contact（全宽） -->
+          <div class="bento-card col-span-2" :style="cssVars">
+            <p class="uppercase tracking-widest text-stone-400 mb-3" style="font-size:9px">Contact · 联系方式</p>
+            <div class="grid grid-cols-2 gap-2 mb-3" :style="{ fontSize: params.fontSize + 'px' }">
+              <span class="text-stone-600">📧 2436698411@qq.com</span>
+              <span class="text-stone-600">📱 +86 184 7665 9652</span>
+              <span class="text-stone-600">📍 北京 / 深圳 / 香港</span>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+              <button class="text-xs px-3 py-1.5 rounded border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors">View on LinkedIn ↗</button>
+              <button class="text-xs px-3 py-1.5 rounded border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors">Download CV ↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：照片区 + Core Traits -->
+      <div class="lg:col-span-5 flex flex-col gap-3">
+        <!-- 照片占位 -->
+        <div
+          class="rounded-2xl border border-stone-200 overflow-hidden"
+          :style="{ borderRadius: params.cardRadius + 'px' }"
+        >
+          <div class="bg-stone-100 flex flex-col items-center justify-center text-stone-400 text-xs gap-2"
+               :style="{ height: params.photoHeight + 'px' }">
+            <span class="text-3xl">📸</span>
+            <span>照片区 (高度可调节)</span>
+            <span class="text-[10px]">public/photo/about/1.jpg ...</span>
+          </div>
+          <div class="bg-white px-6 py-4 border-t border-stone-100">
+            <p class="text-[10px] text-stone-400 uppercase tracking-widest mb-1">Personal Motto</p>
+            <p class="font-serif text-stone-600 leading-relaxed italic" :style="{ fontSize: params.fontSize + 'px' }">
+              "连接洞察与落地之间的每一段距离，是我最享受的事。"
+            </p>
+            <p class="text-stone-400 mt-1" style="font-size:10px">— Bridging insight and execution, always.</p>
+          </div>
+        </div>
+
+        <!-- Core Traits -->
+        <div class="rounded-xl border border-stone-200 bg-white/90 shadow-sm p-4" :style="{ borderRadius: params.cardRadius + 'px' }">
+          <p class="uppercase tracking-widest text-stone-400 mb-3" style="font-size:9px">Core Traits · 核心特质</p>
+          <div class="flex flex-col gap-3">
+            <div>
+              <p class="text-[8px] text-stone-300 uppercase tracking-widest mb-1.5">OUTCOME · 树冠</p>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="pill" style="color:rgba(198,49,74,0.65);border-color:rgba(198,49,74,0.20);background:rgba(198,49,74,0.04)">汇报展示</span>
+                <span class="pill" style="color:rgba(198,49,74,0.65);border-color:rgba(198,49,74,0.20);background:rgba(198,49,74,0.04)">商科 × Tech 落地</span>
+              </div>
+            </div>
+            <div>
+              <p class="text-[8px] text-stone-300 uppercase tracking-widest mb-1.5">CORE ABILITIES · 树干</p>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="pill" style="color:rgba(58,90,64,0.70);border-color:rgba(58,90,64,0.25);background:rgba(58,90,64,0.05)">逻辑分析</span>
+                <span class="pill" style="color:rgba(58,90,64,0.70);border-color:rgba(58,90,64,0.25);background:rgba(58,90,64,0.05)">高效沟通</span>
+                <span class="pill" style="color:rgba(58,90,64,0.70);border-color:rgba(58,90,64,0.25);background:rgba(58,90,64,0.05)">多线程作业</span>
+              </div>
+            </div>
+            <div>
+              <p class="text-[8px] text-stone-300 uppercase tracking-widest mb-1.5">FOUNDATION · 底座</p>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="pill" style="color:rgba(63,46,47,0.60);border-color:rgba(63,46,47,0.20);background:rgba(63,46,47,0.04)">内驱执行</span>
+                <span class="pill" style="color:rgba(63,46,47,0.60);border-color:rgba(63,46,47,0.20);background:rgba(63,46,47,0.04)">高效自学</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ═══ 右侧控制面板 ═══ -->
+  <aside class="w-72 shrink-0 bg-white border-l border-stone-200 p-5 overflow-y-auto sticky top-12 h-[calc(100vh-48px)]">
+    <p class="text-sm font-bold text-stone-700 mb-4">参数控制台</p>
+
+    <!-- 卡片间距 -->
+    <div class="mb-5">
+      <div class="flex justify-between items-center mb-1">
+        <label class="text-xs font-medium text-stone-600">卡片间距 (gap)</label>
+        <span class="text-xs text-stone-400 font-mono" x-text="params.cardGap + 'px'"></span>
+      </div>
+      <input type="range" min="4" max="24" step="2" x-model.number="params.cardGap" @input="updateCSS()" />
+      <div class="flex justify-between text-[9px] text-stone-300 mt-0.5"><span>紧凑 4px</span><span>宽松 24px</span></div>
+    </div>
+
+    <!-- 卡片圆角 -->
+    <div class="mb-5">
+      <div class="flex justify-between items-center mb-1">
+        <label class="text-xs font-medium text-stone-600">卡片圆角 (radius)</label>
+        <span class="text-xs text-stone-400 font-mono" x-text="params.cardRadius + 'px'"></span>
+      </div>
+      <input type="range" min="4" max="24" step="2" x-model.number="params.cardRadius" @input="updateCSS()" />
+      <div class="flex justify-between text-[9px] text-stone-300 mt-0.5"><span>直角 4px</span><span>圆润 24px</span></div>
+    </div>
+
+    <!-- 卡片内边距 -->
+    <div class="mb-5">
+      <div class="flex justify-between items-center mb-1">
+        <label class="text-xs font-medium text-stone-600">卡片内边距 (padding)</label>
+        <span class="text-xs text-stone-400 font-mono" x-text="params.cardPadding + 'px'"></span>
+      </div>
+      <input type="range" min="8" max="32" step="2" x-model.number="params.cardPadding" @input="updateCSS()" />
+      <div class="flex justify-between text-[9px] text-stone-300 mt-0.5"><span>密集 8px</span><span>宽裕 32px</span></div>
+    </div>
+
+    <!-- 字号 -->
+    <div class="mb-5">
+      <div class="flex justify-between items-center mb-1">
+        <label class="text-xs font-medium text-stone-600">正文字号 (font-size)</label>
+        <span class="text-xs text-stone-400 font-mono" x-text="params.fontSize + 'px'"></span>
+      </div>
+      <input type="range" min="10" max="16" step="0.5" x-model.number="params.fontSize" @input="updateCSS()" />
+      <div class="flex justify-between text-[9px] text-stone-300 mt-0.5"><span>小 10px</span><span>大 16px</span></div>
+    </div>
+
+    <!-- 照片高度 -->
+    <div class="mb-5">
+      <div class="flex justify-between items-center mb-1">
+        <label class="text-xs font-medium text-stone-600">照片区高度</label>
+        <span class="text-xs text-stone-400 font-mono" x-text="params.photoHeight + 'px'"></span>
+      </div>
+      <input type="range" min="200" max="500" step="20" x-model.number="params.photoHeight" @input="updateCSS()" />
+      <div class="flex justify-between text-[9px] text-stone-300 mt-0.5"><span>矮 200px</span><span>高 500px</span></div>
+    </div>
+
+    <!-- 卡片背景色 -->
+    <div class="mb-5">
+      <div class="flex justify-between items-center mb-1">
+        <label class="text-xs font-medium text-stone-600">卡片背景</label>
+        <span class="text-xs text-stone-400 font-mono" x-text="params.cardBg"></span>
+      </div>
+      <div class="flex gap-2 flex-wrap mt-1">
+        <template x-for="color in bgOptions">
+          <button
+            @click="params.cardBg = color; updateCSS()"
+            class="w-7 h-7 rounded-md border-2 transition-all"
+            :style="{ backgroundColor: color, borderColor: params.cardBg === color ? '#3A5A40' : 'transparent' }"
+          ></button>
+        </template>
+      </div>
+    </div>
+
+    <!-- 拖拽模式 -->
+    <div class="mb-5">
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="dragToggle" x-model="dragMode" class="accent-[#3A5A40]" />
+        <label for="dragToggle" class="text-xs font-medium text-stone-600">启用卡片拖拽重排</label>
+      </div>
+      <p class="text-[10px] text-stone-400 mt-1">开启后，拖动卡片可以调整顺序（拖拽方向：主要4张小卡）</p>
+    </div>
+
+    <div class="border-t border-stone-100 pt-4">
+      <p class="text-xs font-medium text-stone-600 mb-2">当前参数值</p>
+      <pre class="text-[10px] text-stone-500 bg-stone-50 rounded p-2 overflow-x-auto" x-text="JSON.stringify(params, null, 2)"></pre>
+    </div>
+  </aside>
+</div>
+
+<script>
+function bentoPrototype() {
+  return {
+    currentPreset: 'comfort',
+    copied: false,
+    dragMode: false,
+    dragSource: null,
+
+    params: {
+      cardGap: 12,
+      cardRadius: 8,
+      cardPadding: 16,
+      fontSize: 12,
+      photoHeight: 320,
+      cardBg: '#ffffff',
+    },
+
+    bgOptions: ['#ffffff', '#fdf6e8', '#f5f5f5', '#fef9f0', '#f0f4f0', '#fff8f8'],
+
+    presets: {
+      compact: { cardGap: 6, cardRadius: 6, cardPadding: 10, fontSize: 11, photoHeight: 260, cardBg: '#ffffff' },
+      comfort: { cardGap: 12, cardRadius: 8, cardPadding: 16, fontSize: 12, photoHeight: 320, cardBg: '#ffffff' },
+      spacious: { cardGap: 20, cardRadius: 16, cardPadding: 24, fontSize: 14, photoHeight: 420, cardBg: '#fdf6e8' },
+    },
+
+    get cssVars() {
+      return {
+        '--card-gap': this.params.cardGap + 'px',
+        '--card-radius': this.params.cardRadius + 'px',
+        '--card-padding': this.params.cardPadding + 'px',
+        '--card-font-size': this.params.fontSize + 'px',
+        '--card-bg': this.params.cardBg,
+      };
+    },
+
+    applyPreset(name) {
+      this.currentPreset = name;
+      this.params = { ...this.presets[name] };
+      this.updateCSS();
+    },
+
+    updateCSS() {
+      // Alpine handles reactivity — no manual DOM needed
+    },
+
+    async exportParams() {
+      const json = JSON.stringify({
+        description: "About Me Bento 调参结果",
+        timestamp: new Date().toLocaleString('zh-CN'),
+        params: this.params,
+        tailwindEquivalents: {
+          gap: `gap-[${this.params.cardGap}px]`,
+          rounded: `rounded-[${this.params.cardRadius}px]`,
+          padding: `p-[${this.params.cardPadding}px]`,
+          fontSize: `text-[${this.params.fontSize}px]`,
+        }
+      }, null, 2);
+      try {
+        await navigator.clipboard.writeText(json);
+        this.copied = true;
+        setTimeout(() => this.copied = false, 3000);
+      } catch (e) {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = json;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        this.copied = true;
+        setTimeout(() => this.copied = false, 3000);
+      }
+    },
+
+    dragStart(idx) {
+      this.dragSource = idx;
+    },
+
+    dragDrop(idx) {
+      // Simple visual feedback — actual card reordering is handled by user mental model
+      // since Alpine doesn't easily reorder static DOM
+      this.dragSource = null;
+    },
+  };
+}
+</script>
+</body>
+</html>

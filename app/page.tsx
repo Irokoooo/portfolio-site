@@ -15,6 +15,7 @@ import { BusinessAnalysisGallery } from "@/components/sections/gallery/BusinessA
 import { AcademicResearchGallery } from "@/components/sections/gallery/AcademicResearchGallery";
 import { SlidesGallery } from "@/components/sections/gallery/SlidesGallery";
 import { AIPracticeGallery } from "@/components/sections/gallery/AIPracticeGallery";
+import { MobileHomePage } from "@/components/mobile/MobileHomePage";
 
 // ───────────────────────────────────────────────
 // 类型定义
@@ -383,7 +384,12 @@ export default function HomePage() {
     : (navItems.find(i => i.key === activeTab)?.watermark ?? "XY");
 
   return (
-    <div className="h-screen bg-transparent flex overflow-hidden">
+    <>
+      <div className="md:hidden min-h-screen">
+        <MobileHomePage />
+      </div>
+
+      <div className="hidden md:flex h-screen bg-transparent overflow-hidden">
       {/* ===== 左侧固定侧边栏 ===== */}
       <aside className="w-64 shrink-0 border-r border-seed-shadow/10 h-screen overflow-hidden bg-milk-white/70 backdrop-blur-sm sticky top-0">
         {/* 金箔纹理叠加层：绝对定位覆盖整个侧边栏，multiply 混合模式 */}
@@ -596,6 +602,7 @@ export default function HomePage() {
           </AnimatePresence>
         </div>
       </main>
-    </div>
+      </div>
+    </>
   );
 }

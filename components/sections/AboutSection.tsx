@@ -1,8 +1,6 @@
 'use client';
-// About Me 板块（第十五轮）
-// - Core Traits：从右侧小卡片 → 独立大板块（滚动触发，水平树状生长）
+// About Me 板块
 // - 照片区：Ken Burns 纪录片效果
-// - PhotoPanel 不再包含 Core Traits，CoreTraits 独立渲染在 AboutSection 底部
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { ExternalLinkButton } from "@/components/ui/ExternalLinkButton";
@@ -48,8 +46,8 @@ function PaperCard({ children, className = '', variant = 'default', colSpan = ''
 // ── Languages 卡片 ──
 const languages = [
   { lang: '中文',    detail: '普通话二乙',              level: '母语', color: '#C6314A' },
-  { lang: 'English', detail: 'IELTS 8.0 · 六级 605 · 国才优秀', level: 'C1',   color: '#3A5A40' },
-  { lang: 'Français', detail: '持续学习中',              level: 'B1+', color: '#4A6FA5' },
+  { lang: 'English', detail: '等级 C1 · IELTS 8.0 · CET-6 605', level: 'C1',   color: '#3A5A40' },
+  { lang: 'Français', detail: '等级 B1+ · DELF 备考中（分数待更新）', level: 'B1+', color: '#4A6FA5' },
 ];
 function LanguagesCard() {
   return (
@@ -372,158 +370,6 @@ function PhotoPanel() {
   );
 }
 
-// ────────────────────────────────────────────────
-// ── Core Traits 大板块（水平树状，滚动触发生长）──
-// ────────────────────────────────────────────────
-// 布局：FOUNDATION → (横线) → CORE ABILITIES → (横线) → OUTCOME
-// 每层是一个竖排的节点列（圆点 + 层标签 + pills）
-// 节点间用横线连接，横线 scaleX 0→1 生长
-const traitColumns = [
-  {
-    label: 'Foundation · 底座',
-    desc: '驱动一切的内在根基',
-    traits: ['内驱执行', '高效自学'],
-    dotColor: 'rgba(63,46,47,0.45)',
-    lineColor: 'rgba(63,46,47,0.15)',
-    pillStyle: 'border-seed-shadow/20 text-seed-shadow/60 bg-seed-shadow/4',
-    accent: 'rgba(63,46,47,0.3)',
-  },
-  {
-    label: 'Core Abilities · 树干',
-    desc: '持续输出的核心能力',
-    traits: ['逻辑分析', '高效沟通', '多线程作业'],
-    dotColor: 'rgba(58,90,64,0.55)',
-    lineColor: 'rgba(58,90,64,0.2)',
-    pillStyle: 'border-[#3A5A40]/25 text-[#3A5A40]/70 bg-[#3A5A40]/5',
-    accent: 'rgba(58,90,64,0.35)',
-  },
-  {
-    label: 'Outcome · 树冠',
-    desc: '面向外部的可见产出',
-    traits: ['汇报展示', '商科 × Tech 落地'],
-    dotColor: 'rgba(198,49,74,0.5)',
-    lineColor: 'rgba(198,49,74,0.2)',
-    pillStyle: 'border-strawberry-jam/20 text-strawberry-jam/65 bg-strawberry-jam/4',
-    accent: 'rgba(198,49,74,0.35)',
-  },
-];
-
-function CoreTraitsSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: false, margin: '-120px' });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 42, scale: 0.96 }}
-      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 42, scale: 0.96 }}
-      transition={{ duration: 0.7, ease: 'easeOut' }}
-      className="mt-20 relative"
-    >
-      {/* 标题区 */}
-      <div className="text-center mb-12">
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
-          className="text-xs font-medium text-seed-shadow/35 uppercase tracking-widest mb-2"
-        >
-          Core Traits · 核心特质
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="font-serif text-[30px] text-seed-shadow/72"
-        >
-          从底座到树冠的能力生长
-        </motion.p>
-      </div>
-
-      {/* 水平树状图 */}
-      <div className="flex items-stretch justify-center gap-2">
-        {traitColumns.map((col, i) => (
-          <div key={col.label} className="flex items-center">
-            {/* 节点列 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ delay: i * 0.25 + 0.3, duration: 0.5, ease: 'easeOut' }}
-              className="flex flex-col items-center text-center"
-              style={{ minWidth: 210 }}
-            >
-              {/* 节点圆点（弹出） */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={isInView ? { scale: 1 } : {}}
-                transition={{ delay: i * 0.25 + 0.4, duration: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
-                className="w-5 h-5 rounded-full border-2 border-white shadow-md mb-4"
-                style={{ backgroundColor: col.dotColor, boxShadow: `0 0 0 4px ${col.lineColor}` }}
-              />
-
-              {/* 层标签 */}
-              <p className="text-[10px] font-medium text-seed-shadow/35 uppercase tracking-widest mb-1">{col.label}</p>
-              <p className="text-xs text-seed-shadow/45 mb-4 leading-relaxed px-2">{col.desc}</p>
-
-              {/* Pills */}
-              <div className="flex flex-col gap-1.5 items-center">
-                {col.traits.map((t, ti) => (
-                  <motion.span
-                    key={t}
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.85 }}
-                    transition={{ delay: i * 0.25 + 0.55 + ti * 0.08, duration: 0.35 }}
-                    className={`text-xs px-3.5 py-1.5 rounded-full border font-medium ${col.pillStyle}`}
-                  >
-                    {t}
-                  </motion.span>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* 层间横线（生长动画） */}
-            {i < traitColumns.length - 1 && (
-              <div className="flex items-center px-3" style={{ marginTop: -72 }}>
-                {/* 左圆点 */}
-                <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: col.accent }} />
-                {/* 生长横线 */}
-                <div className="overflow-hidden" style={{ width: 96 }}>
-                  <motion.div
-                    initial={{ scaleX: 0 }}
-                    animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
-                    transition={{ delay: i * 0.25 + 0.6, duration: 0.5, ease: 'easeOut' }}
-                    style={{
-                      height: 1,
-                      transformOrigin: 'left',
-                      background: `linear-gradient(to right, ${col.accent}, ${traitColumns[i + 1].accent})`,
-                    }}
-                  />
-                </div>
-                {/* 右圆点 */}
-                <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: traitColumns[i + 1].accent }} />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* 底部细节装饰线 */}
-      <motion.div
-        initial={{ scaleX: 0, opacity: 0 }}
-        animate={isInView ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
-        transition={{ delay: 1.2, duration: 0.8, ease: 'easeOut' }}
-        className="mt-12 mx-auto"
-        style={{
-          height: 1,
-          maxWidth: 720,
-          transformOrigin: 'center',
-          background: 'linear-gradient(to right, transparent, rgba(63,46,47,0.12), transparent)',
-        }}
-      />
-    </motion.div>
-  );
-}
-
 // ── 植物藤蔓装饰 ──
 function VineDecoration() {
   return (
@@ -554,7 +400,7 @@ export function AboutSection() {
       {/* 主体双栏 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* 左侧 Bento */}
-        <motion.div className="lg:col-span-7 grid grid-cols-2 gap-3" variants={containerVariants} initial="hidden" animate="visible">
+        <motion.div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-3" variants={containerVariants} initial="hidden" animate="visible">
           <PaperCard variant="warm" colSpan="col-span-2" className="p-5 relative overflow-hidden">
             <VineDecoration />
             <p className="text-xs font-medium text-seed-shadow/40 uppercase tracking-widest mb-3">Who I Am</p>
@@ -574,12 +420,12 @@ export function AboutSection() {
             <WorkPrinciplesCard />
           </PaperCard>
 
-          <PaperCard variant="parchment" className="p-4">
-            <PersonalSopCard />
+          <PaperCard variant="parchment" colSpan="col-span-2" className="p-4">
+            <SkillStackCard />
           </PaperCard>
 
-          <PaperCard variant="parchment" className="p-4">
-            <SkillStackCard />
+          <PaperCard variant="parchment" colSpan="col-span-2" className="p-4">
+            <PersonalSopCard />
           </PaperCard>
         </motion.div>
 
@@ -651,8 +497,6 @@ export function AboutSection() {
         </div>
       </motion.div>
 
-      {/* ── Core Traits 大板块（滚动进入视口触发） ── */}
-      <CoreTraitsSection />
     </div>
   );
 }

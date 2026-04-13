@@ -1,15 +1,90 @@
 # Active Context — 当前工作焦点
 
-> 最后更新：2026-04-13（第七十四轮）
+> 最后更新：2026-04-13（第八十三轮）
 > 历史开发记录请查看 `docs/PROGRESS.md`
 
 ---
 
 ## 当前状态
 
+移动端适配已完成：手机端使用底部导航 + 原有完整组件内容，保留所有交互细节与数据。PC 端保持完全不变。
+
+About Me 区域已按最新要求优化：英语与法语文案改为直接展示“等级 + 分数/考试状态”；左侧 Bento 卡片在小屏改为单列（一行一个），避免并排拥挤；Core Traits 已按用户要求删除。
+
+移动端交互已继续优化：教育与经历改为“卡片点击进入抽屉，返回回到卡片列表”；底部导航顺序调整为“作品后紧接创作”；About Me 的 Skill Stack 与 SOP 改为上下顺序。
+
+移动端 Career 已修复文案回退问题：教育经历与荣誉奖项恢复为中文显示，并继续保持从左向右自动循环播放。
+
 已修复生产构建失败问题：`components/ui/ChinaProvinceMap.tsx` 中不兼容的 `projectionConfig.translate` 已移除，`npm run build` 现已通过，等待重新推送后触发 Vercel 新生产部署。
 
 Next Destination 中 Erasmus 条目图标已替换为欧洲旗帜，避免与 Area Studies 条目图标重复。
+
+---
+
+## 最近完成（第七十八轮）
+
+## 最近完成（第八十二轮）
+
+## 最近完成（第八十三轮）
+
+### ✅ 移动端 Career 英文化回退修复
+1. `components/mobile/MobileCareerSection.tsx`：两条教育经历恢复中文（学校名、角色、标签、说明、要点）
+2. `components/mobile/MobileCareerSection.tsx`：荣誉奖项标题/颁发方/级别恢复中文
+3. `components/mobile/MobileCareerSection.tsx`：界面文案恢复中文（教育与经历、返回、实习/教育经历、荣誉奖项）
+
+---
+
+## 最近完成（第八十二轮）
+
+### ✅ 移动端中文恢复 + About Core Traits 删除
+1. `components/mobile/MobileCareerSection.tsx`：两条教育经历与荣誉奖项全部恢复为中文显示
+2. `components/mobile/MobileCareerSection.tsx`：移动端荣誉区继续保持从左向右自动循环
+3. `components/sections/AboutSection.tsx`：删除 Core Traits 整个区块与其渲染入口
+
+---
+
+## 最近完成（第八十一轮）
+
+### ✅ 手机端荣誉区方向提示明确
+1. `components/mobile/MobileCareerSection.tsx`：荣誉区提示文案改为“从左往右循环”，与实际左向右自动循环动画一致
+
+---
+
+## 最近完成（第八十轮）
+
+### ✅ Core Traits 三节点循环显现
+1. `components/sections/AboutSection.tsx`：Core Traits 的三个节点改为按顺序循环显现播放，而不是静态一次性展示
+2. 保持原有文案、布局和连线结构不变，仅增强节点的循环动效
+
+---
+
+## 最近完成（第七十八轮）
+
+### ✅ 移动端经历抽屉化 + 导航顺序 + About 细节动画
+1. 新增 `components/mobile/MobileCareerSection.tsx`：移动端 Career 改为卡片列表 + 抽屉详情（返回回到卡片列表）
+2. `components/mobile/MobileHomePage.tsx`：Career 页切换到 `MobileCareerSection`；底部导航顺序改为“作品 -> 创作 -> 兴趣”
+3. `components/sections/AboutSection.tsx`：`SkillStackCard` 与 `PersonalSopCard` 调整为上下顺序且不并排
+4. `components/sections/AboutSection.tsx`：Core Traits 三个节点圆点改为循环显现播放（依次脉冲）
+
+---
+
+## 最近完成（第七十九轮）
+
+### ✅ 移动端荣誉自动循环播放（左到右）
+1. `components/mobile/MobileCareerSection.tsx`：新增 `MobileHonorsMarquee` 自动轮播区
+2. 奖项卡片采用双数组拼接实现无缝循环，方向为从左向右
+3. 保持“教育与经历”抽屉交互不变，仅增强荣誉展示体验
+
+---
+
+## 最近完成（第七十四轮）
+
+## 最近完成（第七十七轮）
+
+### ✅ About Me 语言信息直出 + 小屏单列优化
+1. `components/sections/AboutSection.tsx`：English 改为“等级 C1 · IELTS 8.0 · CET-6 605”
+2. `components/sections/AboutSection.tsx`：Français 改为“等级 B1+ · DELF 备考中（分数待更新）”
+3. `components/sections/AboutSection.tsx`：左侧 Bento 网格由 `grid-cols-2` 调整为 `grid-cols-1 md:grid-cols-2`，移动端卡片改为一行一个
 
 ---
 
@@ -18,6 +93,15 @@ Next Destination 中 Erasmus 条目图标已替换为欧洲旗帜，避免与 Ar
 ### ✅ 生产构建失败修复
 1. `components/ui/ChinaProvinceMap.tsx`：移除 `projectionConfig` 中不被当前类型接受的 `translate` 字段
 2. 本地校验：`npm run build` 已通过，说明最新提交可以重新部署到 Vercel
+
+---
+
+## 最近完成（第七十五轮）
+
+### ✅ 移动端独立样式与目录拆分
+1. 新增 `components/mobile/MobileHomePage.tsx`，作为手机端独立页面容器（顶部标签导航 + Side Works 子标签）
+2. `app/page.tsx`：新增断点分流，`md` 以下只渲染移动端组件，`md` 及以上继续使用原桌面双栏页面
+3. 保证桌面端既有布局、动效与导航逻辑不变，仅新增移动端渲染入口
 
 ---
 

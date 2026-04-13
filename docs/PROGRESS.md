@@ -5,10 +5,92 @@
 
 ---
 
+## 第八十三轮（2026-04-13）— 移动端 Career 中文文案恢复
+
+- [x] `components/mobile/MobileCareerSection.tsx`：两条教育经历文案恢复中文
+- [x] `components/mobile/MobileCareerSection.tsx`：荣誉奖项文案恢复中文
+- [x] `components/mobile/MobileCareerSection.tsx`：界面按钮与标签文案恢复中文并保持左向右自动循环
+
+---
+
+## 第八十二轮（2026-04-13）— 移动端中文恢复 + About Core Traits 删除
+
+- [x] `components/mobile/MobileCareerSection.tsx`：两条教育经历与荣誉奖项恢复中文显示
+- [x] `components/mobile/MobileCareerSection.tsx`：手机端荣誉区继续从左向右自动循环
+- [x] `components/sections/AboutSection.tsx`：删除 Core Traits 整个区块与渲染入口
+
+---
+
+## 第八十一轮（2026-04-13）— 手机端荣誉区方向提示明确
+
+- [x] `components/mobile/MobileCareerSection.tsx`：荣誉区文案改为“从左往右循环”，与当前自动循环方向一致
+
+---
+
+## 第八十轮（2026-04-13）— Core Traits 三节点循环显现
+
+- [x] `components/sections/AboutSection.tsx`：Core Traits 三个节点改为按顺序循环显现播放
+- [x] 保持原有文案、布局和树状连线结构不变，仅增强动效表现
+
+---
+
+## 第七十九轮（2026-04-13）— 移动端荣誉自动循环播放
+
+- [x] `components/mobile/MobileCareerSection.tsx`：新增 `MobileHonorsMarquee` 荣誉区
+- [x] 荣誉卡片改为手机端自动循环播放，方向为从左向右
+- [x] 保持原有 Career 抽屉详情交互逻辑不变
+
+---
+
+## 第七十八轮（2026-04-13）— 移动端经历抽屉化 + About 动效调整
+
+- [x] 新增 `components/mobile/MobileCareerSection.tsx`：教育与经历改为移动端“卡片列表 -> 抽屉详情 -> 返回卡片”交互
+- [x] `components/mobile/MobileHomePage.tsx`：`career` 页签改为渲染 `MobileCareerSection`
+- [x] `components/mobile/MobileHomePage.tsx`：底部导航顺序改为“作品后紧接创作”（作品 -> 创作 -> 兴趣）
+- [x] `components/sections/AboutSection.tsx`：Skill Stack 与 Personal SOP 改为上下顺序，不再并排
+- [x] `components/sections/AboutSection.tsx`：Core Traits 三个节点圆点改为循环显现播放
+
+---
+
+## 第七十八轮（2026-04-13）— 移动端 Career 抽屉 + 导航顺序调整
+
+- [x] `components/mobile/MobileCareerSection.tsx`：移动端 Career 改为卡片列表 + 抽屉式详情，支持返回回到卡片列表继续点击
+- [x] `components/mobile/MobileHomePage.tsx`：将“创作”移动到“作品”之后，并保持其他移动端分页不变
+- [x] `components/sections/AboutSection.tsx`：About Me 中技能堆与 SOP 维持先后顺序，不再并排拥挤
+
+---
+
+## 第七十七轮（2026-04-13）— About Me 语言与布局精简
+
+- [x] `components/sections/AboutSection.tsx`：English 文案改为 `等级 C1 · IELTS 8.0 · CET-6 605`
+- [x] `components/sections/AboutSection.tsx`：Français 文案改为 `等级 B1+ · DELF 备考中（分数待更新）`
+- [x] `components/sections/AboutSection.tsx`：左侧 Bento 布局由 `grid-cols-2` 调整为 `grid-cols-1 md:grid-cols-2`，小屏一行一个卡片，避免拥挤
+
+---
+
 ## 第七十四轮（2026-04-13）— 生产构建失败修复
 
 - [x] `components/ui/ChinaProvinceMap.tsx`：移除不兼容的 `projectionConfig.translate`
 - [x] 本地 `npm run build` 验证通过，生产部署可重新触发
+
+---
+
+## 第七十五轮（2026-04-13）— 移动端独立样式分流
+
+- [x] 新增 `components/mobile/MobileHomePage.tsx`，将手机端 UI 与导航逻辑独立到 `components/mobile/` 目录
+- [x] `app/page.tsx`：新增断点级渲染分流（`md:hidden` 渲染移动端，`hidden md:flex` 保留桌面端）
+- [x] 保持 PC 端原有布局和交互不变，仅增加移动端入口
+
+---
+
+## 第七十六轮（2026-04-13）— 移动端完整内容迁移 + 原生 App 风格
+
+- [x] 删除虚假内容组件（MobileAboutSection 等），直接复用原有完整 Section 组件，保留所有交互与数据
+- [x] `components/mobile/MobileHomePage.tsx`：改为导入原有的 AboutSection、CareerSection、InterestsSection 等，确保内容、交互、细节完全一致
+- [x] 新增 `components/mobile/MobileBottomNav.tsx`：原生 App 风格底部导航（6 个 emoji 选项卡）
+- [x] 手机端外层布局：顶部 Header + 粘性子菜单（works 时显示）+ 内容区 + 固定底部导航
+- [x] 所有原有交互、Framer Motion 动效、数据绑定保持不变
+- [x] 验证：所有 TS 文件无编译错误
 
 ---
 

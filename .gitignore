@@ -44,3 +44,4 @@ public/works/covers/vibe/Luma-Flow/
 # 个人/项目指令文件，不公开
 .claude/
 CLAUDE.md
+.vscode/

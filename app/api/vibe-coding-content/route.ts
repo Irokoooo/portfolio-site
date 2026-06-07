@@ -10,8 +10,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "missing file" }, { status: 400 });
   }
 
-  // Basic hardening: only allow local markdown filenames.
-  if (!/^[a-z0-9-]+\.md$/i.test(file)) {
+  // Basic hardening: only allow local markdown filenames (including .en.md).
+  if (!/^[a-z0-9-]+(\.en)?\.md$/i.test(file)) {
     return NextResponse.json({ error: "invalid file" }, { status: 400 });
   }
 

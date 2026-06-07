@@ -9,6 +9,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { AcademicResearchPost } from "@/content/academic-research/index";
 import { categories } from "@/content/academic-research/index";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 interface AcademicResearchClientProps {
   posts: AcademicResearchPost[];
@@ -192,46 +193,65 @@ function ColorTag({ tag, themeKey }: { tag: string; themeKey: keyof typeof categ
 }
 
 // 分类描述
-const categoryDescriptions: Record<string, string> = {
-  research: "在跨学科交叉领域深度探讨，完成学术论文研究与成果发表",
-  fieldwork: "通过田野调查与定性研究，深化对产业与社区的实地理解",
-  learning: "系统化整理与总结的知识框架与学习进度记录",
+const categoryDescriptions: Record<string, { zh: string; en: string }> = {
+  research: { zh: "在跨学科交叉领域深度探讨，完成学术论文研究与成果发表", en: "Deep cross-disciplinary inquiry, culminating in academic papers and published research." },
+  fieldwork: { zh: "通过田野调查与定性研究，深化对产业与社区的实地理解", en: "Field surveys and qualitative research to build ground-level understanding of industries and communities." },
+  learning: { zh: "系统化整理与总结的知识框架与学习进度记录", en: "Systematically organised knowledge frameworks and learning progress logs." },
+};
+
+const categoryLabels: Record<string, { zh: string; en: string }> = {
+  research: { zh: "科研项目", en: "Research Projects" },
+  fieldwork: { zh: "调研项目", en: "Fieldwork" },
+  learning: { zh: "自学笔记", en: "Learning Notes" },
 };
 
 // 社会实践数据
 interface FieldExperience {
   title: string;
-  role: string;
-  tags: string[];
-  desc: string;
+  role: { zh: string; en: string };
+  tags: { zh: string; en: string }[];
+  desc: { zh: string; en: string };
   period: string;
 }
 
 const fieldExperiences: FieldExperience[] = [
   {
     title: "深圳国际世博会 (Shenzhen Expo)",
-    role: "外事协调组志愿者",
-    tags: ["跨文化沟通", "外宾接待", "现场统筹"],
-    desc: "在多语言环境下负责外宾接待，敏捷应对突发状况，保障大型外事活动顺畅执行。",
+    role: { zh: "外事协调组志愿者", en: "Foreign Affairs Coordination Volunteer" },
+    tags: [
+      { zh: "跨文化沟通", en: "Cross-cultural Communication" },
+      { zh: "外宾接待", en: "VIP Reception" },
+      { zh: "现场统筹", en: "On-site Coordination" },
+    ],
+    desc: { zh: "在多语言环境下负责外宾接待，敏捷应对突发状况，保障大型外事活动顺畅执行。", en: "Managed foreign guest reception in a multilingual environment, handled unexpected situations, and ensured smooth execution of large-scale diplomatic events." },
     period: "2024.09 — 2025.06",
   },
   {
     title: "北京国际短片节 (BISFF)",
-    role: "国际组联络志愿者",
-    tags: ["国际交流", "双语宣发", "媒体统筹"],
-    desc: "统筹现场执行与国际文化交流，负责双语媒体宣传，展现跨文化沟通与媒体统筹能力。",
+    role: { zh: "国际组联络志愿者", en: "International Liaison Volunteer" },
+    tags: [
+      { zh: "国际交流", en: "International Exchange" },
+      { zh: "双语宣发", en: "Bilingual PR" },
+      { zh: "媒体统筹", en: "Media Coordination" },
+    ],
+    desc: { zh: "统筹现场执行与国际文化交流，负责双语媒体宣传，展现跨文化沟通与媒体统筹能力。", en: "Coordinated on-site execution and international cultural exchange, managed bilingual media outreach, and demonstrated cross-cultural communication and media coordination skills." },
     period: "2025.10 — 2025.12",
   },
   {
     title: "SheNicest 深圳黑客松 (Hackathon)",
-    role: "统筹志愿者 & 软件组参与者",
-    tags: ["GenAI 赋能", "Prompt 调优", "跨界参与"],
-    desc: "统筹赛事现场执行与流程推进，同时作为参赛团队外部伙伴提供 AI Prompt 调优与应用建议指导。",
+    role: { zh: "统筹志愿者 & 软件组参与者", en: "Event Coordinator & Software Track Participant" },
+    tags: [
+      { zh: "GenAI 赋能", en: "GenAI Empowerment" },
+      { zh: "Prompt 调优", en: "Prompt Tuning" },
+      { zh: "跨界参与", en: "Cross-domain Participation" },
+    ],
+    desc: { zh: "统筹赛事现场执行与流程推进，同时作为参赛团队外部伙伴提供 AI Prompt 调优与应用建议指导。", en: "Coordinated event execution and workflow, while also serving as an external AI advisor, providing Prompt tuning and application guidance to competing teams." },
     period: "2026.03",
   },
 ];
 
 export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
+  const { lang } = useLanguage();
   const [selectedPost, setSelectedPost] = useState<AcademicResearchPost | null>(null);
   const [selectedContent, setSelectedContent] = useState("");
   const [isLoadingContent, setIsLoadingContent] = useState(false);
@@ -261,21 +281,29 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
     }
 
     const contentFile = selectedPost.contentFile;
+    const enFile = contentFile ? contentFile.replace(/\.md$/, '.en.md') : null;
 
     let cancelled = false;
 
     async function loadMarkdown() {
       setIsLoadingContent(true);
       try {
+        if (lang === 'en' && enFile) {
+          const enRes = await fetch(`/api/academic-content?file=${encodeURIComponent(enFile)}`);
+          if (enRes.ok) {
+            const enData = (await enRes.json()) as { content?: string };
+            if (!cancelled) { setSelectedContent(enData.content ?? ""); return; }
+          }
+        }
         const res = await fetch(`/api/academic-content?file=${encodeURIComponent(contentFile)}`);
         if (!res.ok) throw new Error("failed");
         const data = (await res.json()) as { content?: string };
         if (!cancelled) {
-          setSelectedContent(data.content ?? "正文暂未同步，请检查学术 md 文件。");
+          setSelectedContent(data.content ?? (lang === 'en' ? "Content coming soon." : "正文暂未同步，请检查学术 md 文件。"));
         }
       } catch {
         if (!cancelled) {
-          setSelectedContent("加载正文失败，请检查 academic content API 与 md 文件映射。");
+          setSelectedContent(lang === 'en' ? "Failed to load content." : "加载正文失败，请检查 academic content API 与 md 文件映射。");
         }
       } finally {
         if (!cancelled) setIsLoadingContent(false);
@@ -283,10 +311,8 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
     }
 
     loadMarkdown();
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedPost]);
+    return () => { cancelled = true; };
+  }, [selectedPost, lang]);
 
   return (
     <div className="relative">
@@ -305,7 +331,7 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
       >
         <div>
           <h2 className="text-2xl font-serif text-seed-shadow mb-1">Academic Research</h2>
-          <p className="text-xs text-seed-shadow/40 mb-8">学术与实践 — 跨学科深度学习与研究记录</p>
+          <p className="text-xs text-seed-shadow/40 mb-8">{lang === 'en' ? 'Academic & Field Practice — cross-disciplinary research and learning records' : '学术与实践 — 跨学科深度学习与研究记录'}</p>
         </div>
 
         {/* ── 两列布局 ── */}
@@ -326,8 +352,8 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                   <div key={category.key} className="space-y-3">
                     {/* 分类标题（去掉数字） */}
                     <CategoryHeader
-                      label={category.label}
-                      description={categoryDescriptions[category.key]}
+                      label={categoryLabels[category.key]?.[lang] ?? category.label}
+                      description={categoryDescriptions[category.key]?.[lang] ?? categoryDescriptions[category.key]?.zh ?? ""}
                       themeKey={themeKey}
                     />
 
@@ -408,8 +434,8 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
             {/* ─── 社会实践（非交互卡片）─── */}
             <div className="space-y-3">
               <CategoryHeader
-                label="Field Experience · 社会实践"
-                description="国际交流与现场统筹——在大型赛事与论坛中担任核心协调与外事支撑角色"
+                label={lang === 'en' ? "Field Experience" : "Field Experience · 社会实践"}
+                description={lang === 'en' ? "International exchange and on-site coordination — serving as a core liaison and diplomatic support role in major events and forums." : "国际交流与现场统筹——在大型赛事与论坛中担任核心协调与外事支撑角色"}
                 themeKey="fieldExperience"
               />
 
@@ -444,14 +470,14 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                               className="text-xs font-medium mb-2"
                               style={{ color: theme.headerColor }}
                             >
-                              {exp.role}
+                              {exp.role[lang]}
                             </p>
                             <p className="text-xs text-seed-shadow/55 leading-relaxed line-clamp-2 mb-2.5">
-                              {exp.desc}
+                              {exp.desc[lang]}
                             </p>
                             <div className="flex flex-wrap gap-1.5">
                               {exp.tags.map((tag) => (
-                                <ColorTag key={tag} tag={tag} themeKey="fieldExperience" />
+                                <ColorTag key={tag[lang]} tag={tag[lang]} themeKey="fieldExperience" />
                               ))}
                             </div>
                             <p
@@ -473,8 +499,8 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
             {learningNotes.length > 0 && (
               <div className="space-y-3">
                 <CategoryHeader
-                  label="Learning Notes · 自学笔记"
-                  description={categoryDescriptions["learning"]}
+                  label={lang === 'en' ? "Learning Notes" : "Learning Notes · 自学笔记"}
+                  description={categoryDescriptions["learning"]?.[lang] ?? categoryDescriptions["learning"]?.zh ?? ""}
                   themeKey="learning"
                 />
 
@@ -662,7 +688,7 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                   {isLoadingContent ? (
                     <div className="flex items-center gap-2 py-4">
                       <div className="w-4 h-4 border-2 border-seed-shadow/20 border-t-seed-shadow/60 rounded-full animate-spin" />
-                      <p className="text-sm text-seed-shadow/40">正在加载正文...</p>
+                      <p className="text-sm text-seed-shadow/40">{lang === 'en' ? 'Loading content...' : '正在加载正文...'}</p>
                     </div>
                   ) : selectedContent ? (
                     <div className="prose prose-sm max-w-none
@@ -680,7 +706,7 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                       </ReactMarkdown>
                     </div>
                   ) : (
-                    <p className="text-sm text-seed-shadow/45">该条目暂未配置正文内容。</p>
+                    <p className="text-sm text-seed-shadow/45">{lang === 'en' ? 'No content configured for this entry.' : '该条目暂未配置正文内容。'}</p>
                   )}
                 </div>
               </div>

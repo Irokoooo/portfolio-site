@@ -6,9 +6,33 @@ import { motion } from "framer-motion";
 interface ExternalLinkButtonProps {
   href: string;
   label: string;
+  disabled?: boolean;
 }
 
-export function ExternalLinkButton({ href, label }: ExternalLinkButtonProps) {
+export function ExternalLinkButton({ href, label, disabled = false }: ExternalLinkButtonProps) {
+  if (disabled) {
+    return (
+      <span
+        aria-disabled="true"
+        className="inline-flex items-center gap-1.5 text-xs
+          text-seed-shadow/35 border border-seed-shadow/15
+          px-3 py-1.5 rounded
+          bg-milk-white/40
+          cursor-not-allowed select-none"
+      >
+        {label}
+        <svg
+          className="w-3 h-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7v10" />
+        </svg>
+      </span>
+    );
+  }
+
   return (
     <motion.a
       href={href}

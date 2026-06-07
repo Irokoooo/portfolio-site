@@ -1,6 +1,6 @@
 # Active Context — 当前工作焦点
 
-> 最后更新：2026-04-13（第八十三轮）
+> 最后更新：2026-04-13（第八十四轮）
 > 历史开发记录请查看 `docs/PROGRESS.md`
 
 ---
@@ -9,21 +9,52 @@
 
 移动端适配已完成：手机端使用底部导航 + 原有完整组件内容，保留所有交互细节与数据。PC 端保持完全不变。
 
+新增全局中英切换能力：桌面与手机端均支持一键切换中文/英文，语言选择会持久化到本地存储。
+
 About Me 区域已按最新要求优化：英语与法语文案改为直接展示“等级 + 分数/考试状态”；左侧 Bento 卡片在小屏改为单列（一行一个），避免并排拥挤；Core Traits 已按用户要求删除。
 
 移动端交互已继续优化：教育与经历改为“卡片点击进入抽屉，返回回到卡片列表”；底部导航顺序调整为“作品后紧接创作”；About Me 的 Skill Stack 与 SOP 改为上下顺序。
 
 移动端 Career 已修复文案回退问题：教育经历与荣誉奖项恢复为中文显示，并继续保持从左向右自动循环播放。
 
+语言切换已接入移动端 Career 内容区（教育经历与荣誉奖项）和 About 关键内容区（Who I Am、工作理念、SOP），可随开关实时切换。
+
 已修复生产构建失败问题：`components/ui/ChinaProvinceMap.tsx` 中不兼容的 `projectionConfig.translate` 已移除，`npm run build` 现已通过，等待重新推送后触发 Vercel 新生产部署。
 
 Next Destination 中 Erasmus 条目图标已替换为欧洲旗帜，避免与 Area Studies 条目图标重复。
+
+本轮已临时关闭 About Me 中的 `Download CV` 外链，避免继续下载旧版简历；同时把好未来经历时间截止更新到 2026.05.15，并新增了 `北京字节跳动` 的 Career 骨架条目，logo 已接入官网官方 SVG，等待用户继续补充岗位与成果细节。
 
 ---
 
 ## 最近完成（第七十八轮）
 
 ## 最近完成（第八十二轮）
+
+## 最近完成（第八十三轮）
+
+## 最近完成（第八十四轮）
+
+### ✅ 全局中英切换（桌面 + 手机）
+1. 新增 `components/i18n/LanguageProvider.tsx`：全局语言上下文与 localStorage 持久化
+2. 新增 `components/ui/LanguageSwitch.tsx`：中英切换按钮组件
+3. `app/page.tsx`：接入 `LanguageProvider`，桌面侧边栏新增语言切换按钮
+4. `components/mobile/MobileHomePage.tsx`：手机端顶部新增紧凑语言切换按钮
+5. `components/mobile/MobileCareerSection.tsx`：教育经历与荣誉奖项接入中英内容切换
+6. `components/sections/AboutSection.tsx`：Who I Am、工作理念、SOP 接入中英内容切换
+
+---
+
+## 最近完成（第八十六轮）
+
+### ✅ CV 下载临时关闭 + 字节跳动经历框架
+1. `components/ui/ExternalLinkButton.tsx`：新增 `disabled` 状态，供 `Download CV` 暂时断链使用
+2. `components/sections/AboutSection.tsx`：`Download CV` 按钮改为禁用态，停止指向旧版 `resume.pdf`
+3. `content/career/internships/tal-education-group.md`：好未来经历时间更新为 `2025.11 — 2026.05.15`
+4. `content/career/internships/bytedance.md`：新增 `北京字节跳动` 经历框架，占位待补充岗位、方向、指标与复盘内容
+5. `public/assets/icons/bytedance.svg`：已接入官网官方 ByteDance logo 作为该经历的机构 icon
+
+---
 
 ## 最近完成（第八十三轮）
 

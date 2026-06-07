@@ -16,6 +16,8 @@ import { AcademicResearchGallery } from "@/components/sections/gallery/AcademicR
 import { SlidesGallery } from "@/components/sections/gallery/SlidesGallery";
 import { AIPracticeGallery } from "@/components/sections/gallery/AIPracticeGallery";
 import { MobileHomePage } from "@/components/mobile/MobileHomePage";
+import { LanguageProvider } from "@/components/i18n/LanguageProvider";
+import { LanguageSwitch } from "@/components/ui/LanguageSwitch";
 
 // ───────────────────────────────────────────────
 // 类型定义
@@ -384,7 +386,7 @@ export default function HomePage() {
     : (navItems.find(i => i.key === activeTab)?.watermark ?? "XY");
 
   return (
-    <>
+    <LanguageProvider>
       <div className="md:hidden min-h-screen">
         <MobileHomePage />
       </div>
@@ -417,6 +419,8 @@ export default function HomePage() {
               <h1 className="text-2xl font-serif leading-tight shimmer-name">史心怡</h1>
               <p className="text-sm text-seed-shadow/50 mt-0.5">Xinyi Shi / Seraphina</p>
             </div>
+
+            <LanguageSwitch />
 
             <div className="grid grid-cols-2 gap-1.5">
               {sidebarTags.map((tag) => (
@@ -603,6 +607,6 @@ export default function HomePage() {
         </div>
       </main>
       </div>
-    </>
+    </LanguageProvider>
   );
 }

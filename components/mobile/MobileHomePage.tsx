@@ -12,6 +12,7 @@ import { AIPracticeGallery } from "@/components/sections/gallery/AIPracticeGalle
 import { SlidesGallery } from "@/components/sections/gallery/SlidesGallery";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { MobileCareerSection } from "./MobileCareerSection";
+import { LanguageSwitch } from "@/components/ui/LanguageSwitch";
 
 type MobileTabKey = "about" | "career" | "projects" | "interests" | "works" | "next";
 type MobileSubTabKey = "vibe" | "slides" | "business";
@@ -92,9 +93,12 @@ export function MobileHomePage() {
   return (
     <div className="min-h-screen bg-milk-white text-seed-shadow pb-20">
       <header className="sticky top-0 z-20 border-b border-seed-shadow/10 bg-milk-white/95 backdrop-blur">
-        <div className="px-4 pt-4 pb-4">
-          <h1 className="text-2xl font-serif leading-tight">史心怡</h1>
-          <p className="text-xs text-seed-shadow/50 mt-1">Xinyi Shi / Seraphina</p>
+        <div className="px-4 pt-4 pb-4 flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-serif leading-tight">史心怡</h1>
+            <p className="text-xs text-seed-shadow/50 mt-1">Xinyi Shi / Seraphina</p>
+          </div>
+          <LanguageSwitch compact />
         </div>
       </header>
 

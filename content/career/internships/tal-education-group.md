@@ -6,8 +6,8 @@ org: 好未来教育集团
 orgEn: TAL Education Group
 role: 数字化教研产品实习生 · AI Workflow
 direction: Think Kids 海外业务（国际数学竞赛教研）
-period: 2025.11 — 至今
-periodShort: 2025.11 —
+period: 2025.11 — 2026.05.15
+periodShort: 2025.11 — 2026.05.15
 logoSrc: /assets/icons/tal.svg
 tag: AI 工程
 metrics:

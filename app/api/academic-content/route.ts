@@ -10,8 +10,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "missing file" }, { status: 400 });
   }
 
-  // 仅允许本地 markdown 文件名，避免路径穿越。
-  if (!/^[a-z0-9-]+\.md$/i.test(file)) {
+  // 仅允许本地 markdown 文件名，避免路径穿越（支持 .en.md）。
+  if (!/^[a-z0-9-]+(\.en)?\.md$/i.test(file)) {
     return NextResponse.json({ error: "invalid file" }, { status: 400 });
   }
 

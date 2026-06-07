@@ -5,6 +5,7 @@
 
 import { createPortal } from "react-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -201,11 +202,11 @@ function VerticalCoverTicker({ posts }: { posts: VibeCodingPost[] }) {
   );
 }
 
-// ── 媒体类型标签中文 ──
-const mediaLabel: Record<string, string> = {
-  image: "截图展示",
-  video: "演示视频",
-  mixed: "图文 + 视频",
+// ── 媒体类型标签 ──
+const mediaLabel: Record<string, { zh: string; en: string }> = {
+  image: { zh: "截图展示", en: "Screenshots" },
+  video: { zh: "演示视频", en: "Demo Video" },
+  mixed: { zh: "图文 + 视频", en: "Media + Video" },
 };
 
 // ── 项目类型色标 ──
@@ -255,6 +256,7 @@ function DrawerCoverImg({ slug }: { slug: string }) {
 }
 
 export function AIPracticeClient({ posts }: AIPracticeClientProps) {
+  const { lang } = useLanguage();
   const listContainerRef = useRef<HTMLDivElement>(null);
   const [selectedPost, setSelectedPost] = useState<VibeCodingPost | null>(null);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
@@ -268,7 +270,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
     return [...posts].sort((a, b) => parseYearMonth(b.date) - parseYearMonth(a.date));
   }, [posts]);
 
-  // 内容加载
+  // 内容加载（语言切换时重新拉取）
   useEffect(() => {
     if (!selectedPost) {
       setSelectedContent("");
@@ -288,20 +290,33 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
     }
 
     const contentFile = selectedPost.contentFile;
+    // 英文模式优先尝试 .en.md
+    const enFile = contentFile.replace(/\.md$/, '.en.md');
     let cancelled = false;
 
     async function loadMarkdown() {
       setIsLoadingContent(true);
       try {
+        // try EN file first when lang === 'en'
+        if (lang === 'en') {
+          const enRes = await fetch(`/api/vibe-coding-content?file=${encodeURIComponent(enFile)}`);
+          if (enRes.ok) {
+            const enData = (await enRes.json()) as { content?: string };
+            if (!cancelled) {
+              setSelectedContent(enData.content ?? "");
+              return;
+            }
+          }
+        }
         const res = await fetch(`/api/vibe-coding-content?file=${encodeURIComponent(contentFile)}`);
         if (!res.ok) throw new Error("failed");
         const data = (await res.json()) as { content?: string };
         if (!cancelled) {
-          setSelectedContent(data.content ?? "正文暂未同步，请检查对应 md 文件。");
+          setSelectedContent(data.content ?? (lang === 'en' ? "Content coming soon." : "正文暂未同步，请检查对应 md 文件。"));
         }
       } catch {
         if (!cancelled) {
-          setSelectedContent("加载正文失败，请检查 md 文件与 API 路由。");
+          setSelectedContent(lang === 'en' ? "Failed to load content." : "加载正文失败，请检查 md 文件与 API 路由。");
         }
       } finally {
         if (!cancelled) setIsLoadingContent(false);
@@ -310,7 +325,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
 
     loadMarkdown();
     return () => { cancelled = true; };
-  }, [selectedPost]);
+  }, [selectedPost, lang]);
 
   return (
     <div className="relative space-y-6 overflow-hidden">
@@ -319,7 +334,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
       {/* ── 板块标题 ── */}
       <div className="relative z-10">
         <h2 className="text-2xl font-serif text-seed-shadow mb-1">Vibe Coding</h2>
-        <p className="text-xs text-seed-shadow/40 mb-6">用 AI 工具链从零构建产品原型 — 点击卡片展开详情</p>
+        <p className="text-xs text-seed-shadow/40 mb-6">{lang === 'en' ? 'AI-powered product prototypes built from scratch — click a card to expand' : '用 AI 工具链从零构建产品原型 — 点击卡片展开详情'}</p>
       </div>
 
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -426,7 +441,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                         border: "1px solid rgba(184,134,11,0.18)",
                       }}
                     >
-                      {mediaLabel[item.mediaType] ?? item.mediaType}
+                      {(mediaLabel[item.mediaType]?.[lang] ?? mediaLabel[item.mediaType]?.zh) ?? item.mediaType}
                     </span>
                   </div>
 

@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { ExternalLinkButton } from "@/components/ui/ExternalLinkButton";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 // ── 动画变量 ──
 const containerVariants = {
@@ -45,11 +46,11 @@ function PaperCard({ children, className = '', variant = 'default', colSpan = ''
 
 // ── Languages 卡片 ──
 const languages = [
-  { lang: '中文',    detail: '普通话二乙',              level: '母语', color: '#C6314A' },
-  { lang: 'English', detail: '等级 C1 · IELTS 8.0 · CET-6 605', level: 'C1',   color: '#3A5A40' },
-  { lang: 'Français', detail: '等级 B1+ · DELF 备考中（分数待更新）', level: 'B1+', color: '#4A6FA5' },
+  { lang: '中文',    detail: { zh: '普通话二乙', en: 'Putonghua Level II-B' }, level: '母语', color: '#C6314A' },
+  { lang: 'English', detail: { zh: '等级 C1 · IELTS 8.0 · CET-6 605', en: 'C1 · IELTS 8.0 · CET-6 605' }, level: 'C1', color: '#3A5A40' },
+  { lang: 'Français', detail: { zh: '等级 B1+ · DELF 备考中（分数待更新）', en: 'B1+ · Preparing for DELF (score TBD)' }, level: 'B1+', color: '#4A6FA5' },
 ];
-function LanguagesCard() {
+function LanguagesCard({ lang }: { lang: 'zh' | 'en' }) {
   return (
     <div>
       <p className="text-[9px] font-medium text-seed-shadow/35 uppercase tracking-widest mb-3">Languages · 语言能力</p>
@@ -60,7 +61,7 @@ function LanguagesCard() {
             <div className="flex-1 min-w-0">
               <p className="text-[11px] font-medium text-seed-shadow/80 leading-none">
                 {l.lang}
-                <span className="text-[9px] font-normal text-seed-shadow/40 ml-1.5">{l.detail}</span>
+                <span className="text-[9px] font-normal text-seed-shadow/40 ml-1.5">{l.detail[lang]}</span>
               </p>
             </div>
             <span className="text-[10px] font-medium px-1.5 py-0.5 rounded border flex-shrink-0"
@@ -122,12 +123,24 @@ const sopSteps = [
   },
 ];
 
-function PersonalSopCard() {
+const sopStepsEn = [
+  { title: 'Goal Alignment', detail: 'Align team OKRs and personal objectives first, then define your role in the chain.' },
+  { title: 'Write Before Review', detail: 'Draft a complete version independently before entering review and optimization.' },
+  { title: 'Self Diagnosis', detail: 'Troubleshoot and identify causes first, then ask precise questions with options.' },
+  { title: 'Clear Dependencies', detail: 'Clarify upstream and downstream dependencies so delivery usage is explicit.' },
+  { title: 'Retrospective', detail: 'Maintain a mistake log and retrospectives to avoid repeating the same pitfalls.' },
+];
+
+function PersonalSopCard({ lang }: { lang: 'zh' | 'en' }) {
+  const sopTexts = lang === 'zh'
+    ? sopSteps.map((item) => ({ title: item.title, detail: item.detail }))
+    : sopStepsEn;
+
   return (
     <div className="relative">
       <div className="absolute inset-0 -z-10 rounded-md border border-seed-shadow/8 bg-milk-white/25 translate-x-1.5 translate-y-1.5" aria-hidden="true" />
       <p className="text-[10px] font-medium text-seed-shadow/35 uppercase tracking-widest mb-3">Personal Workflow SOP</p>
-      <p className="text-sm font-serif text-seed-shadow/80 mb-3">个人工作 SOP 指南</p>
+      <p className="text-sm font-serif text-seed-shadow/80 mb-3">{lang === 'zh' ? '个人工作 SOP 指南' : 'Personal Workflow SOP Guide'}</p>
       <div className="space-y-2.5">
         {sopSteps.map((step, index) => (
           <div key={step.title} className="flex items-start gap-2.5 rounded-md border border-seed-shadow/10 bg-milk-white/45 p-2.5">
@@ -137,9 +150,9 @@ function PersonalSopCard() {
             <div className="flex-1">
               <div className="flex items-center gap-1.5 text-seed-shadow/55 mb-1">
                 <span className="w-4 h-4 flex items-center justify-center">{step.icon}</span>
-                <p className="text-xs font-medium text-seed-shadow/78">{step.title}</p>
+                <p className="text-xs font-medium text-seed-shadow/78">{sopTexts[index]?.title ?? step.title}</p>
               </div>
-              <p className="text-xs text-seed-shadow/70 leading-relaxed">{step.detail}</p>
+              <p className="text-xs text-seed-shadow/70 leading-relaxed">{sopTexts[index]?.detail ?? step.detail}</p>
             </div>
           </div>
         ))}
@@ -148,25 +161,29 @@ function PersonalSopCard() {
   );
 }
 
-function WorkPrinciplesCard() {
+function WorkPrinciplesCard({ lang }: { lang: 'zh' | 'en' }) {
   return (
     <div className="relative">
       <div className="absolute inset-0 -z-10 rounded-md border border-seed-shadow/8 bg-milk-white/25 -translate-x-1.5 translate-y-1.5" aria-hidden="true" />
       <p className="text-[10px] font-medium text-seed-shadow/35 uppercase tracking-widest mb-3">Working Principles</p>
-      <p className="text-sm font-serif text-seed-shadow/80 mb-3">工作理念</p>
+      <p className="text-sm font-serif text-seed-shadow/80 mb-3">{lang === 'zh' ? '工作理念' : 'Working Principles'}</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="rounded-md border border-seed-shadow/15 bg-milk-white/55 p-3">
           <div className="h-1 w-14 rounded-full bg-strawberry-jam/35 mb-2" aria-hidden="true" />
-          <p className="text-xs font-medium text-seed-shadow mb-1">1. 利他原则</p>
+          <p className="text-xs font-medium text-seed-shadow mb-1">{lang === 'zh' ? '1. 利他原则' : '1. Reduce Cognitive Load'}</p>
           <p className="text-xs text-seed-shadow/70 leading-relaxed">
-            面向对接方先降理解成本：信息按阅读顺序组织，避免抽象表达，提前准备例子与上下文。
+            {lang === 'zh'
+              ? '面向对接方先降理解成本：信息按阅读顺序组织，避免抽象表达，提前准备例子与上下文。'
+              : 'Organize information in reading order, avoid abstract wording, and prepare examples/context in advance.'}
           </p>
         </div>
         <div className="rounded-md border border-seed-shadow/15 bg-milk-white/55 p-3">
           <div className="h-1 w-14 rounded-full bg-leaf-green/35 mb-2" aria-hidden="true" />
-          <p className="text-xs font-medium text-seed-shadow mb-1">2. 即时反馈</p>
+          <p className="text-xs font-medium text-seed-shadow mb-1">{lang === 'zh' ? '2. 即时反馈' : '2. Fast Feedback'}</p>
           <p className="text-xs text-seed-shadow/70 leading-relaxed">
-            主动同步正在做什么、产出什么、卡点在哪，用截图与文字给到可执行反馈，必要时快速拉会。
+            {lang === 'zh'
+              ? '主动同步正在做什么、产出什么、卡点在哪，用截图与文字给到可执行反馈，必要时快速拉会。'
+              : 'Actively sync progress, outputs, and blockers. Provide actionable feedback with screenshots and concise notes.'}
           </p>
         </div>
       </div>
@@ -178,9 +195,9 @@ function WorkPrinciplesCard() {
 const capabilityItems = [
   {
     index: '01',
-    title: '业务桥梁与流程重构',
+    title: { zh: '业务桥梁与流程重构', en: 'Business Bridge & Process Design' },
     subtitle: 'Business-Tech Architect',
-    desc: '具备极强业务沟通理解与 GenAI 场景落地能力；擅长将一线业务痛点转化为明确的技术需求与功能提案，并主导端到端内容工作流的自动化设计落地与 SOP 标准化搭建，有效降低跨部门协作沟通熵。',
+    desc: { zh: '具备极强业务沟通理解与 GenAI 场景落地能力；擅长将一线业务痛点转化为明确的技术需求与功能提案，并主导端到端内容工作流的自动化设计落地与 SOP 标准化搭建，有效降低跨部门协作沟通熵。', en: 'Strong business communication and GenAI deployment skills; adept at translating frontline pain points into clear technical requirements, and leading end-to-end workflow automation and SOP standardisation to reduce cross-team communication overhead.' },
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
@@ -189,9 +206,9 @@ const capabilityItems = [
   },
   {
     index: '02',
-    title: '商业洞察与数据驱动',
+    title: { zh: '商业洞察与数据驱动', en: 'Business Insight & Data Analytics' },
     subtitle: 'Data-Driven Strategist',
-    desc: '具备"数据处理-深度挖掘-商业分析"的完整闭环能力。熟练运用 Python/SQL/Stata 独立完成复杂数据的清洗与可视化，能以商业思维进行多维剖析，高效输出业务策略交付物与数据看板。',
+    desc: { zh: '具备"数据处理-深度挖掘-商业分析"的完整闭环能力。熟练运用 Python/SQL/Stata 独立完成复杂数据的清洗与可视化，能以商业思维进行多维剖析，高效输出业务策略交付物与数据看板。', en: 'Full-cycle capability from data processing to business analysis. Proficient in Python/SQL/Stata for data cleaning and visualisation; delivers business strategy outputs and dashboards with a commercial mindset.' },
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /><line x1="2" y1="20" x2="22" y2="20" />
@@ -200,9 +217,9 @@ const capabilityItems = [
   },
   {
     index: '03',
-    title: '敏捷执行与综合素养',
+    title: { zh: '敏捷执行与综合素养', en: 'Agile Execution & Versatility' },
     subtitle: 'Agile Execution',
-    desc: '极具内驱力与高效自学能力，擅长多线程并发作业与多场景应用能力。兼备严密逻辑思维与深度田野调研能力，具备极强的商业路演与答辩表现，能在复杂业务环境下保持高质量的敏捷交付。',
+    desc: { zh: '极具内驱力与高效自学能力，擅长多线程并发作业与多场景应用能力。兼备严密逻辑思维与深度田野调研能力，具备极强的商业路演与答辩表现，能在复杂业务环境下保持高质量的敏捷交付。', en: 'Highly self-motivated and fast-learning; skilled at parallel multi-stream work across contexts. Combines rigorous logical thinking with fieldwork research, strong pitch and defence performance, and high-quality agile delivery in complex environments.' },
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -211,18 +228,18 @@ const capabilityItems = [
   },
 ];
 
-function SkillStackCard() {
+function SkillStackCard({ lang }: { lang: 'zh' | 'en' }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
   const skills = [
-    { label: 'AI Workflow / Multi-Agent', value: 95, tip: '用于并行审查、格式校对与流程自动化。' },
-    { label: 'SQL / Python', value: 92, tip: '用于用户反馈分析、特征提取与聚类。' },
-    { label: 'PRD / SOP', value: 94, tip: '用于需求转译、流程沉淀与标准化交付。' },
-    { label: 'Excel / PPT', value: 93, tip: '用于数据整理、复盘汇报与路演表达。' },
-    { label: 'Figma / Canva', value: 90, tip: '用于原型、视觉排版与教学工具界面设计。' },
-    { label: 'Notion / Obsidian', value: 93, tip: '用于知识库管理与结构化记录。' },
-    { label: 'Prompt Engineering', value: 95, tip: '用于高复用提示词与任务拆解。' },
-    { label: '英文 / 法语', value: 90, tip: '用于跨文化沟通与多语种材料处理。' },
+    { label: 'AI Workflow / Multi-Agent', value: 95, tip: { zh: '用于并行审查、格式校对与流程自动化。', en: 'Used for parallel review, formatting QA, and workflow automation.' } },
+    { label: 'SQL / Python', value: 92, tip: { zh: '用于用户反馈分析、特征提取与聚类。', en: 'Used for user feedback analysis, feature extraction, and clustering.' } },
+    { label: 'PRD / SOP', value: 94, tip: { zh: '用于需求转译、流程沉淀与标准化交付。', en: 'Used for requirement translation, process documentation, and standardised delivery.' } },
+    { label: 'Excel / PPT', value: 93, tip: { zh: '用于数据整理、复盘汇报与路演表达。', en: 'Used for data organisation, retrospective reporting, and pitch presentations.' } },
+    { label: 'Figma / Canva', value: 90, tip: { zh: '用于原型、视觉排版与教学工具界面设计。', en: 'Used for prototyping, visual layout, and educational tool UI design.' } },
+    { label: 'Notion / Obsidian', value: 93, tip: { zh: '用于知识库管理与结构化记录。', en: 'Used for knowledge base management and structured note-taking.' } },
+    { label: 'Prompt Engineering', value: 95, tip: { zh: '用于高复用提示词与任务拆解。', en: 'Used for reusable prompt design and task decomposition.' } },
+    { label: lang === 'en' ? 'EN / FR Languages' : '英文 / 法语', value: 90, tip: { zh: '用于跨文化沟通与多语种材料处理。', en: 'Used for cross-cultural communication and multilingual content handling.' } },
   ];
 
   return (
@@ -245,7 +262,7 @@ function SkillStackCard() {
               />
             </div>
             <div className="absolute right-0 -top-8 z-20 px-2 py-1 rounded border border-seed-shadow/15 bg-milk-white text-[11px] text-seed-shadow/70 whitespace-nowrap shadow-sm opacity-0 translate-y-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0">
-              {skill.tip}
+              {skill.tip[lang]}
             </div>
           </div>
         ))}
@@ -254,36 +271,36 @@ function SkillStackCard() {
   );
 }
 
-function LanguagePanelCard() {
+function LanguagePanelCard({ lang }: { lang: 'zh' | 'en' }) {
   return (
     <div>
-      <p className="text-sm font-serif text-seed-shadow/90 mb-3">语言能力</p>
-      <LanguagesCard />
+      <p className="text-sm font-serif text-seed-shadow/90 mb-3">{lang === 'en' ? 'Languages' : '语言能力'}</p>
+      <LanguagesCard lang={lang} />
     </div>
   );
 }
 
 // 证书资历卡（独立）— 统一古典暖棕色系
 const certItems = [
-  { label: "CDA 数据分析师", icon: "◈" },
-  { label: "NCRE 二级",      icon: "◈" },
-  { label: "Prompt Cert.",   icon: "◈" },
-  { label: "普通话二乙",     icon: "◈" },
+  { label: { zh: "CDA 数据分析师", en: "CDA Data Analyst" }, icon: "◈" },
+  { label: { zh: "NCRE 二级", en: "NCRE Level II" }, icon: "◈" },
+  { label: { zh: "Prompt Cert.", en: "Prompt Cert." }, icon: "◈" },
+  { label: { zh: "普通话二乙", en: "Putonghua II-B" }, icon: "◈" },
 ];
 
-function CertificatePanelCard() {
+function CertificatePanelCard({ lang }: { lang: 'zh' | 'en' }) {
   return (
     <div>
       <p className="text-[9px] font-medium text-seed-shadow/30 uppercase tracking-widest mb-2">Credentials · 证书资历</p>
       <div className="grid grid-cols-2 gap-1.5">
         {certItems.map((cert) => (
           <div
-            key={cert.label}
+            key={cert.label.zh}
             className="rounded px-2.5 py-1.5 flex items-center gap-1.5 bg-milk-white/70"
             style={{ border: '1px solid rgba(63,46,47,0.10)' }}
           >
             <span className="text-[8px] text-seed-shadow/30">{cert.icon}</span>
-            <span className="text-xs text-seed-shadow/72">{cert.label}</span>
+            <span className="text-xs text-seed-shadow/72">{cert.label[lang]}</span>
           </div>
         ))}
       </div>
@@ -291,7 +308,7 @@ function CertificatePanelCard() {
   );
 }
 
-function ContactPanelCard() {
+function ContactPanelCard({ lang }: { lang: 'zh' | 'en' }) {
   return (
     <div>
       <p className="text-[9px] font-medium text-seed-shadow/30 uppercase tracking-widest mb-2">Contact · 联系方式</p>
@@ -310,18 +327,18 @@ function ContactPanelCard() {
         <div className="flex items-center gap-2 text-sm text-seed-shadow/65 rounded px-2.5 py-1.5 bg-milk-white/50"
           style={{ border: '1px solid rgba(63,46,47,0.08)' }}>
           <span className="text-base leading-none opacity-60">📍</span>
-          <span>北京 / 深圳 / 香港</span>
+          <span>{lang === 'en' ? 'Beijing / Shenzhen / Hong Kong' : '北京 / 深圳 / 香港'}</span>
         </div>
       </div>
       <div className="flex gap-3 flex-wrap">
         <ExternalLinkButton href="https://www.linkedin.com/in/xinyi-shi1015" label="View on LinkedIn" />
-        <ExternalLinkButton href="/resume.pdf" label="Download CV" />
+        <ExternalLinkButton href="/resume.pdf" label="Download CV" disabled />
       </div>
     </div>
   );
 }
 
-function PhotoPanel() {
+function PhotoPanel({ lang }: { lang: 'zh' | 'en' }) {
   return (
     <div className="rounded-2xl overflow-hidden border border-seed-shadow/8 shadow-sm">
       {/* 固定宽高比，防止视频加载导致布局跳动 */}
@@ -362,9 +379,11 @@ function PhotoPanel() {
       <div className="bg-white px-6 py-5 border-t border-seed-shadow/8">
         <p className="text-[10px] font-medium text-seed-shadow/30 uppercase tracking-widest mb-2">Personal Motto</p>
         <p className="font-serif text-base text-seed-shadow/80 leading-relaxed italic">
-          "做一个不知疲倦的海绵"
+          {lang === 'en' ? '"Be an inexhaustible sponge."' : '"做一个不知疲倦的海绵"'}
         </p>
-        <p className="text-xs text-seed-shadow/35 mt-2 font-light">— Bridging insight and execution, always.</p>
+        {lang === 'zh' && (
+          <p className="text-xs text-seed-shadow/35 mt-2 font-light">— Bridging insight and execution, always.</p>
+        )}
       </div>
     </div>
   );
@@ -386,13 +405,24 @@ function VineDecoration() {
 
 // ── 主组件 ──
 export function AboutSection() {
+  const { lang } = useLanguage();
+  const whoIAmText = lang === 'zh'
+    ? '与其坐以待毙寻找“为何而活”，我选择推开门，走向更大的世界。在探索中定义生命，而非在围城里自怨自艾。'
+    : 'Instead of waiting for meaning to appear, I choose to push the door open and step into a larger world.';
+  const whoIAmText2 = lang === 'zh'
+    ? '在自学成本近乎为零的 AI 时代，我热衷于以极高的好奇心探索陌生领域，打破学科间的知识壁垒，探索跨领域结合的可能性。我享受高压下的多线程并发作业，并始终践行「开始做了，就做到最好」的准则，希望能够成为一个强悍的一体机。对我而言，探索本身就是对虚无最有力的回应，而高效、高质量的交付，则是对自己生命精力输出的最基本负责。'
+    : 'In the AI era where self-learning cost is near zero, I explore unfamiliar domains with strong curiosity, break disciplinary silos, and turn ideas into high-quality execution under pressure.';
+  const whoTags = lang === 'zh'
+    ? ['国际经济与贸易', 'Vibe Coder / AI Workflow', 'IELTS 8.0 · 法语 B1+', '全链路中台运营', '高精力奋战人']
+    : ['International Economics & Trade', 'Vibe Coder / AI Workflow', 'IELTS 8.0 · French B1+', 'End-to-End Ops', 'High-Energy Executor'];
+
   return (
     <div className="space-y-6">
       {/* 标题 */}
       <motion.div initial={{ opacity: 0, y: 16, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: 0.5, ease: "easeOut" }}>
         <h2 className="text-2xl font-serif text-seed-shadow mb-1">About Me</h2>
-        <p className="text-xs text-seed-shadow/50">关于我</p>
+        <p className="text-xs text-seed-shadow/50">{lang === 'zh' ? '关于我' : 'Profile'}</p>
         <img src="/assets/decorations/ornament-divider.svg" alt="" aria-hidden="true"
           className="mt-2 opacity-25 w-48 pointer-events-none select-none" />
       </motion.div>
@@ -405,27 +435,27 @@ export function AboutSection() {
             <VineDecoration />
             <p className="text-xs font-medium text-seed-shadow/40 uppercase tracking-widest mb-3">Who I Am</p>
             <p className="text-sm text-seed-shadow leading-relaxed">
-              与其坐以待毙寻找“为何而活”，我选择推开门，走向更大的世界。在探索中定义生命，而非在围城里自怨自艾。
+              {whoIAmText}
               <br className="hidden sm:block" />
-              在自学成本近乎为零的 AI 时代，我热衷于以极高的好奇心探索陌生领域，打破学科间的知识壁垒，探索跨领域结合的可能性。我享受高压下的多线程并发作业，并始终践行「开始做了，就做到最好」的准则，希望能够成为一个强悍的一体机。对我而言，探索本身就是对虚无最有力的回应，而高效、高质量的交付，则是对自己生命精力输出的最基本负责。
+              {whoIAmText2}
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {["国际经济与贸易", "Vibe Coder / AI Workflow", "IELTS 8.0 · 法语 B1+", "全链路中台运营", "高精力奋战人"].map(tag => (
+              {whoTags.map(tag => (
                 <span key={tag} className="text-xs bg-milk-white border border-seed-shadow/15 text-seed-shadow/70 px-2 py-0.5 rounded">{tag}</span>
               ))}
             </div>
           </PaperCard>
 
           <PaperCard variant="parchment" colSpan="col-span-2" className="p-4">
-            <WorkPrinciplesCard />
+            <WorkPrinciplesCard lang={lang} />
           </PaperCard>
 
           <PaperCard variant="parchment" colSpan="col-span-2" className="p-4">
-            <SkillStackCard />
+            <SkillStackCard lang={lang} />
           </PaperCard>
 
           <PaperCard variant="parchment" colSpan="col-span-2" className="p-4">
-            <PersonalSopCard />
+            <PersonalSopCard lang={lang} />
           </PaperCard>
         </motion.div>
 
@@ -437,17 +467,17 @@ export function AboutSection() {
           style={{ transformOrigin: 'bottom' }}
           className="lg:col-span-5 lg:sticky lg:top-8 space-y-4"
         >
-          <PhotoPanel />
+          <PhotoPanel lang={lang} />
           <PaperCard className="p-5">
-            <LanguagePanelCard />
+            <LanguagePanelCard lang={lang} />
           </PaperCard>
           {/* 证书资历卡 */}
           <PaperCard variant="parchment" className="p-5">
-            <CertificatePanelCard />
+            <CertificatePanelCard lang={lang} />
           </PaperCard>
           {/* 联系方式卡 */}
           <PaperCard className="p-5">
-            <ContactPanelCard />
+            <ContactPanelCard lang={lang} />
           </PaperCard>
         </motion.div>
       </div>
@@ -468,7 +498,7 @@ export function AboutSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {capabilityItems.map((item, i) => (
             <motion.div
-              key={item.title}
+              key={item.index}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
@@ -487,10 +517,10 @@ export function AboutSection() {
                   </span>
                 </div>
                 {/* 标题 */}
-                <p className="text-[13px] font-semibold text-seed-shadow/85 leading-snug mb-0.5">{item.title}</p>
+                <p className="text-[13px] font-semibold text-seed-shadow/85 leading-snug mb-0.5">{item.title[lang]}</p>
                 <p className="text-[10px] font-medium text-seed-shadow/35 tracking-wide mb-3">{item.subtitle}</p>
                 {/* 描述 */}
-                <p className="text-xs text-seed-shadow/60 leading-relaxed">{item.desc}</p>
+                <p className="text-xs text-seed-shadow/60 leading-relaxed">{item.desc[lang]}</p>
               </div>
             </motion.div>
           ))}

@@ -3,6 +3,42 @@
 > 本文件保存每一轮开发的完成内容，作为项目历史档案。
 > 当前工作焦点请看 `docs/ACTIVE_CONTEXT.md`。
 
+## 第八十五轮（2026-04-20）— 全站中英切换 · md 英文版批量创建
+
+- [x] 梳理 content/academic-research、business-analysis、vibe-coding 目录下所有 md 内容，确认需要英文版的文件清单
+- [x] 批量为以下 md 文件创建英文版（.en.md），内容为 placeholder，便于后续补充翻译：
+  - academic-research/uhv-power-transmission.en.md
+  - business-analysis/miyun-rural-survey.en.md
+  - business-analysis/southeast-asia-market.en.md
+  - business-analysis/supply-chain-risk.en.md
+  - vibe-coding/agrimind-eco-platform.en.md
+  - vibe-coding/challenge-cup-website.en.md
+  - vibe-coding/lawflaw-ai-assistant.en.md
+  - vibe-coding/luma-flow.en.md
+  - vibe-coding/portfolio-early-version.en.md
+  - vibe-coding/student-evaluation-system.en.md
+- [x] 为后续 mdx 加载逻辑和 Section 组件的语言切换打下基础
+---
+
+## 第八十六轮（2026-06-07）— CV 链路关闭 + 字节跳动经历框架
+
+- [x] `components/ui/ExternalLinkButton.tsx`：为外链按钮增加 `disabled` 态
+- [x] `components/sections/AboutSection.tsx`：`Download CV` 暂时关闭，避免继续下载旧版简历
+- [x] `content/career/internships/tal-education-group.md`：好未来经历时间截止更新到 `2026.05.15`
+- [x] `content/career/internships/bytedance.md`：新增 `北京字节跳动` 经历框架
+- [x] `public/assets/icons/bytedance.svg`：接入 ByteDance 官网官方 logo SVG
+
+---
+
+## 第八十四轮（2026-04-13）— 全局中英切换（桌面 + 手机）
+
+- [x] 新增 `components/i18n/LanguageProvider.tsx`：全局语言状态管理与本地持久化
+- [x] 新增 `components/ui/LanguageSwitch.tsx`：统一语言切换按钮
+- [x] `app/page.tsx`：桌面端接入语言切换（侧边栏可一键切换）
+- [x] `components/mobile/MobileHomePage.tsx`：手机端接入语言切换（顶部按钮）
+- [x] `components/mobile/MobileCareerSection.tsx`：教育经历与荣誉奖项支持中英切换
+- [x] `components/sections/AboutSection.tsx`：Who I Am、工作理念、SOP 支持中英切换
+
 ---
 
 ## 第八十三轮（2026-04-13）— 移动端 Career 中文文案恢复
@@ -1344,3 +1380,4 @@
 ---
 
 *最后更新：2026-04-07 | 记录至第十二轮开发*
+

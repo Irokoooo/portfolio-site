@@ -1,5 +1,5 @@
 'use client';
-// InterestsSection（第十五轮）
+// InterestsSection（第十六轮）
 // - 学术兴趣：点击展开弹幕区（横向滚动问句，hover 暂停+思考气泡）
 // - 书架：16本书（上下各8）+ 第二排右侧 SVG 台灯（可交互点亮/熄灭）
 // - 泡泡图：7个爱好圆形泡泡
@@ -7,114 +7,121 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { hobbyPhotos } from "@/lib/hobbyPhotos";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 // ─────────────────────────────────────────────
-// 学术兴趣数据（含弹幕问题 + hover 思考气泡）
-// 你可以在 questions 数组里随意增删条目
+// 学术兴趣数据（含弹幕问题 + hover 思考气泡，双语）
 // ─────────────────────────────────────────────
 const academicInterests = [
   {
     id: "ai",
-    title: "生产力重塑 (Generative AI)",
-    desc: "关注大模型在垂直领域的落地、Prompt 工程，以及 AI 对个人知识库和工作流的重构。",
-    // 弹幕问句。格式：{ q: 问句, thought: hover 显示的思考 }
-    // 分三行，每行速度不同
+    title: { zh: "生产力重塑 (Generative AI)", en: "Productivity Reimagined (Generative AI)" },
+    desc: {
+      zh: "关注大模型在垂直领域的落地、Prompt 工程，以及 AI 对个人知识库和工作流的重构。",
+      en: "Tracking LLM deployment in vertical domains, prompt engineering, and how AI restructures personal knowledge and workflows.",
+    },
     questions: [
-      // 第一行（慢）
       [
-        { q: "AI 会替代哪些工作，又会创造哪些？", thought: "我觉得不是替代，而是把工作粒度拆得更细，再重新分配。" },
-        { q: "Prompt 工程是真的技能还是过渡期产物？", thought: "与其争论，不如把它当作和机器沟通的语言学去学。" },
-        { q: "个人知识库的终极形态是什么？", thought: "也许是一个能主动提问而不只是被动存储的系统。" },
-        { q: "大模型真的能理解语义还是只是统计？", thought: "这个问题让我想重新定义「理解」本身。" },
+        { q: { zh: "AI 会替代哪些工作，又会创造哪些？", en: "Which jobs will AI replace — and which will it create?" }, thought: { zh: "我觉得不是替代，而是把工作粒度拆得更细，再重新分配。", en: "I think it's less about replacement and more about fragmenting tasks and redistributing them." } },
+        { q: { zh: "Prompt 工程是真的技能还是过渡期产物？", en: "Is prompt engineering a real skill or just a transitional artifact?" }, thought: { zh: "与其争论，不如把它当作和机器沟通的语言学去学。", en: "Better to treat it as linguistics for human–machine communication than to debate its longevity." } },
+        { q: { zh: "个人知识库的终极形态是什么？", en: "What is the ultimate form of a personal knowledge base?" }, thought: { zh: "也许是一个能主动提问而不只是被动存储的系统。", en: "Perhaps a system that actively asks questions rather than just passively storing answers." } },
+        { q: { zh: "大模型真的能理解语义还是只是统计？", en: "Do LLMs truly understand semantics, or is it all just statistics?" }, thought: { zh: "这个问题让我想重新定义「理解」本身。", en: "This question makes me want to redefine what 'understanding' even means." } },
       ],
-      // 第二行（中速）
       [
-        { q: "用 AI 提效，节省出的时间应该用来做什么？", thought: "这才是真正值得思考的问题——时间的再分配。" },
-        { q: "AI 幻觉问题能彻底解决吗？", thought: "也许永远无法彻底解决，就像人类也无法彻底客观。" },
-        { q: "什么样的问题是 AI 永远无法解决的？", thought: "需要真实利害关系的判断，和需要承担后果的决策。" },
-        { q: "多模态 AI 会如何改变内容创作行业？", thought: "门槛降低，但品味和判断力的稀缺性会大幅上升。" },
+        { q: { zh: "用 AI 提效，节省出的时间应该用来做什么？", en: "If AI saves us time, what should we actually do with it?" }, thought: { zh: "这才是真正值得思考的问题——时间的再分配。", en: "That's the real question — the reallocation of time." } },
+        { q: { zh: "AI 幻觉问题能彻底解决吗？", en: "Can the AI hallucination problem ever be fully solved?" }, thought: { zh: "也许永远无法彻底解决，就像人类也无法彻底客观。", en: "Probably not entirely — just as humans can never be fully objective." } },
+        { q: { zh: "什么样的问题是 AI 永远无法解决的？", en: "What kinds of problems will AI never be able to solve?" }, thought: { zh: "需要真实利害关系的判断，和需要承担后果的决策。", en: "Judgments that require real stakes, and decisions that require accountability." } },
+        { q: { zh: "多模态 AI 会如何改变内容创作行业？", en: "How will multimodal AI reshape the content creation industry?" }, thought: { zh: "门槛降低，但品味和判断力的稀缺性会大幅上升。", en: "The barrier to entry drops, but taste and judgment become far more scarce." } },
       ],
-      // 第三行（快）
       [
-        { q: "GenAI 时代的核心竞争力是什么？", thought: "会提问 + 会判断 + 会整合——元认知能力。" },
-        { q: "AI 工具链如何与个人工作流真正融合？", thought: "关键是找到摩擦最小的那个接入点。" },
-        { q: "开源模型会赶上闭源模型吗？", thought: "速度惊人，趋势已经很明显了。" },
-        { q: "Agent 时代下人的主体性在哪里？", thought: "在于设定目标和评估结果，而不是执行步骤。" },
+        { q: { zh: "GenAI 时代的核心竞争力是什么？", en: "What is the core competitive edge in the GenAI era?" }, thought: { zh: "会提问 + 会判断 + 会整合——元认知能力。", en: "Asking good questions + sound judgment + synthesis — metacognitive ability." } },
+        { q: { zh: "AI 工具链如何与个人工作流真正融合？", en: "How do AI tool chains truly integrate into personal workflows?" }, thought: { zh: "关键是找到摩擦最小的那个接入点。", en: "The key is finding the point of least friction." } },
+        { q: { zh: "开源模型会赶上闭源模型吗？", en: "Will open-source models catch up with closed-source ones?" }, thought: { zh: "速度惊人，趋势已经很明显了。", en: "The pace is breathtaking — the trend is already quite clear." } },
+        { q: { zh: "Agent 时代下人的主体性在哪里？", en: "Where does human agency sit in the age of AI agents?" }, thought: { zh: "在于设定目标和评估结果，而不是执行步骤。", en: "In setting goals and evaluating outcomes — not executing steps." } },
       ],
     ],
   },
   {
     id: "digital",
-    title: "数字化转型 (Digital Transformation)",
-    desc: "传统行业的数字化跃迁、数据治理，以及技术变革对宏观服务业与经济表现的影响。",
+    title: { zh: "数字化转型 (Digital Transformation)", en: "Digital Transformation" },
+    desc: {
+      zh: "传统行业的数字化跃迁、数据治理，以及技术变革对宏观服务业与经济表现的影响。",
+      en: "Digital leaps in traditional industries, data governance, and how technological change affects macro service sectors and economic performance.",
+    },
     questions: [
       [
-        { q: "为什么大量数字化项目最终失败？", thought: "技术不是瓶颈，组织惰性才是。" },
-        { q: "数据治理的核心矛盾是什么？", thought: "效率与合规之间的张力，永远在博弈。" },
-        { q: "传统企业的数字化应该从哪里切入？", thought: "从痛点最浅、数据最干净的那个流程开始。" },
-        { q: "数字化会加剧行业集中度吗？", thought: "规模效应在数字世界被放大了，所以可能会。" },
+        { q: { zh: "为什么大量数字化项目最终失败？", en: "Why do so many digital transformation projects ultimately fail?" }, thought: { zh: "技术不是瓶颈，组织惰性才是。", en: "Technology is rarely the bottleneck — organizational inertia is." } },
+        { q: { zh: "数据治理的核心矛盾是什么？", en: "What is the core tension in data governance?" }, thought: { zh: "效率与合规之间的张力，永远在博弈。", en: "The constant tug-of-war between efficiency and compliance." } },
+        { q: { zh: "传统企业的数字化应该从哪里切入？", en: "Where should traditional firms begin their digital journey?" }, thought: { zh: "从痛点最浅、数据最干净的那个流程开始。", en: "Start with the process that has the least friction and the cleanest data." } },
+        { q: { zh: "数字化会加剧行业集中度吗？", en: "Does digitalization increase industry concentration?" }, thought: { zh: "规模效应在数字世界被放大了，所以可能会。", en: "Scale effects are amplified in digital markets, so quite possibly yes." } },
       ],
       [
-        { q: "中小企业的数字化路径和大企业有什么根本不同？", thought: "资源约束反而逼出了更务实的方案。" },
-        { q: "数据要素如何真正变成生产要素？", thought: "定价机制和确权是还没解决的基础设施问题。" },
-        { q: "服务业数字化为什么比制造业难？", thought: "服务的交付过程本身高度依赖人，标准化阻力更大。" },
-        { q: "平台经济的下一个演化方向是什么？", thought: "可能是从流量平台走向基础设施平台。" },
+        { q: { zh: "中小企业的数字化路径和大企业有什么根本不同？", en: "How does the digital path for SMEs fundamentally differ from large firms?" }, thought: { zh: "资源约束反而逼出了更务实的方案。", en: "Resource constraints often force more pragmatic, effective solutions." } },
+        { q: { zh: "数据要素如何真正变成生产要素？", en: "How can data truly become a factor of production?" }, thought: { zh: "定价机制和确权是还没解决的基础设施问题。", en: "Pricing mechanisms and property rights are still unsolved infrastructure problems." } },
+        { q: { zh: "服务业数字化为什么比制造业难？", en: "Why is digitalization harder in services than in manufacturing?" }, thought: { zh: "服务的交付过程本身高度依赖人，标准化阻力更大。", en: "Service delivery is inherently human-intensive, making standardization far harder." } },
+        { q: { zh: "平台经济的下一个演化方向是什么？", en: "What is the next evolutionary direction for platform economies?" }, thought: { zh: "可能是从流量平台走向基础设施平台。", en: "Probably a shift from traffic platforms to infrastructure platforms." } },
       ],
       [
-        { q: "数字化转型的 ROI 如何衡量？", thought: "很多价值是滞后的、间接的，这导致投资决策难做。" },
-        { q: "云原生架构适合所有规模的企业吗？", thought: "不适合，迁移成本有时候远高于收益。" },
-        { q: "数字化转型需要专门的变革管理吗？", thought: "绝对需要，而且这才是决定成败的关键变量。" },
-        { q: "政府数字化和企业数字化的核心差异是什么？", thought: "目标函数完全不同——一个是效率，一个是公平服务。" },
+        { q: { zh: "数字化转型的 ROI 如何衡量？", en: "How do you measure the ROI of digital transformation?" }, thought: { zh: "很多价值是滞后的、间接的，这导致投资决策难做。", en: "Much of the value is lagged and indirect, making investment decisions notoriously difficult." } },
+        { q: { zh: "云原生架构适合所有规模的企业吗？", en: "Is cloud-native architecture suitable for all company sizes?" }, thought: { zh: "不适合，迁移成本有时候远高于收益。", en: "Not really — migration costs can sometimes far exceed the benefits." } },
+        { q: { zh: "数字化转型需要专门的变革管理吗？", en: "Does digital transformation require dedicated change management?" }, thought: { zh: "绝对需要，而且这才是决定成败的关键变量。", en: "Absolutely — and it's the variable that most often determines success or failure." } },
+        { q: { zh: "政府数字化和企业数字化的核心差异是什么？", en: "What is the core difference between government and enterprise digitalization?" }, thought: { zh: "目标函数完全不同——一个是效率，一个是公平服务。", en: "The objective functions are entirely different — one optimizes efficiency, the other equitable access." } },
       ],
     ],
   },
   {
     id: "psychology",
-    title: "经济心理学与行为决策 (Psychology)",
-    desc: "探究非理性选择背后的决策机制，结合经济学模型与心理学动力，分析人类行为偏差。",
+    title: { zh: "经济心理学与行为决策 (Psychology)", en: "Behavioral Economics & Decision-Making" },
+    desc: {
+      zh: "探究非理性选择背后的决策机制，结合经济学模型与心理学动力，分析人类行为偏差。",
+      en: "Unpacking the mechanisms behind irrational choices — merging economic models with psychological drivers to analyze human behavioral biases.",
+    },
     questions: [
       [
-        { q: "损失厌恶真的是普世的吗？", thought: "跨文化研究显示有差异，但大方向是一致的。" },
-        { q: "「理性人」假设到底错在哪里？", thought: "它假设了人有无限的信息处理能力和稳定的偏好。" },
-        { q: "助推（Nudge）是操控还是赋能？", thought: "取决于设计者的目标和透明度，两者都可能。" },
-        { q: "行为经济学能预测市场崩溃吗？", thought: "能解释，但预测时间节点还做不到。" },
+        { q: { zh: "损失厌恶真的是普世的吗？", en: "Is loss aversion truly universal?" }, thought: { zh: "跨文化研究显示有差异，但大方向是一致的。", en: "Cross-cultural research shows variation, but the broad direction holds." } },
+        { q: { zh: "「理性人」假设到底错在哪里？", en: "Where exactly does the 'rational agent' assumption go wrong?" }, thought: { zh: "它假设了人有无限的信息处理能力和稳定的偏好。", en: "It assumes unlimited information processing capacity and stable preferences." } },
+        { q: { zh: "助推（Nudge）是操控还是赋能？", en: "Is nudging manipulation or empowerment?" }, thought: { zh: "取决于设计者的目标和透明度，两者都可能。", en: "Depends on the designer's intent and transparency — both are possible." } },
+        { q: { zh: "行为经济学能预测市场崩溃吗？", en: "Can behavioral economics predict market crashes?" }, thought: { zh: "能解释，但预测时间节点还做不到。", en: "It can explain them after the fact, but pinpointing timing remains elusive." } },
       ],
       [
-        { q: "为什么明知道不该拖延还是会拖延？", thought: "双曲折现——未来的奖励在心理上被大幅打折。" },
-        { q: "锚定效应在谈判中有多强？", thought: "强到令人不安，第一个数字往往决定了讨论的框架。" },
-        { q: "心理账户如何影响消费决策？", thought: "同样的钱贴了不同标签，花起来的感觉完全不同。" },
-        { q: "社会规范和市场规范冲突时会发生什么？", thought: "引入金钱往往会摧毁社会规范，且很难逆转。" },
+        { q: { zh: "为什么明知道不该拖延还是会拖延？", en: "Why do we procrastinate even when we know we shouldn't?" }, thought: { zh: "双曲折现——未来的奖励在心理上被大幅打折。", en: "Hyperbolic discounting — future rewards are heavily discounted in our minds." } },
+        { q: { zh: "锚定效应在谈判中有多强？", en: "How powerful is the anchoring effect in negotiation?" }, thought: { zh: "强到令人不安，第一个数字往往决定了讨论的框架。", en: "Disturbingly powerful — the first number often sets the entire frame." } },
+        { q: { zh: "心理账户如何影响消费决策？", en: "How do mental accounts shape spending decisions?" }, thought: { zh: "同样的钱贴了不同标签，花起来的感觉完全不同。", en: "The same money feels very different to spend depending on which mental bucket it's in." } },
+        { q: { zh: "社会规范和市场规范冲突时会发生什么？", en: "What happens when social norms and market norms collide?" }, thought: { zh: "引入金钱往往会摧毁社会规范，且很难逆转。", en: "Introducing money often destroys social norms — and the damage is hard to undo." } },
       ],
       [
-        { q: "默认选项为什么如此强大？", thought: "惰性 + 认可效应，改变需要付出认知成本。" },
-        { q: "情绪对决策的影响是干扰还是必要信号？", thought: "Damasio 的研究说明：没有情绪其实根本无法做决策。" },
-        { q: "过度自信偏差在哪些职业最严重？", thought: "金融分析师、预测师、外科医生——都有研究支持。" },
-        { q: "行为设计能帮助人做出更好的长期决策吗？", thought: "承诺机制是目前效果最好的工具之一。" },
+        { q: { zh: "默认选项为什么如此强大？", en: "Why are default options so powerful?" }, thought: { zh: "惰性 + 认可效应，改变需要付出认知成本。", en: "Inertia plus an implied endorsement — change requires cognitive effort." } },
+        { q: { zh: "情绪对决策的影响是干扰还是必要信号？", en: "Is emotion a disturbance or a necessary signal in decision-making?" }, thought: { zh: "Damasio 的研究说明：没有情绪其实根本无法做决策。", en: "Damasio's research shows: without emotion, decision-making breaks down entirely." } },
+        { q: { zh: "过度自信偏差在哪些职业最严重？", en: "Which professions suffer most from overconfidence bias?" }, thought: { zh: "金融分析师、预测师、外科医生——都有研究支持。", en: "Financial analysts, forecasters, surgeons — all well-documented." } },
+        { q: { zh: "行为设计能帮助人做出更好的长期决策吗？", en: "Can behavioral design help people make better long-term decisions?" }, thought: { zh: "承诺机制是目前效果最好的工具之一。", en: "Commitment devices are among the most effective tools we have." } },
       ],
     ],
   },
   {
     id: "regional",
-    title: "区域国别研究 (Area Studies)",
-    desc: "关注不同区域的政治经济结构、产业路径与文化语境，理解同一商业问题在不同国家的差异化答案。",
+    title: { zh: "区域国别研究 (Area Studies)", en: "Area Studies & Regional Development" },
+    desc: {
+      zh: "关注不同区域的政治经济结构、产业路径与文化语境，理解同一商业问题在不同国家的差异化答案。",
+      en: "Examining political-economic structures, industrial paths, and cultural contexts across regions — understanding why the same business problem yields different answers in different countries.",
+    },
     questions: [
       [
-        { q: "区域国别研究和国际关系研究的核心差别是什么？", thought: "前者更强调具体区域语境，后者更强调体系规则与权力结构。" },
-        { q: "为什么同样的政策工具在不同国家效果完全不同？", thought: "制度基础、社会信任与执行链路的差异，决定了政策落地效果。" },
-        { q: "做区域研究时最容易忽略的变量是什么？", thought: "历史路径依赖，很多现实选择都被过去塑形。" },
-        { q: "语言能力在区域研究中的价值到底有多大？", thought: "它决定你能否直接接触一手材料，而不是只看二手解读。" },
+        { q: { zh: "区域国别研究和国际关系研究的核心差别是什么？", en: "What is the core difference between area studies and international relations?" }, thought: { zh: "前者更强调具体区域语境，后者更强调体系规则与权力结构。", en: "Area studies emphasizes specific regional context; IR focuses on systemic rules and power structures." } },
+        { q: { zh: "为什么同样的政策工具在不同国家效果完全不同？", en: "Why do identical policy tools produce such different outcomes across countries?" }, thought: { zh: "制度基础、社会信任与执行链路的差异，决定了政策落地效果。", en: "Differences in institutional foundations, social trust, and implementation chains determine the outcome." } },
+        { q: { zh: "做区域研究时最容易忽略的变量是什么？", en: "What variable is most often overlooked in area research?" }, thought: { zh: "历史路径依赖，很多现实选择都被过去塑形。", en: "Historical path dependence — many present choices are shaped by the past." } },
+        { q: { zh: "语言能力在区域研究中的价值到底有多大？", en: "How much does language ability actually matter in area research?" }, thought: { zh: "它决定你能否直接接触一手材料，而不是只看二手解读。", en: "It determines whether you can access primary sources or remain dependent on second-hand interpretations." } },
       ],
       [
-        { q: "东盟案例为什么适合观察区域协同治理？", thought: "它同时包含发展差异、制度协商与地缘平衡三个复杂维度。" },
-        { q: "中欧经贸议题里，最值得持续跟踪的变量是什么？", thought: "除了贸易额，更关键是规则协调、供应链安全和产业定位。" },
-        { q: "区域研究如何转化为企业的市场进入策略？", thought: "把宏观判断转成渠道、合规、伙伴和节奏这四个决策。" },
-        { q: "跨国商业模式本地化最难的部分是什么？", thought: "不是技术移植，而是用户行为与制度预期的再适配。" },
+        { q: { zh: "东盟案例为什么适合观察区域协同治理？", en: "Why is ASEAN a useful lens for studying regional cooperative governance?" }, thought: { zh: "它同时包含发展差异、制度协商与地缘平衡三个复杂维度。", en: "It simultaneously contains developmental divergence, institutional negotiation, and geopolitical balance." } },
+        { q: { zh: "中欧经贸议题里，最值得持续跟踪的变量是什么？", en: "In China-EU trade dynamics, which variable deserves the most sustained attention?" }, thought: { zh: "除了贸易额，更关键是规则协调、供应链安全和产业定位。", en: "Beyond trade volumes: regulatory alignment, supply chain security, and industrial positioning." } },
+        { q: { zh: "区域研究如何转化为企业的市场进入策略？", en: "How can area research translate into a firm's market entry strategy?" }, thought: { zh: "把宏观判断转成渠道、合规、伙伴和节奏这四个决策。", en: "Convert macro judgment into four decisions: channels, compliance, partners, and timing." } },
+        { q: { zh: "跨国商业模式本地化最难的部分是什么？", en: "What is the hardest part of localizing a cross-border business model?" }, thought: { zh: "不是技术移植，而是用户行为与制度预期的再适配。", en: "Not technology transfer, but re-adapting to local user behavior and institutional expectations." } },
       ],
       [
-        { q: "比较政治经济学如何提升区域研究解释力？", thought: "它能把零散个案放进可比较、可复盘的分析框架。" },
-        { q: "区域研究能为商科申请提供什么独特价值？", thought: "它让商业判断不只停留在数字，还能看到制度与文化约束。" },
-        { q: "如何避免把单一区域经验错误外推到全球？", thought: "先建立共性假设，再逐层验证差异边界。" },
-        { q: "我为什么持续关注区域国别议题？", thought: "因为它连接了商业决策、社会结构与真实世界的复杂性。" },
+        { q: { zh: "比较政治经济学如何提升区域研究解释力？", en: "How does comparative political economy strengthen area research?" }, thought: { zh: "它能把零散个案放进可比较、可复盘的分析框架。", en: "It places scattered case studies into a comparable, replicable analytical framework." } },
+        { q: { zh: "区域研究能为商科申请提供什么独特价值？", en: "What unique value does area studies bring to a business school application?" }, thought: { zh: "它让商业判断不只停留在数字，还能看到制度与文化约束。", en: "It moves business judgment beyond numbers to see institutional and cultural constraints." } },
+        { q: { zh: "如何避免把单一区域经验错误外推到全球？", en: "How do you avoid wrongly generalizing single-region experience globally?" }, thought: { zh: "先建立共性假设，再逐层验证差异边界。", en: "Establish common assumptions first, then test the boundaries of difference layer by layer." } },
+        { q: { zh: "我为什么持续关注区域国别议题？", en: "Why do I keep returning to area and regional studies?" }, thought: { zh: "因为它连接了商业决策、社会结构与真实世界的复杂性。", en: "Because it connects business decisions, social structures, and the genuine complexity of the world." } },
       ],
     ],
   },
@@ -128,10 +135,12 @@ function MarqueeRow({
   items,
   duration,
   reverse = false,
+  lang,
 }: {
-  items: { q: string; thought: string }[];
+  items: { q: { zh: string; en: string }; thought: { zh: string; en: string } }[];
   duration: number;
   reverse?: boolean;
+  lang: 'zh' | 'en';
 }) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   // 重复两次内容让无缝衔接
@@ -144,11 +153,9 @@ function MarqueeRow({
         animate={{ x: reverse ? ['0%', '50%'] : ['0%', '-50%'] }}
         transition={{ duration, ease: 'linear', repeat: Infinity }}
         style={{ animationPlayState: hoveredIndex !== null ? 'paused' : 'running' }}
-        // pause via animate stop trick: when hover, set to current position
       >
         {doubled.map((item, idx) => {
           const isHovered = hoveredIndex === idx;
-          const origIdx = idx % items.length;
           return (
             <div
               key={idx}
@@ -166,7 +173,7 @@ function MarqueeRow({
                   color: isHovered ? 'rgba(63,46,47,0.85)' : 'rgba(63,46,47,0.5)',
                 }}
               >
-                {item.q}
+                {item.q[lang]}
               </motion.div>
 
               {/* hover 思考气泡 */}
@@ -182,8 +189,10 @@ function MarqueeRow({
                   >
                     {/* 气泡小三角 */}
                     <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white/95 border-r border-b border-seed-shadow/10 rotate-45" />
-                    <p className="text-[9px] text-seed-shadow/35 uppercase tracking-widest mb-1">我的思考</p>
-                    <p className="text-[11px] text-seed-shadow/75 leading-relaxed">{item.thought}</p>
+                    <p className="text-[9px] text-seed-shadow/35 uppercase tracking-widest mb-1">
+                      {lang === 'en' ? 'My Thoughts' : '我的思考'}
+                    </p>
+                    <p className="text-[11px] text-seed-shadow/75 leading-relaxed">{item.thought[lang]}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -198,7 +207,7 @@ function MarqueeRow({
 // ─────────────────────────────────────────────
 // 学术兴趣卡片（含弹幕展开）
 // ─────────────────────────────────────────────
-function AcademicCard({ item }: { item: typeof academicInterests[0] }) {
+function AcademicCard({ item, lang }: { item: typeof academicInterests[0]; lang: 'zh' | 'en' }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -215,10 +224,10 @@ function AcademicCard({ item }: { item: typeof academicInterests[0] }) {
         <div className="p-4 flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <p className={`text-sm font-semibold leading-tight ${open ? "text-[#3A5A40]" : "text-seed-shadow"}`}>
-              {item.title}
+              {item.title[lang]}
             </p>
             {!open && (
-              <p className="text-xs text-seed-shadow/50 leading-relaxed mt-1 line-clamp-1">{item.desc}</p>
+              <p className="text-xs text-seed-shadow/50 leading-relaxed mt-1 line-clamp-1">{item.desc[lang]}</p>
             )}
           </div>
           {/* 展开/收起箭头 */}
@@ -251,11 +260,11 @@ function AcademicCard({ item }: { item: typeof academicInterests[0] }) {
                 Questions I keep thinking about · 持续思考的问题
               </p>
               {/* 三行弹幕，速度各不同 */}
-              <MarqueeRow items={item.questions[0]} duration={38} />
-              <MarqueeRow items={item.questions[1]} duration={28} reverse />
-              <MarqueeRow items={item.questions[2]} duration={20} />
+              <MarqueeRow items={item.questions[0]} duration={38} lang={lang} />
+              <MarqueeRow items={item.questions[1]} duration={28} reverse lang={lang} />
+              <MarqueeRow items={item.questions[2]} duration={20} lang={lang} />
               <p className="text-[9px] text-seed-shadow/25 text-right pt-1">
-                将鼠标悬停在问题上，查看我的思考 →
+                {lang === 'en' ? 'Hover over a question to see my thoughts →' : '将鼠标悬停在问题上，查看我的思考 →'}
               </p>
             </div>
           </motion.div>
@@ -775,13 +784,13 @@ function BookModal({ book, onClose }: { book: typeof books[0]; onClose: () => vo
 // 漂流瓶（生活爱好）— 使用用户提供的 1.svg / 2.svg
 // ─────────────────────────────────────────────
 const lifeHobbies = [
-  { id: "craft",    label: "手工 · 串珠", desc: "用双手创造秩序感，冥想式的专注体验。" },
-  { id: "hardware", label: "硬件拼装",     desc: "从零构建可运行的东西，数字与物理的边界模糊处。" },
-  { id: "sport",    label: "健身 & 羽球", desc: "在对抗中找到节奏感，身体是最诚实的反馈。" },
-  { id: "explore",  label: "探索跨界",     desc: "每个领域都是一扇窗，好奇心是最好的导航。" },
-  { id: "reading",  label: "阅读 & 语言", desc: "语言是进入另一个世界的钥匙，阅读是最便宜的旅行。" },
-  { id: "coding",   label: "Vibe Coding", desc: "需求驱动的创造，把想法变成可运行的东西。" },
-  { id: "pkm",      label: "知识整理",     desc: "思维的外骨骼，让信息不再流失在遗忘曲线里。" },
+  { id: "craft",    label: { zh: "手工 · 串珠", en: "Crafts · Beading" }, desc: { zh: "用双手创造秩序感，冥想式的专注体验。", en: "Creating order with your hands — a meditative, focused experience." } },
+  { id: "hardware", label: { zh: "硬件拼装", en: "Hardware Building" },   desc: { zh: "从零构建可运行的东西，数字与物理的边界模糊处。", en: "Building something that runs from scratch, where the digital and physical blur." } },
+  { id: "sport",    label: { zh: "健身 & 羽球", en: "Fitness & Badminton" }, desc: { zh: "在对抗中找到节奏感，身体是最诚实的反馈。", en: "Finding rhythm through competition — the body is the most honest feedback loop." } },
+  { id: "explore",  label: { zh: "探索跨界", en: "Cross-domain Exploration" }, desc: { zh: "每个领域都是一扇窗，好奇心是最好的导航。", en: "Every field is a window; curiosity is the best navigation system." } },
+  { id: "reading",  label: { zh: "阅读 & 语言", en: "Reading & Languages" }, desc: { zh: "语言是进入另一个世界的钥匙，阅读是最便宜的旅行。", en: "Language is the key to another world; reading is the cheapest form of travel." } },
+  { id: "coding",   label: { zh: "Vibe Coding", en: "Vibe Coding" }, desc: { zh: "需求驱动的创造，把想法变成可运行的东西。", en: "Demand-driven creation — turning ideas into something that actually runs." } },
+  { id: "pkm",      label: { zh: "知识整理", en: "Knowledge Management" }, desc: { zh: "思维的外骨骼，让信息不再流失在遗忘曲线里。", en: "The exoskeleton of thought — so information no longer fades along the forgetting curve." } },
 ];
 
 // 瓶子大小与上下浮动配置（固定值，避免 SSR hydration mismatch）
@@ -794,10 +803,11 @@ const bottleConfigs = lifeHobbies.map((_, i) => ({
 }));
 
 // 单个瓶子组件（浮动动画独立，文字在瓶子下方）
-function DriftBottle({ hobby, cfg, idx }: {
+function DriftBottle({ hobby, cfg, idx, lang }: {
   hobby: typeof lifeHobbies[0];
   cfg: typeof bottleConfigs[0];
   idx: number;
+  lang: 'zh' | 'en';
 }) {
   const [showDesc, setShowDesc] = useState(false);
   // 瓶身宽度按比例（原始 SVG 约 213:265 宽高比）
@@ -817,7 +827,7 @@ function DriftBottle({ hobby, cfg, idx }: {
       {/* 瓶子图片 */}
       <img
         src={`/assets/decorations/${cfg.svg}.svg`}
-        alt={hobby.label}
+        alt={hobby.label[lang]}
         width={bottleW}
         height={bottleH}
         style={{ objectFit: 'contain', width: bottleW, height: bottleH }}
@@ -834,7 +844,7 @@ function DriftBottle({ hobby, cfg, idx }: {
           letterSpacing: '0.02em',
         }}
       >
-        {hobby.label}
+        {hobby.label[lang]}
       </p>
 
       {/* click 展开描述纸条 */}
@@ -853,7 +863,7 @@ function DriftBottle({ hobby, cfg, idx }: {
             }}
           >
             <p className="text-[8px] text-seed-shadow/60 leading-relaxed text-center" style={{ fontFamily: 'serif' }}>
-              {hobby.desc}
+              {hobby.desc[lang]}
             </p>
           </motion.div>
         )}
@@ -862,7 +872,7 @@ function DriftBottle({ hobby, cfg, idx }: {
   );
 }
 
-function BubbleChart() {
+function BubbleChart({ lang }: { lang: 'zh' | 'en' }) {
   // 复制数组实现无缝 marquee（同胶片轮播思路）
   const doubled = [...lifeHobbies, ...lifeHobbies];
   const doubledCfg = [...bottleConfigs, ...bottleConfigs];
@@ -911,13 +921,13 @@ function BubbleChart() {
         style={{ width: totalW * 2 + 100, left: 0 }}
       >
         {doubled.map((h, i) => (
-          <DriftBottle key={`${h.id}-${i}`} hobby={h} cfg={doubledCfg[i]} idx={i} />
+          <DriftBottle key={`${h.id}-${i}`} hobby={h} cfg={doubledCfg[i]} idx={i} lang={lang} />
         ))}
       </motion.div>
 
       {/* 提示 */}
       <p className="absolute bottom-1 right-3 text-[8px] text-seed-shadow/25 pointer-events-none z-20">
-        点击瓶子查看
+        {lang === 'en' ? 'Click a bottle to see details' : '点击瓶子查看'}
       </p>
     </div>
   );
@@ -996,6 +1006,7 @@ function HobbyKenBurns() {
 // 主组件
 // ─────────────────────────────────────────────
 export function InterestsSection() {
+  const { lang } = useLanguage();
   const [selectedBook, setSelectedBook] = useState<typeof books[0] | null>(null);
 
   const handleSelectBook = useCallback((id: string) => {
@@ -1023,7 +1034,7 @@ export function InterestsSection() {
               Academic Interests · 学术兴趣
             </p>
             {academicInterests.map(item => (
-              <AcademicCard key={item.id} item={item} />
+              <AcademicCard key={item.id} item={item} lang={lang} />
             ))}
           </motion.div>
 
@@ -1038,7 +1049,9 @@ export function InterestsSection() {
               <Shelf shelfBooks={shelf1} selectedId={selectedBook?.id ?? null} onSelect={handleSelectBook} showTank />
               {/* 下排（带台灯） */}
               <Shelf shelfBooks={shelf2} selectedId={selectedBook?.id ?? null} onSelect={handleSelectBook} showLamp />
-              <p className="text-[9px] text-seed-shadow/30 text-center">点击书脊查看笔记 · 点击鱼缸投食 · 点击台灯切换光线</p>
+              <p className="text-[9px] text-seed-shadow/30 text-center">
+                {lang === 'en' ? 'Click a spine to read notes · Click the tank to feed · Click the lamp to toggle light' : '点击书脊查看笔记 · 点击鱼缸投食 · 点击台灯切换光线'}
+              </p>
             </div>
           </motion.div>
         </div>
@@ -1048,7 +1061,7 @@ export function InterestsSection() {
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }} className="space-y-4">
           <p className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest">Life &amp; Hobbies · 生活爱好</p>
           <div className="rounded-2xl border border-seed-shadow/8 bg-cream-pour/20 p-6 overflow-hidden">
-            <BubbleChart />
+            <BubbleChart lang={lang} />
             <p className="text-[9px] text-seed-shadow/30 text-center mt-2">将鼠标悬停在泡泡上查看详情</p>
           </div>
         </motion.div>

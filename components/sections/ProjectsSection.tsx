@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLinkButton } from "@/components/ui/ExternalLinkButton";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 type TabKey = "all" | "research" | "product" | "competition";
 
-const tabs: { key: TabKey; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "research", label: "Research · 学术" },
-  { key: "product", label: "Product · 产品" },
-  { key: "competition", label: "Competition · 竞赛" },
+const tabs: { key: TabKey; label: { zh: string; en: string } }[] = [
+  { key: "all", label: { zh: "All", en: "All" } },
+  { key: "research", label: { zh: "Research · 学术", en: "Research" } },
+  { key: "product", label: { zh: "Product · 产品", en: "Product" } },
+  { key: "competition", label: { zh: "Competition · 竞赛", en: "Competition" } },
 ];
 
 const projects = [
@@ -18,22 +19,43 @@ const projects = [
     id: 1,
     category: "research" as TabKey,
     emoji: "📈",
-    title: "特高压输电工程对服务业企业绩效的影响",
-    subtitle: "独立学术论文",
-    tags: ["Stata DID", "ArcGIS", "Python", "面板数据"],
-    desc: "构建双重差分模型，独立完成 14 年跨度面板数据清洗与实证分析，产出高质量学术图表。",
+    title: {
+      zh: "特高压输电工程对服务业企业绩效的影响",
+      en: "Impact of UHV Transmission on Service Industry Performance"
+    },
+    subtitle: {
+      zh: "独立学术论文",
+      en: "Independent Research Paper"
+    },
+    tags: ["Stata DID", "ArcGIS", "Python", "Panel Data"],
+    desc: {
+      zh: "构建双重差分模型，独立完成 14 年跨度面板数据清洗与实证分析，产出高质量学术图表。",
+      en: "Built difference-in-differences model, independently completed 14-year panel data cleaning and empirical analysis, producing high-quality academic visualizations."
+    },
     period: "2025.11 — 2026.03",
-    award: "🏆 全国能源经济大赛本科生研究论文组一等奖",
+    award: {
+      zh: "🏆 全国能源经济大赛本科生研究论文组一等奖",
+      en: "🏆 First Prize, National Energy Economics Competition (Undergraduate Research)"
+    },
     featured: true,
   },
   {
     id: 2,
     category: "research" as TabKey,
     emoji: "🤖",
-    title: "基于机器学习的边疆企业数字化转型测度",
-    subtitle: "科研项目 · 核心成员",
-    tags: ["ERNIE 模型", "特征工程", "数据清洗"],
-    desc: "负责核心面板数据收集整理，将原始数据转化为高质量结构化资产，为 ERNIE 模型训练提供基础。",
+    title: {
+      zh: "基于机器学习的边疆企业数字化转型测度",
+      en: "ML-Based Digital Transformation Measurement of Frontier Enterprises"
+    },
+    subtitle: {
+      zh: "科研项目 · 核心成员",
+      en: "Research Project · Core Member"
+    },
+    tags: ["ERNIE Model", "Feature Engineering", "Data Cleaning"],
+    desc: {
+      zh: "负责核心面板数据收集整理，将原始数据转化为高质量结构化资产，为 ERNIE 模型训练提供基础。",
+      en: "Led panel data collection and structuring, transforming raw data into high-quality assets for ERNIE model training."
+    },
     period: "2024.09 — 2025.06",
     featured: false,
   },
@@ -41,21 +63,60 @@ const projects = [
     id: 7,
     category: "research" as TabKey,
     emoji: "🚢",
-    title: "厦门国贸供应链数智化转型分析",
-    subtitle: "案例分析 · 核心成员",
-    tags: ["商业分析", "供应链管理", "数据可视化", "结构化交付"],
-    desc: "聚焦厦门国贸集团供应链数字化路径，深度拆解从传统贸易到数智化平台的转型逻辑，产出结构化分析报告。",
-    period: "2026.01 — 至今",
+    title: {
+      zh: "厦门国贸供应链数智化转型分析",
+      en: "Xiamen ITG Supply Chain Digital Transformation Analysis"
+    },
+    subtitle: {
+      zh: "案例分析 · 核心成员",
+      en: "Case Study · Core Member"
+    },
+    tags: ["Business Analysis", "Supply Chain", "Data Visualization", "Structured Delivery"],
+    desc: {
+      zh: "聚焦厦门国贸集团供应链数字化路径，深度拆解从传统贸易到数智化平台的转型逻辑，产出结构化分析报告。",
+      en: "Analyzed Xiamen ITG's supply chain digitalization, deconstructing the transition from traditional trade to intelligent platforms with structured analytical reports."
+    },
+    period: "2026.01 — Present",
+    featured: false,
+  },
+  {
+    id: 8,
+    category: "product" as TabKey,
+    emoji: "📖",
+    title: {
+      zh: "SpellBook - OpenClaw 智能工作台",
+      en: "SpellBook - OpenClaw AI Workbench"
+    },
+    subtitle: {
+      zh: "全栈开发 · 独立作品",
+      en: "Full-Stack Development · Solo Project"
+    },
+    tags: ["Next.js 15", "Supabase Realtime", "Python FastAPI", "shadcn/ui", "Agent Architecture", "Full-Stack"],
+    desc: {
+      zh: "构建 AI Agent 可视化管理平台，用网页聊天替代传统终端操作，降低 OpenClaw 使用门槛。实现 Web + 本地 Agent 双端架构，支持离线任务队列与流式输出，Windows 系统开箱即用。",
+      en: "Built AI Agent visualization platform replacing CLI with web chat interface, lowering OpenClaw's entry barrier. Implemented Web + local Agent dual architecture with offline task queue and streaming output, Windows ready out-of-box."
+    },
+    period: "2026.06",
+    github: "https://github.com/Irokoooo/spellbook-openclaw",
     featured: false,
   },
   {
     id: 3,
     category: "product" as TabKey,
     emoji: "🌐",
-    title: "本作品集网站 Portfolio Site",
-    subtitle: "Vibe Coding 实践",
+    title: {
+      zh: "本作品集网站 Portfolio Site",
+      en: "This Portfolio Site"
+    },
+    subtitle: {
+      zh: "Vibe Coding 实践",
+      en: "Vibe Coding Practice"
+    },
     tags: ["Next.js 14", "Tailwind CSS", "TypeScript", "framer-motion"],
-    desc: "从零搭建个人作品集网站，采用双栏架构 + 状态驱动渲染，完整记录 AI 辅助开发的 Vibe Coding 工作流。",
+    desc: {
+      zh: "从零搭建个人作品集网站，采用双栏架构 + 状态驱动渲染，完整记录 AI 辅助开发的 Vibe Coding 工作流。",
+      en: "Built portfolio site from scratch with dual-column architecture and state-driven rendering, documenting complete AI-assisted Vibe Coding workflow."
+    },
     period: "2026.04",
     github: "https://github.com",
     featured: true,
@@ -64,42 +125,78 @@ const projects = [
     id: 4,
     category: "product" as TabKey,
     emoji: "⚖️",
-    title: "AI 法律服务数字化展示平台",
-    subtitle: "全国挑战赛 · 技术成员",
-    tags: ["前端开发", "Agent 架构", "Prompt 调优"],
-    desc: "负责 Agent 架构搭建、Prompt 调试调优与落地场景优化，以及数字化展示网页平台前端落地。",
+    title: {
+      zh: "AI 法律服务数字化展示平台",
+      en: "AI Legal Service Digital Platform"
+    },
+    subtitle: {
+      zh: "全国挑战赛 · 技术成员",
+      en: "National Challenge · Tech Member"
+    },
+    tags: ["Frontend Development", "Agent Architecture", "Prompt Engineering"],
+    desc: {
+      zh: "负责 Agent 架构搭建、Prompt 调试调优与落地场景优化，以及数字化展示网页平台前端落地。",
+      en: "Led Agent architecture setup, prompt debugging and optimization, scenario refinement, and frontend implementation of digital platform."
+    },
     period: "2025.11 — 2025.12",
-    award: "🏆 全国智法杯优秀奖 · 全国 AI 赋能司法创新大赛国家三等奖",
+    award: {
+      zh: "🏆 全国智法杯优秀奖 · 全国 AI 赋能司法创新大赛国家三等奖",
+      en: "🏆 National Smart Law Cup Excellence Award · National AI-Empowered Justice Innovation Competition Third Prize"
+    },
     featured: false,
   },
   {
     id: 5,
     category: "competition" as TabKey,
     emoji: "💡",
-    title: "第十六届三创赛商业计划",
-    subtitle: "全国二等奖",
-    tags: ["商业计划书", "路演答辩", "商业模式"],
-    desc: "负责核心商业文书结构化撰写，答辩 PPT 制作与商业模式运营落地规划。",
+    title: {
+      zh: "第十六届三创赛商业计划",
+      en: "16th Three Creations Competition Business Plan"
+    },
+    subtitle: {
+      zh: "全国二等奖",
+      en: "National Second Prize"
+    },
+    tags: ["Business Plan", "Pitch Presentation", "Business Model"],
+    desc: {
+      zh: "负责核心商业文书结构化撰写，答辩 PPT 制作与商业模式运营落地规划。",
+      en: "Led structured business documentation, pitch deck creation, and business model operational planning."
+    },
     period: "2026.03",
-    award: "🏆 全国二等奖",
+    award: {
+      zh: "🏆 全国二等奖",
+      en: "🏆 National Second Prize"
+    },
     featured: false,
   },
   {
     id: 6,
     category: "competition" as TabKey,
     emoji: "🌏",
-    title: "国际商务大赛全英文论文",
-    subtitle: "北京市二等奖",
-    tags: ["学术英语写作", "商务分析", "路演答辩"],
-    desc: "全英文论文主笔撰写，担任团队主答辩手。",
+    title: {
+      zh: "国际商务大赛全英文论文",
+      en: "International Business Competition English Paper"
+    },
+    subtitle: {
+      zh: "北京市二等奖",
+      en: "Beijing Second Prize"
+    },
+    tags: ["Academic Writing", "Business Analysis", "Pitch Presentation"],
+    desc: {
+      zh: "全英文论文主笔撰写，担任团队主答辩手。",
+      en: "Led full-English paper writing and served as primary presenter for team defense."
+    },
     period: "2025.11",
-    award: "🏆 北京市二等奖",
+    award: {
+      zh: "🏆 北京市二等奖",
+      en: "🏆 Beijing Second Prize"
+    },
     featured: false,
   },
 ];
 
 // ── Rich Media Skeleton 占位符组件 ──
-function VideoPlaceholder() {
+function VideoPlaceholder({ lang }: { lang: 'zh' | 'en' }) {
   return (
     <div className="rounded-lg overflow-hidden border border-gray-100 bg-gray-50">
       <div className="aspect-video relative animate-pulse bg-gray-100 flex flex-col items-center justify-center gap-2">
@@ -108,7 +205,9 @@ function VideoPlaceholder() {
           <div className="w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-l-[14px] border-l-gray-400 ml-1" />
         </div>
         <p className="text-xs text-gray-400 font-medium">🎥 Video Player Placeholder</p>
-        <p className="text-xs text-gray-300">项目演示视频 · 即将上传</p>
+        <p className="text-xs text-gray-300">
+          {lang === 'zh' ? '项目演示视频 · 即将上传' : 'Demo Video · Coming Soon'}
+        </p>
       </div>
       {/* 进度条骨架 */}
       <div className="p-3 space-y-2 animate-pulse">
@@ -124,7 +223,7 @@ function VideoPlaceholder() {
   );
 }
 
-function FigmaPlaceholder() {
+function FigmaPlaceholder({ lang }: { lang: 'zh' | 'en' }) {
   return (
     <div className="rounded-lg overflow-hidden border border-gray-100">
       {/* Figma 顶部工具栏骨架 */}
@@ -149,7 +248,9 @@ function FigmaPlaceholder() {
           <span className="text-xs text-gray-400 font-medium">Figma</span>
         </div>
         <p className="text-xs text-gray-400 font-medium">🖱️ Figma Prototype iframe Placeholder</p>
-        <p className="text-xs text-gray-300">交互原型内嵌展示 · 连接中...</p>
+        <p className="text-xs text-gray-300">
+          {lang === 'zh' ? '交互原型内嵌展示 · 连接中...' : 'Interactive Prototype · Loading...'}
+        </p>
         {/* 加载点动画 */}
         <div className="flex gap-1.5 mt-1">
           {[0, 1, 2].map((i) => (
@@ -167,6 +268,7 @@ function FigmaPlaceholder() {
 
 export function ProjectsSection() {
   const [activeTab, setActiveTab] = useState<TabKey>("all");
+  const { lang } = useLanguage();
 
   const filtered = activeTab === "all"
     ? projects
@@ -195,7 +297,7 @@ export function ProjectsSection() {
                 : "text-seed-shadow/50 border-seed-shadow/20 hover:border-seed-shadow/40 hover:text-seed-shadow"
             }`}
           >
-            {tab.label}
+            {tab.label[lang]}
           </button>
         ))}
       </div>
@@ -220,8 +322,8 @@ export function ProjectsSection() {
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">{project.emoji}</span>
                   <div>
-                    <p className="text-sm font-medium text-seed-shadow group-hover:text-seed-shadow/80">{project.title}</p>
-                    <p className="text-xs text-seed-shadow/40 mt-0.5">{project.subtitle}</p>
+                    <p className="text-sm font-medium text-seed-shadow group-hover:text-seed-shadow/80">{project.title[lang]}</p>
+                    <p className="text-xs text-seed-shadow/40 mt-0.5">{project.subtitle[lang]}</p>
                   </div>
                 </div>
                 <span
@@ -229,9 +331,9 @@ export function ProjectsSection() {
                   style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif' }}
                 >{project.period}</span>
               </div>
-              <p className="text-xs text-seed-shadow/65 leading-relaxed mb-3">{project.desc}</p>
+              <p className="text-xs text-seed-shadow/65 leading-relaxed mb-3">{project.desc[lang]}</p>
               {project.award && (
-                <p className="text-xs text-amber-700/80 mb-3">{project.award.replace('🏆 ', '')}</p>
+                <p className="text-xs text-amber-700/80 mb-3">{project.award[lang].replace('🏆 ', '')}</p>
               )}
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-1.5">
@@ -263,11 +365,11 @@ export function ProjectsSection() {
                       style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif' }}
                     >{project.period}</span>
                   </div>
-                  <p className="text-xs font-medium text-seed-shadow group-hover:text-seed-shadow/80 mb-1">{project.title}</p>
-                  <p className="text-xs text-seed-shadow/40 mb-2">{project.subtitle}</p>
-                  <p className="text-xs text-seed-shadow/60 leading-relaxed mb-2">{project.desc}</p>
+                  <p className="text-xs font-medium text-seed-shadow group-hover:text-seed-shadow/80 mb-1">{project.title[lang]}</p>
+                  <p className="text-xs text-seed-shadow/40 mb-2">{project.subtitle[lang]}</p>
+                  <p className="text-xs text-seed-shadow/60 leading-relaxed mb-2">{project.desc[lang]}</p>
                   {project.award && (
-                    <p className="text-xs text-amber-700/80 mb-2">{project.award.replace('🏆 ', '')}</p>
+                    <p className="text-xs text-amber-700/80 mb-2">{project.award[lang].replace('🏆 ', '')}</p>
                   )}
                   <div className="flex flex-wrap gap-1">
                     {project.tags.map((tag) => (
@@ -285,11 +387,11 @@ export function ProjectsSection() {
           {(activeTab === "all" || activeTab === "product") && (
             <div className="space-y-3 pt-2">
               <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">
-                Rich Media · 项目媒体展示（即将上线）
+                {lang === 'zh' ? 'Rich Media · 项目媒体展示（即将上线）' : 'Rich Media · Coming Soon'}
               </p>
               <div className="grid grid-cols-1 gap-4">
-                <VideoPlaceholder />
-                <FigmaPlaceholder />
+                <VideoPlaceholder lang={lang} />
+                <FigmaPlaceholder lang={lang} />
               </div>
             </div>
           )}

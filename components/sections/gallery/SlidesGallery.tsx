@@ -3,16 +3,17 @@
 // 交互：鼠标悬停卡片时显示PDF预览（自动轮播页码，悬停暂停）
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
 interface SlideItem {
   id: number;
-  title: string;
-  subtitle: string;
-  event: string;       // 比赛/课程名称
+  title: { zh: string; en: string };
+  subtitle: { zh: string; en: string };
+  event: { zh: string; en: string };       // 比赛/课程名称
   period: string;
   tags: string[];
-  desc: string;        // 悬停展开的详情
-  award?: string;
+  desc: { zh: string; en: string };        // 悬停展开的详情
+  award?: { zh: string; en: string };
   pdfUrl: string;      // PDF 文件路径（public/works/slides/）
   pdfPageCount: number; // PDF 总页数
   coverColor: string;  // 封面色调（Tailwind bg 类）
@@ -29,78 +30,168 @@ function encodePublicFilePath(url: string) {
 const slides: SlideItem[] = [
   {
     id: 1,
-    title: "绿壳鸡蛋农业品牌商业计划书",
-    subtitle: "全国商业大赛 · 国家级奖项",
-    event: "全国商业大赛",
+    title: {
+      zh: "绿壳鸡蛋农业品牌商业计划书",
+      en: "Green Shell Egg Agricultural Brand Business Plan"
+    },
+    subtitle: {
+      zh: "全国商业大赛 · 国家级奖项",
+      en: "National Business Competition · National Award"
+    },
+    event: {
+      zh: "全国商业大赛",
+      en: "National Business Competition"
+    },
     period: "2026.03",
     tags: ["商业计划书", "品牌策划", "小程序产品"],
-    desc: "主导小程序与软件产品逻辑、交互设计与实地调查路演。将传统农业品牌与数字化销售渠道结合，构建从产地到消费者的完整商业闭环。",
-    award: "全国商业大赛 · 国家级奖项",
+    desc: {
+      zh: "主导小程序与软件产品逻辑、交互设计与实地调查路演。将传统农业品牌与数字化销售渠道结合，构建从产地到消费者的完整商业闭环。",
+      en: "Led mini-program product logic, interaction design, and field research presentations. Integrated traditional agricultural branding with digital sales channels, building a complete commercial loop from origin to consumer."
+    },
+    award: {
+      zh: "全国商业大赛 · 国家级奖项",
+      en: "National Business Competition · National Award"
+    },
     pdfUrl: "/works/slides/绿壳鸡蛋ppt.pdf",
     pdfPageCount: 35,
     coverColor: "bg-emerald-50",
   },
   {
     id: 2,
-    title: "全场景具身智能消防机器人系统",
-    subtitle: "全国电子商务创新创业挑战赛 · 优秀奖",
-    event: "第十六届全国大学生电子商务创新创业挑战赛",
+    title: {
+      zh: "全场景具身智能消防机器人系统",
+      en: "Full-Scenario Embodied AI Fire-Fighting Robot System"
+    },
+    subtitle: {
+      zh: "全国电子商务创新创业挑战赛 · 优秀奖",
+      en: "National E-Commerce Innovation Competition · Excellence Award"
+    },
+    event: {
+      zh: "第十六届全国大学生电子商务创新创业挑战赛",
+      en: "16th National E-Commerce Innovation & Entrepreneurship Challenge"
+    },
     period: "2026.03",
     tags: ["创新创业", "硬件系统", "商业计划"],
-    desc: "展示城市末端消防\"最后一公里\"解决方案的技术与商业逻辑。集成机器学习、物联网与硬件工程，打造具身智能系统的完整演示。",
-    award: "全国电子商务创新创业挑战赛优秀奖",
+    desc: {
+      zh: "展示城市末端消防\"最后一公里\"解决方案的技术与商业逻辑。集成机器学习、物联网与硬件工程，打造具身智能系统的完整演示。",
+      en: "Presented technical and business logic for urban last-mile fire-fighting solutions. Integrated machine learning, IoT, and hardware engineering to create a complete embodied AI system demonstration."
+    },
+    award: {
+      zh: "全国电子商务创新创业挑战赛优秀奖",
+      en: "National E-Commerce Innovation Competition Excellence Award"
+    },
     pdfUrl: "/works/slides/烽智安新——全场景具身智能消防机器人系统.pdf",
     pdfPageCount: 26,
     coverColor: "bg-orange-50",
   },
   {
     id: 3,
-    title: "校园拼车出行新模式",
-    subtitle: "全国大学生创新创业赛 · 三创赛 2025",
-    event: "中央民族大学第三届经创杯 · 全国三创赛",
+    title: {
+      zh: "校园拼车出行新模式",
+      en: "Campus Ride-Sharing Innovation Model"
+    },
+    subtitle: {
+      zh: "全国大学生创新创业赛 · 三创赛 2025",
+      en: "National Innovation & Entrepreneurship Competition 2025"
+    },
+    event: {
+      zh: "中央民族大学第三届经创杯 · 全国三创赛",
+      en: "Minzu University Business Innovation Cup · National Three-Innovation Competition"
+    },
     period: "2025.3",
     tags: ["共享经济", "校园服务", "商业模式"],
-    desc: "创新的校园出行解决方案，集成社交、出行与消费。展示从校园痛点到商业闭环的创业思路与实施路径。",
-    award: "三创赛 2025 参赛作品",
+    desc: {
+      zh: "创新的校园出行解决方案，集成社交、出行与消费。展示从校园痛点到商业闭环的创业思路与实施路径。",
+      en: "Innovative campus mobility solution integrating social networking, transportation, and consumption. Demonstrated entrepreneurial thinking from campus pain points to complete business model."
+    },
+    award: {
+      zh: "三创赛 2025 参赛作品",
+      en: "Three-Innovation Competition 2025 Entry"
+    },
     pdfUrl: "/works/slides/小民快跑ppt.pdf",
     pdfPageCount: 20,
     coverColor: "bg-blue-50",
   },
   {
     id: 4,
-    title: "文化书吧实体IP赋能社交APP",
-    subtitle: "商业赛 2025 · 创意创业项目",
-    event: "中国传媒大学 × 中央民族大学联合赛事",
+    title: {
+      zh: "文化书吧实体IP赋能社交APP",
+      en: "Cultural Bookstore IP Empowering Social App"
+    },
+    subtitle: {
+      zh: "商业赛 2025 · 创意创业项目",
+      en: "Business Competition 2025 · Creative Entrepreneurship Project"
+    },
+    event: {
+      zh: "中国传媒大学 × 中央民族大学联合赛事",
+      en: "Communication Univ. of China × Minzu Univ. Joint Competition"
+    },
     period: "2025.06",
     tags: ["文化创意", "社群运营", "实体+APP融合"],
-    desc: "以传统文化书吧为载体，通过实体IP赋能数字社交平台。展现青年创意、社区服务与银发经济的三维融合创新。",
-    award: "商业创意赛 2025",
+    desc: {
+      zh: "以传统文化书吧为载体，通过实体IP赋能数字社交平台。展现青年创意、社区服务与银发经济的三维融合创新。",
+      en: "Leveraged traditional cultural bookstore as physical IP to empower digital social platforms. Showcased three-dimensional integration of youth creativity, community service, and silver economy."
+    },
+    award: {
+      zh: "商业创意赛 2025",
+      en: "Business Creativity Competition 2025"
+    },
     pdfUrl: "/works/slides/本科创意组-新文科-巧愿·学者芸窗：以文化书吧实体IP赋能文娱社交app的运营创业实践(1).pdf",
     pdfPageCount: 27,
     coverColor: "bg-pink-50",
   },
   {
     id: 5,
-    title: "International Business Management",
-    subtitle: "国际商务大赛 · 北京市二等奖",
-    event: "国际商务大赛",
+    title: {
+      zh: "International Business Management",
+      en: "International Business Management"
+    },
+    subtitle: {
+      zh: "国际商务大赛 · 北京市二等奖",
+      en: "International Business Competition · Beijing Second Prize"
+    },
+    event: {
+      zh: "国际商务大赛",
+      en: "International Business Competition"
+    },
     period: "2025.11",
     tags: ["全英文写作", "商务分析", "跨文化沟通"],
-    desc: "全英文论文主笔撰写，担任团队主答辩手。从市场分析、竞争格局到战略落地，全程英文输出与现场答辩。",
-    award: "北京市二等奖",
+    desc: {
+      zh: "全英文论文主笔撰写，担任团队主答辩手。从市场分析、竞争格局到战略落地，全程英文输出与现场答辩。",
+      en: "Authored full English paper and served as team lead presenter. Covered market analysis, competitive landscape, and strategic implementation with complete English delivery and live defense."
+    },
+    award: {
+      zh: "北京市二等奖",
+      en: "Beijing Second Prize"
+    },
     pdfUrl: "/works/slides/International Business Mgt(1).pdf",
     pdfPageCount: 41,
     coverColor: "bg-indigo-50",
   },
   {
     id: 6,
-    title: "特高压输电工程对服务业企业绩效的影响",
-    subtitle: "全国能源经济大赛 · 一等奖",
-    event: "全国能源经济大赛",
+    title: {
+      zh: "特高压输电工程对服务业企业绩效的影响",
+      en: "Impact of UHV Transmission Projects on Service Industry Performance"
+    },
+    subtitle: {
+      zh: "全国能源经济大赛 · 一等奖",
+      en: "National Energy Economics Competition · First Prize"
+    },
+    event: {
+      zh: "全国能源经济大赛",
+      en: "National Energy Economics Competition"
+    },
     period: "2026.04",
     tags: ["学术路演", "Stata DID", "ArcGIS", "面板数据"],
-    desc: "基于双重差分模型的实证研究，展示特高压工程对服务业的外溢效应。配套完整学术 PPT 与可视化图表与答辩演示。",
-    award: "本科生研究论文组一等奖",
+    desc: {
+      zh: "基于双重差分模型的实证研究，展示特高压工程对服务业的外溢效应。配套完整学术 PPT 与可视化图表与答辩演示。",
+      en: "Empirical research based on Difference-in-Differences model, demonstrating spillover effects of UHV projects on service industry. Delivered with complete academic presentation, visualization charts, and defense."
+    },
+    award: {
+      zh: "本科生研究论文组一等奖",
+      en: "Undergraduate Research Paper Group First Prize"
+    },
     pdfUrl: "/works/slides/特高压输电ppt.pdf",
     pdfPageCount: 12,
     coverColor: "bg-amber-50",
@@ -112,9 +203,10 @@ const slides: SlideItem[] = [
 interface PDFFrameProps {
   pdfUrl: string;
   pdfPageCount: number;
+  lang: 'zh' | 'en';
 }
 
-function PDFFrame({ pdfUrl, pdfPageCount }: PDFFrameProps) {
+function PDFFrame({ pdfUrl, pdfPageCount, lang }: PDFFrameProps) {
   const maxPreviewPages = Math.min(pdfPageCount, 6);
   const pageImageUrls = Array.from({ length: maxPreviewPages }, (_, i) =>
     encodePublicFilePath(pdfUrl.replace(".pdf", `_p${i + 1}.jpg`))
@@ -138,7 +230,7 @@ function PDFFrame({ pdfUrl, pdfPageCount }: PDFFrameProps) {
       {/* 页码指示器 - 左下角 */}
       <div className="absolute bottom-2 left-2 bg-black/60 rounded-full px-2 py-1">
         <p className="text-white text-xs font-medium whitespace-nowrap">
-          手动滚动预览
+          {lang === 'zh' ? '手动滚动预览' : 'Manual Scroll'}
         </p>
       </div>
 
@@ -150,7 +242,7 @@ function PDFFrame({ pdfUrl, pdfPageCount }: PDFFrameProps) {
   );
 }
 
-function SlideCover({ slide }: { slide: SlideItem }) {
+function SlideCover({ slide, lang }: { slide: SlideItem; lang: 'zh' | 'en' }) {
   const [imgError, setImgError] = useState(false);
   const thumbUrl = encodePublicFilePath(slide.pdfUrl.replace(".pdf", "_thumb.jpg"));
 
@@ -165,7 +257,7 @@ function SlideCover({ slide }: { slide: SlideItem }) {
   return (
     <img
       src={thumbUrl}
-      alt={slide.title}
+      alt={slide.title[lang]}
       className="w-full h-full object-contain"
       onError={() => setImgError(true)}
     />
@@ -174,12 +266,17 @@ function SlideCover({ slide }: { slide: SlideItem }) {
 
 export function SlidesGallery() {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const { lang } = useLanguage();
 
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-serif text-gray-900 mb-1">Slides</h2>
-        <p className="text-xs text-gray-400 mb-6">路演作品 — 商业计划、学术报告与竞赛演示</p>
+        <p className="text-xs text-gray-400 mb-6">
+          {lang === 'zh'
+            ? '路演作品 — 商业计划、学术报告与竞赛演示'
+            : 'Pitch Decks — Business Plans, Academic Presentations & Competition Demos'}
+        </p>
       </div>
 
       {/* PPT 卡片网格 */}
@@ -204,7 +301,7 @@ export function SlidesGallery() {
                   {/* 缩略图区域 */}
                   <div className={`${slide.coverColor} px-4 pt-4 pb-3`}>
                     <div className="aspect-video rounded border border-gray-200/60 bg-gray-50 flex items-center justify-center overflow-hidden">
-                      <SlideCover slide={slide} />
+                      <SlideCover slide={slide} lang={lang} />
                     </div>
                   </div>
 
@@ -213,9 +310,9 @@ export function SlidesGallery() {
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
                         <p className="text-xs font-medium text-gray-900 line-clamp-1">
-                          {slide.title}
+                          {slide.title[lang]}
                         </p>
-                        <p className="text-[10px] text-gray-400 mt-0.5">{slide.subtitle}</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5">{slide.subtitle[lang]}</p>
                       </div>
                       <span className="text-[10px] text-gray-400 whitespace-nowrap shrink-0">
                         {slide.period}
@@ -249,18 +346,18 @@ export function SlidesGallery() {
                 >
                   {/* 上部：文字描述 */}
                   <div className="mb-3 flex-shrink-0">
-                    <p className="text-xs font-medium text-gray-900 mb-1">{slide.title}</p>
+                    <p className="text-xs font-medium text-gray-900 mb-1">{slide.title[lang]}</p>
                     {slide.award && (
-                      <p className="text-[10px] text-amber-700 mb-1.5 font-medium">{slide.award}</p>
+                      <p className="text-[10px] text-amber-700 mb-1.5 font-medium">{slide.award[lang]}</p>
                     )}
                     <p className="text-[11px] text-gray-600 leading-relaxed line-clamp-3">
-                      {slide.desc}
+                      {slide.desc[lang]}
                     </p>
                   </div>
 
                   {/* 中部：PDF预览框（with 黑色边框）*/}
                   <div className="flex-1 mb-3 min-h-0">
-                    <PDFFrame pdfUrl={slide.pdfUrl} pdfPageCount={slide.pdfPageCount} />
+                    <PDFFrame pdfUrl={slide.pdfUrl} pdfPageCount={slide.pdfPageCount} lang={lang} />
                   </div>
 
                   {/* 下部：Tags */}
@@ -284,7 +381,9 @@ export function SlidesGallery() {
       {/* 底部说明 */}
       <div className="border-t border-gray-100 pt-5">
         <p className="text-xs text-gray-400">
-          将鼠标悬停在卡片上即可预览 PDF 内容。中间预览框支持手动滚动查看。
+          {lang === 'zh'
+            ? '将鼠标悬停在卡片上即可预览 PDF 内容。中间预览框支持手动滚动查看。'
+            : 'Hover over cards to preview PDF content. The preview frame supports manual scrolling.'}
         </p>
       </div>
     </div>

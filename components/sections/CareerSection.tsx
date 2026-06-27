@@ -8,13 +8,14 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView, type Variants } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
 
 // ─────────────────────────────────────────
 // 类型定义
 // ─────────────────────────────────────────
 
 interface MetricCard {
-  label: string;
+  label: { zh: string; en: string };
   value: string;    // 数字部分（如 "500", "33.3"）
   prefix?: string;
   unit?: string;
@@ -26,16 +27,16 @@ interface Experience {
   type: 'internship' | 'education';
   org: string;
   orgEn: string;
-  role: string;
+  role: { zh: string; en: string };
   direction?: string;
   period: string;
   periodShort: string;
   /** 机构 Logo SVG 路径（public/assets/icons/），替代原 Emoji */
   logoSrc: string;
-  tag?: string;
+  tag?: { zh: string; en: string };
   metrics?: MetricCard[];
-  quote?: string;
-  bullets: string[];
+  quote?: { zh: string; en: string };
+  bullets: { zh: string[]; en: string[] };
   skills?: string[];
   markdownContent?: string;
   galleryImages?: string[];
@@ -44,9 +45,9 @@ interface Experience {
 interface HonorItem {
   date: string;
   yearLabel: string;
-  title: string;
-  issuer: string;
-  level?: string;
+  title: { zh: string; en: string };
+  issuer: { zh: string; en: string };
+  level?: { zh: string; en: string };
   /** 奖项图标 SVG 路径（icon-award / icon-medal / icon-star 循环） */
   iconSrc: string;
 }
@@ -70,36 +71,62 @@ const educationExperiences: Experience[] = [
     type: 'education',
     org: '香港岭南大学',
     orgEn: 'Lingnan University, Hong Kong',
-    role: '交换生 · 商学院 Global Business Focus',
+    role: {
+      zh: '交换生 · 商学院 Global Business Focus',
+      en: 'Exchange Student · Business School Global Business Focus'
+    },
     period: '2026.01 — 2026.06',
     periodShort: '2026',
     logoSrc: '/assets/icons/ln.svg',
-    tag: '交换项目',
-    quote: '额外申请人工智能数字化进阶课程，商科视野与 AI 工程能力在此深度融合。',
-    bullets: [
-      '商学院核心课程：全球商业战略、国际市场营销、国际商务分析、商业数据统计分析、数字化经济路径研究。',
-      '额外申请人工智能数字化进阶课程，探索 AI 工具与商业场景的深度融合。',
-      '获评学年优秀校际交换生，跨文化沟通与自适应能力得到认可。',
-    ],
-    skills: ['Global Business', '跨文化沟通', 'FinTech', '粤语'],
+    tag: { zh: '交换项目', en: 'Exchange' },
+    quote: {
+      zh: '额外申请人工智能数字化进阶课程，商科视野与 AI 工程能力在此深度融合。',
+      en: 'Applied for advanced AI digitalization courses, deeply integrating business perspectives with AI engineering capabilities.'
+    },
+    bullets: {
+      zh: [
+        '商学院核心课程：全球商业战略、国际市场营销、国际商务分析、商业数据统计分析、数字化经济路径研究。',
+        '额外申请人工智能数字化进阶课程，探索 AI 工具与商业场景的深度融合。',
+        '获评学年优秀校际交换生，跨文化沟通与自适应能力得到认可。',
+      ],
+      en: [
+        'Core business courses: Global Business Strategy, International Marketing, International Business Analysis, Business Data Statistical Analysis, Digital Economy Pathway Research.',
+        'Applied for advanced AI digitalization courses to explore the deep integration of AI tools with business scenarios.',
+        'Awarded Outstanding Inter-university Exchange Student of the Academic Year, recognized for cross-cultural communication and adaptive abilities.',
+      ],
+    },
+    skills: ['Global Business', '跨文化沟通 Cross-cultural', 'FinTech', '粤语 Cantonese'],
   },
   {
     id: 'minzu',
     type: 'education',
     org: '中央民族大学',
     orgEn: 'Minzu University of China',
-    role: '经济学（本科）· 国际经济与贸易',
+    role: {
+      zh: '经济学（本科）· 国际经济与贸易',
+      en: 'Economics (Undergraduate) · International Economics and Trade'
+    },
     period: '2024.09 — 2028.06',
     periodShort: '2024 —',
     logoSrc: '/assets/icons/muc.svg',
-    tag: '主校',
-    quote: '国际经贸底色，科研量化研究起点。在这里踏上了属于自己的大学之旅',
-    bullets: [
-      '主修国际经济与贸易。',
-      '积极参与学校各类活动，包括学术科研、创赛商赛，探索不同场景下对于个人能力的要求，争做一体机。',
-      '连续获评经济学院专业一等奖奖学金（前 5%），学业绩点优异。',
-    ],
-    skills: ['经济学', '国际贸易', 'Stata', 'Python', '学术写作'],
+    tag: { zh: '主校', en: 'Main' },
+    quote: {
+      zh: '国际经贸底色，科研量化研究起点。在这里踏上了属于自己的大学之旅',
+      en: 'Foundation in international trade, starting point for quantitative research. Here began my university journey.'
+    },
+    bullets: {
+      zh: [
+        '主修国际经济与贸易。',
+        '积极参与学校各类活动，包括学术科研、创赛商赛，探索不同场景下对于个人能力的要求，争做一体机。',
+        '连续获评经济学院专业一等奖奖学金（前 5%），学业绩点优异。',
+      ],
+      en: [
+        'Major in International Economics and Trade.',
+        'Actively participated in various school activities, including academic research and business competitions, exploring personal capability requirements across different scenarios.',
+        'Continuously awarded First-Class Scholarship from School of Economics (top 5%), with excellent academic GPA.',
+      ],
+    },
+    skills: ['经济学 Economics', '国际贸易 Int\'l Trade', 'Stata', 'Python', '学术写作 Academic Writing'],
   },
 ];
 
@@ -113,81 +140,141 @@ const honors: HonorItem[] = [
   {
     date: '2026.4',
     yearLabel: '2026',
-    title: '学年优秀校际交换生',
-    issuer: '香港岭南大学 商学院',
-    level: '校级',
+    title: {
+      zh: '学年优秀校际交换生',
+      en: 'Outstanding Inter-university Exchange Student of the Year'
+    },
+    issuer: {
+      zh: '香港岭南大学 商学院',
+      en: 'Lingnan University Business School'
+    },
+    level: { zh: '校级', en: 'University-level' },
     iconSrc: HONOR_ICONS[0],
   },
   {
     date: '2026.04',
     yearLabel: '2026',
-    title: '全国能源经济大赛 · 本科生研究论文组一等奖',
-    issuer: '中国能源研究会',
-    level: '国家级',
+    title: {
+      zh: '全国能源经济大赛 · 本科生研究论文组一等奖',
+      en: 'National Energy Economics Competition · First Prize (Undergraduate Research)'
+    },
+    issuer: {
+      zh: '中国能源研究会',
+      en: 'China Energy Research Society'
+    },
+    level: { zh: '国家级', en: 'National-level' },
     iconSrc: HONOR_ICONS[1],
   },
   {
     date: '2026.03',
     yearLabel: '2026',
-    title: '第十六届全国大学生"三创赛" · 全国二等奖',
-    issuer: '全国大学生创新创业大赛组委会',
-    level: '国家级',
+    title: {
+      zh: '第十六届全国大学生"三创赛" · 全国二等奖',
+      en: '16th National "San Chuang" Competition · Second Prize'
+    },
+    issuer: {
+      zh: '全国大学生创新创业大赛组委会',
+      en: 'National College Innovation & Entrepreneurship Competition Committee'
+    },
+    level: { zh: '国家级', en: 'National-level' },
     iconSrc: HONOR_ICONS[2],
   },
   {
     date: '2026.03',
     yearLabel: '2026',
-    title: '全国品牌策划竞赛（农里鸿项目）· 主撰稿人',
-    issuer: '全国品牌策划竞赛组委会',
-    level: '国家级',
+    title: {
+      zh: '全国品牌策划竞赛（农里鸿项目）· 主撰稿人',
+      en: 'National Brand Planning Competition (Nonglihong Project) · Lead Writer'
+    },
+    issuer: {
+      zh: '全国品牌策划竞赛组委会',
+      en: 'National Brand Planning Competition Committee'
+    },
+    level: { zh: '国家级', en: 'National-level' },
     iconSrc: HONOR_ICONS[0],
   },
   {
     date: '2025.12',
     yearLabel: '2025',
-    title: '"智法杯"人工智能赋能法学创新大赛 · 优秀奖',
-    issuer: '智法杯组委会',
-    level: '省级',
+    title: {
+      zh: '"智法杯"人工智能赋能法学创新大赛 · 优秀奖',
+      en: '"Zhifa Cup" AI-Empowered Legal Innovation Competition · Excellence Award'
+    },
+    issuer: {
+      zh: '智法杯组委会',
+      en: 'Zhifa Cup Committee'
+    },
+    level: { zh: '省级', en: 'Provincial-level' },
     iconSrc: HONOR_ICONS[1],
   },
   {
     date: '2025.11',
     yearLabel: '2025',
-    title: '全国 AI 赋能司法行政创新挑战赛 · 国家三等奖',
-    issuer: '司法部',
-    level: '国家级',
+    title: {
+      zh: '全国 AI 赋能司法行政创新挑战赛 · 国家三等奖',
+      en: 'National AI-Empowered Judicial Administration Innovation Challenge · Third Prize'
+    },
+    issuer: {
+      zh: '司法部',
+      en: 'Ministry of Justice'
+    },
+    level: { zh: '国家级', en: 'National-level' },
     iconSrc: HONOR_ICONS[2],
   },
   {
     date: '2025.11',
     yearLabel: '2025',
-    title: '国际商务大赛 · 北京市二等奖',
-    issuer: '北京市教育委员会',
-    level: '市级',
+    title: {
+      zh: '国际商务大赛 · 北京市二等奖',
+      en: 'International Business Competition · Beijing Second Prize'
+    },
+    issuer: {
+      zh: '北京市教育委员会',
+      en: 'Beijing Municipal Education Commission'
+    },
+    level: { zh: '市级', en: 'Municipal-level' },
     iconSrc: HONOR_ICONS[0],
   },
   {
     date: '2025.09',
     yearLabel: '2025',
-    title: '经济学院专业一等奖学金（前 5%）',
-    issuer: '中央民族大学 经济学院',
-    level: '院级',
+    title: {
+      zh: '经济学院专业一等奖学金（前 5%）',
+      en: 'First-Class Scholarship, School of Economics (Top 5%)'
+    },
+    issuer: {
+      zh: '中央民族大学 经济学院',
+      en: 'Minzu University of China, School of Economics'
+    },
+    level: { zh: '院级', en: 'School-level' },
     iconSrc: HONOR_ICONS[1],
   },
   {
     date: '2025.07',
     yearLabel: '2025',
-    title: '全国商务大赛（巧愿自习室项目）· 国家级奖项',
-    issuer: '中国国际贸易促进委员会',
-    level: '国家级',
+    title: {
+      zh: '全国商务大赛（巧愿自习室项目）· 国家级奖项',
+      en: 'National Business Competition (Qiaoyuan Study Room Project) · National Award'
+    },
+    issuer: {
+      zh: '中国国际贸易促进委员会',
+      en: 'China Council for the Promotion of International Trade'
+    },
+    level: { zh: '国家级', en: 'National-level' },
     iconSrc: HONOR_ICONS[2],
   },
   {
     date: '2025.05',
     yearLabel: '2025',
-    title: '大学生创新创业大赛 · 全国三等奖',
-    issuer: '教育部',
-    level: '国家级',
+    title: {
+      zh: '大学生创新创业大赛 · 全国三等奖',
+      en: 'College Innovation & Entrepreneurship Competition · National Third Prize'
+    },
+    issuer: {
+      zh: '教育部',
+      en: 'Ministry of Education'
+    },
+    level: { zh: '国家级', en: 'National-level' },
     iconSrc: HONOR_ICONS[0],
   },
 ];
@@ -336,9 +423,10 @@ interface ExperienceCardProps {
   exp: Experience;
   isActive: boolean;
   onClick: () => void;
+  lang: 'zh' | 'en';
 }
 
-function ExperienceCard({ exp, isActive, onClick }: ExperienceCardProps) {
+function ExperienceCard({ exp, isActive, onClick, lang }: ExperienceCardProps) {
   return (
     <motion.div
       variants={itemVariants}
@@ -380,7 +468,7 @@ function ExperienceCard({ exp, isActive, onClick }: ExperienceCardProps) {
             {exp.periodShort}
           </span>
         </div>
-        <p className="text-xs text-seed-shadow/60 leading-snug mb-2 pl-0.5">{exp.role}</p>
+        <p className="text-xs text-seed-shadow/60 leading-snug mb-2 pl-0.5">{exp.role[lang]}</p>
         {exp.tag && (
           <span className={[
             'inline-block text-[10px] px-1.5 py-0.5 rounded font-medium',
@@ -388,7 +476,7 @@ function ExperienceCard({ exp, isActive, onClick }: ExperienceCardProps) {
               ? 'bg-leaf-green/10 text-leaf-green'
               : 'bg-strawberry-jam/10 text-strawberry-jam',
           ].join(' ')}>
-            {exp.tag}
+            {exp.tag[lang]}
           </span>
         )}
       </div>
@@ -400,7 +488,7 @@ function ExperienceCard({ exp, isActive, onClick }: ExperienceCardProps) {
 // 右侧详情面板（含 Odometer + Ink Reveal）
 // ─────────────────────────────────────────
 
-function DetailPanel({ exp }: { exp: Experience }) {
+function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
   const hasMarkdown = typeof exp.markdownContent === 'string' && exp.markdownContent.length > 0;
 
   return (
@@ -428,10 +516,10 @@ function DetailPanel({ exp }: { exp: Experience }) {
                   const isDecimal = m.value.includes('.');
                   return (
                     <div
-                      key={m.label}
+                      key={m.label[lang]}
                       className="bg-milk-white/60 backdrop-blur-sm rounded-xl p-3 border border-seed-shadow/6 text-center"
                     >
-                      <p className="text-[10px] text-seed-shadow/50 mb-1 leading-snug">{m.label}</p>
+                      <p className="text-[10px] text-seed-shadow/50 mb-1 leading-snug">{m.label[lang]}</p>
                       <p className="text-xl font-serif font-bold text-leaf-green leading-none">
                         {m.prefix && (
                           <span className="text-xs font-sans font-normal text-seed-shadow/40 mr-0.5 align-middle">
@@ -461,7 +549,7 @@ function DetailPanel({ exp }: { exp: Experience }) {
                 &ldquo;
               </span>
               <p className="text-sm text-seed-shadow/70 italic leading-relaxed pt-2">
-                <InkReveal text={exp.quote} />
+                <InkReveal text={exp.quote[lang]} />
               </p>
             </div>
           ) : null}
@@ -496,7 +584,7 @@ function DetailPanel({ exp }: { exp: Experience }) {
                   Highlights · 核心职责
                 </p>
                 <ul className="space-y-2.5">
-                  {exp.bullets.map((b, i) => (
+                  {exp.bullets[lang].map((b, i) => (
                     <li key={i} className="flex items-start gap-2.5 group/item">
                       <span className="mt-1 shrink-0 w-1.5 h-1.5 rounded-full bg-leaf-green/60 group-hover/item:bg-leaf-green transition-colors duration-200" />
                       <span className="text-xs text-seed-shadow/70 leading-relaxed group-hover/item:text-seed-shadow transition-colors duration-200">{b}</span>
@@ -601,7 +689,7 @@ function SineWaveLine({ nodeCount, nodeWidth, nodeGap, paddingX }: SineWaveLineP
 // 横向可滑动时间轴节点（上下交替，中线居中，顺序淡入）
 // ─────────────────────────────────────────
 
-function TimelineNode({ honor, index }: { honor: HonorItem; index: number }) {
+function TimelineNode({ honor, index, lang }: { honor: HonorItem; index: number; lang: 'zh' | 'en' }) {
   const isUp = index % 2 === 0; // 偶数上，奇数下
 
   const cardContent = (
@@ -618,11 +706,11 @@ function TimelineNode({ honor, index }: { honor: HonorItem; index: number }) {
           {honor.date}
         </span>
       </div>
-      <p className="text-[11px] font-semibold text-seed-shadow leading-snug mb-1">{honor.title}</p>
-      <p className="text-[10px] text-seed-shadow/45 leading-snug mb-1.5">{honor.issuer}</p>
+      <p className="text-[11px] font-semibold text-seed-shadow leading-snug mb-1">{honor.title[lang]}</p>
+      <p className="text-[10px] text-seed-shadow/45 leading-snug mb-1.5">{honor.issuer[lang]}</p>
       {honor.level && (
         <span className="inline-block text-[9px] px-1.5 py-0.5 rounded-full bg-strawberry-jam/8 text-strawberry-jam font-semibold border border-strawberry-jam/15">
-          {honor.level}
+          {honor.level[lang]}
         </span>
       )}
     </motion.div>
@@ -676,6 +764,7 @@ function TimelineNode({ honor, index }: { honor: HonorItem; index: number }) {
 // ─────────────────────────────────────────
 
 export function CareerSection() {
+  const { lang } = useLanguage();
   const [internshipExperiences, setInternshipExperiences] = useState<Experience[]>([]);
   const [activeExp, setActiveExp] = useState<Experience | null>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -808,8 +897,12 @@ export function CareerSection() {
     >
       {/* 顶部标题 */}
       <motion.div variants={itemVariants}>
-        <h2 className="text-2xl font-serif text-seed-shadow mb-1">Career Journey</h2>
-        <p className="text-xs text-seed-shadow/40">教育与经历</p>
+        <h2 className="text-2xl font-serif text-seed-shadow mb-1">
+          {lang === 'zh' ? '教育与经历' : 'Career Journey'}
+        </h2>
+        <p className="text-xs text-seed-shadow/40">
+          {lang === 'zh' ? 'Career Journey' : '教育与经历'}
+        </p>
       </motion.div>
 
       {/* ══ 上半部：Master-Detail 主从分屏 ══ */}
@@ -818,17 +911,17 @@ export function CareerSection() {
         {/* 左侧导航（col-span-5） */}
         <motion.div variants={containerVariants} className="lg:col-span-5 flex flex-col gap-2.5">
           <motion.p variants={itemVariants} className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest px-1 mb-0.5">
-            Internships · 核心实习
+            {lang === 'zh' ? 'Internships · 核心实习' : 'Internships · 核心实习'}
           </motion.p>
           {internshipExperiences.map(exp => (
-            <ExperienceCard key={exp.id} exp={exp} isActive={activeExp?.id === exp.id} onClick={() => handleExperienceSelect(exp)} />
+            <ExperienceCard key={exp.id} exp={exp} isActive={activeExp?.id === exp.id} onClick={() => handleExperienceSelect(exp)} lang={lang} />
           ))}
 
           <motion.p variants={itemVariants} className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest px-1 mt-2 mb-0.5">
-            Education · 教育背景
+            {lang === 'zh' ? 'Education · 教育背景' : 'Education · 教育背景'}
           </motion.p>
           {educationExperiences.map(exp => (
-            <ExperienceCard key={exp.id} exp={exp} isActive={activeExp?.id === exp.id} onClick={() => handleExperienceSelect(exp)} />
+            <ExperienceCard key={exp.id} exp={exp} isActive={activeExp?.id === exp.id} onClick={() => handleExperienceSelect(exp)} lang={lang} />
           ))}
         </motion.div>
 
@@ -839,10 +932,10 @@ export function CareerSection() {
           style={{ minHeight: '420px' }}
         >
           {activeExp ? (
-            <DetailPanel exp={activeExp} />
+            <DetailPanel exp={activeExp} lang={lang} />
           ) : (
             <div className="paper-panel rounded-2xl h-full min-h-[420px] p-6 flex items-center justify-center text-seed-shadow/40">
-              正在加载实习数据...
+              {lang === 'zh' ? '正在加载实习数据...' : 'Loading internship data...'}
             </div>
           )}
         </motion.div>
@@ -852,12 +945,12 @@ export function CareerSection() {
       <motion.div ref={honorsSectionRef} variants={itemVariants} className="pt-4">
         <div className="flex items-center gap-3 mb-6">
           <p className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest shrink-0">
-            Honours &amp; Awards · 荣誉奖项
+            {lang === 'zh' ? 'Honours & Awards · 荣誉奖项' : 'Honours & Awards · 荣誉奖项'}
           </p>
           <div className="flex-1 h-px bg-seed-shadow/8" />
           <p className="text-[10px] text-seed-shadow/30 shrink-0 flex items-center gap-1">
             <span>←</span>
-            <span>拖动滑动</span>
+            <span>{lang === 'zh' ? '拖动滑动' : 'Drag to scroll'}</span>
             <span>→</span>
           </p>
         </div>
@@ -891,7 +984,7 @@ export function CareerSection() {
               />
               <div className="flex items-start gap-4 px-8 py-2" style={{ alignItems: 'flex-start' }}>
                 {honors.map((honor, i) => (
-                  <TimelineNode key={i} honor={honor} index={i} />
+                  <TimelineNode key={i} honor={honor} index={i} lang={lang} />
                 ))}
               </div>
             </div>

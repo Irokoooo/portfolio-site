@@ -16,7 +16,7 @@ import { AcademicResearchGallery } from "@/components/sections/gallery/AcademicR
 import { SlidesGallery } from "@/components/sections/gallery/SlidesGallery";
 import { AIPracticeGallery } from "@/components/sections/gallery/AIPracticeGallery";
 import { MobileHomePage } from "@/components/mobile/MobileHomePage";
-import { LanguageProvider } from "@/components/i18n/LanguageProvider";
+import { LanguageProvider, useLanguage } from "@/components/i18n/LanguageProvider";
 import { LanguageSwitch } from "@/components/ui/LanguageSwitch";
 
 // ───────────────────────────────────────────────
@@ -54,7 +54,7 @@ type SidebarTagId = "atyp-biz-student" | "idea-lander" | "vibe-coder" | "french-
 
 interface SidebarTag {
   id: SidebarTagId;
-  label: string;
+  label: { zh: string; en: string };
 }
 
 // ───────────────────────────────────────────────
@@ -86,11 +86,11 @@ const visibleSubNavItems = ENABLE_BUSINESS_ANALYSIS
   ? subNavItems
   : subNavItems.filter((item) => item.key !== "business");
 
-const sidebarTags: SidebarTag[] = [
-  { id: "atyp-biz-student", label: "非典型商科生" },
-  { id: "idea-lander", label: "脑洞落地机" },
-  { id: "vibe-coder", label: "Vibe Coding驯服中" },
-  { id: "french-learning", label: "FR学习施法中..." },
+const sidebarTags: { id: SidebarTagId; label: { zh: string; en: string } }[] = [
+  { id: "atyp-biz-student", label: { zh: "非典型商科生", en: "Atypical Biz Student" } },
+  { id: "idea-lander", label: { zh: "脑洞落地机", en: "Idea Executor" } },
+  { id: "vibe-coder", label: { zh: "Vibe Coding驯服中", en: "Learning Vibe Coding" } },
+  { id: "french-learning", label: { zh: "FR学习施法中...", en: "Learning French..." } },
 ];
 
 // ───────────────────────────────────────────────
@@ -176,7 +176,7 @@ function NavIcon({ src, isActive }: NavIconProps) {
   );
 }
 
-function TagBadge({ tag }: { tag: SidebarTag }) {
+function TagBadge({ tag, lang }: { tag: { id: SidebarTagId; label: { zh: string; en: string } }; lang: 'zh' | 'en' }) {
   const [isHovered, setIsHovered] = useState(false);
   const [glitter, setGlitter] = useState({ x: 50, y: 50, opacity: 0 });
   const glitterTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -196,6 +196,8 @@ function TagBadge({ tag }: { tag: SidebarTag }) {
     }, 220);
   };
 
+  const displayLabel = tag.label[lang];
+
   if (tag.id === "atyp-biz-student") {
     return (
       <motion.span
@@ -206,7 +208,7 @@ function TagBadge({ tag }: { tag: SidebarTag }) {
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className={`${baseClass} text-seed-shadow/70`}
       >
-        {tag.label}
+        {displayLabel}
       </motion.span>
     );
   }
@@ -222,7 +224,7 @@ function TagBadge({ tag }: { tag: SidebarTag }) {
         transition={{ duration: 0.28, ease: "easeOut" }}
         className={`${baseClass} text-seed-shadow/70`}
       >
-        {tag.label}
+        {displayLabel}
       </motion.span>
     );
   }
@@ -237,7 +239,7 @@ function TagBadge({ tag }: { tag: SidebarTag }) {
         transition={{ duration: 1.2, ease: "easeInOut", repeat: Infinity }}
         className={`${baseClass} text-seed-shadow/70`}
       >
-        {tag.label}
+        {displayLabel}
       </motion.span>
     );
   }
@@ -261,7 +263,7 @@ function TagBadge({ tag }: { tag: SidebarTag }) {
         transition={{ duration: 1, ease: "easeInOut" }}
         className="relative z-20"
       >
-        {tag.label}
+        {displayLabel}
       </motion.span>
 
       <motion.span
@@ -318,7 +320,8 @@ function renderSubSection(key: SubNavKey): React.ReactNode {
 // 主页面组件
 // ───────────────────────────────────────────────
 
-export default function HomePage() {
+function HomePageContent() {
+  const { lang } = useLanguage();
   const [activeTab, setActiveTab] = useState<NavKey>("about");
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   const [subActiveTab, setSubActiveTab] = useState<SubNavKey>("vibe");
@@ -386,7 +389,7 @@ export default function HomePage() {
     : (navItems.find(i => i.key === activeTab)?.watermark ?? "XY");
 
   return (
-    <LanguageProvider>
+    <>
       <div className="md:hidden min-h-screen">
         <MobileHomePage />
       </div>
@@ -424,7 +427,7 @@ export default function HomePage() {
 
             <div className="grid grid-cols-2 gap-1.5">
               {sidebarTags.map((tag) => (
-                <TagBadge key={tag.id} tag={tag} />
+                <TagBadge key={tag.id} tag={tag} lang={lang} />
               ))}
             </div>
 
@@ -607,6 +610,14 @@ export default function HomePage() {
         </div>
       </main>
       </div>
+    </>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <LanguageProvider>
+      <HomePageContent />
     </LanguageProvider>
   );
 }

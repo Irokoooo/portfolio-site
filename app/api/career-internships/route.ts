@@ -4,10 +4,13 @@ import path from "path";
 import matter from "gray-matter";
 
 interface InternshipMetric {
-  label: string;
+  labelZh: string;
+  labelEn: string;
   value: string;
-  unit?: string;
+  prefix?: string;
   suffix?: string;
+  unitZh?: string;
+  unitEn?: string;
 }
 
 interface InternshipFrontmatter {
@@ -16,12 +19,15 @@ interface InternshipFrontmatter {
   order?: number;
   org: string;
   orgEn: string;
-  role: string;
-  direction?: string;
+  roleZh: string;
+  roleEn: string;
+  directionZh?: string;
+  directionEn?: string;
   period: string;
   periodShort: string;
   logoSrc: string;
-  tag?: string;
+  tagZh?: string;
+  tagEn?: string;
   metrics?: InternshipMetric[];
   skills?: string[];
   galleryImages?: string[];
@@ -34,10 +40,41 @@ function isInternshipFrontmatter(data: unknown): data is InternshipFrontmatter {
   return typeof value.id === "string"
     && typeof value.org === "string"
     && typeof value.orgEn === "string"
-    && typeof value.role === "string"
+    && typeof value.roleZh === "string"
+    && typeof value.roleEn === "string"
     && typeof value.period === "string"
     && typeof value.periodShort === "string"
     && typeof value.logoSrc === "string";
+}
+
+// 解析 markdown 正文中的双语内容
+function parseMarkdownContent(content: string): { zh: string[]; en: string[] } {
+  const sections = content.split(/^## /m).filter(Boolean);
+  const zhBullets: string[] = [];
+  const enBullets: string[] = [];
+
+  sections.forEach(section => {
+    const lines = section.trim().split('\n');
+    let currentLang: 'zh' | 'en' | null = null;
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed === '### 中文') {
+        currentLang = 'zh';
+      } else if (trimmed === '### English') {
+        currentLang = 'en';
+      } else if (trimmed.startsWith('-') && currentLang) {
+        const bullet = trimmed.substring(1).trim();
+        if (currentLang === 'zh') {
+          zhBullets.push(bullet);
+        } else {
+          enBullets.push(bullet);
+        }
+      }
+    });
+  });
+
+  return { zh: zhBullets, en: enBullets };
 }
 
 export async function GET() {
@@ -63,20 +100,39 @@ export async function GET() {
         if (data.id === "internship-slug" || data.org === "公司名称" || data.orgEn === "Company Name") {
           return null;
         }
+
+        // 解析正文中的双语内容
+        const bullets = parseMarkdownContent(parsed.content.trim());
+
+        // 转换 metrics 格式
+        const metrics = Array.isArray(data.metrics)
+          ? data.metrics.map(m => ({
+              label: { zh: m.labelZh, en: m.labelEn },
+              value: m.value,
+              prefix: m.prefix,
+              suffix: m.suffix,
+              unit: m.unitZh || m.unitEn ? { zh: m.unitZh, en: m.unitEn } : undefined,
+            }))
+          : [];
+
         return {
           id: data.id,
           type: "internship" as const,
           order: typeof data.order === "number" ? data.order : 999,
           org: data.org,
           orgEn: data.orgEn,
-          role: data.role,
-          direction: typeof data.direction === "string" ? data.direction : undefined,
+          role: { zh: data.roleZh, en: data.roleEn },
+          direction: data.directionZh && data.directionEn
+            ? { zh: data.directionZh, en: data.directionEn }
+            : undefined,
           period: data.period,
           periodShort: data.periodShort,
           logoSrc: data.logoSrc,
-          tag: typeof data.tag === "string" ? data.tag : undefined,
-          metrics: Array.isArray(data.metrics) ? data.metrics : [],
-          bullets: [],
+          tag: data.tagZh && data.tagEn
+            ? { zh: data.tagZh, en: data.tagEn }
+            : undefined,
+          metrics,
+          bullets,
           skills: Array.isArray(data.skills) ? data.skills : [],
           galleryImages: Array.isArray(data.galleryImages) ? data.galleryImages : [],
           markdownContent: parsed.content.trim(),

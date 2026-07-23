@@ -257,7 +257,7 @@ function SlideCover({ slide, lang }: { slide: SlideItem; lang: 'zh' | 'en' }) {
   return (
     <img
       src={thumbUrl}
-      alt={slide.title[lang]}
+      alt={lang === 'zh' ? slide.title.zh : slide.title.en}
       className="w-full h-full object-contain"
       onError={() => setImgError(true)}
     />
@@ -310,9 +310,9 @@ export function SlidesGallery() {
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
                         <p className="text-xs font-medium text-gray-900 line-clamp-1">
-                          {slide.title[lang]}
+                          {lang === 'zh' ? slide.title.zh : slide.title.en}
                         </p>
-                        <p className="text-[10px] text-gray-400 mt-0.5">{slide.subtitle[lang]}</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5">{lang === 'zh' ? slide.subtitle.zh : slide.subtitle.en}</p>
                       </div>
                       <span className="text-[10px] text-gray-400 whitespace-nowrap shrink-0">
                         {slide.period}
@@ -346,12 +346,12 @@ export function SlidesGallery() {
                 >
                   {/* 上部：文字描述 */}
                   <div className="mb-3 flex-shrink-0">
-                    <p className="text-xs font-medium text-gray-900 mb-1">{slide.title[lang]}</p>
+                    <p className="text-xs font-medium text-gray-900 mb-1">{lang === 'zh' ? slide.title.zh : slide.title.en}</p>
                     {slide.award && (
-                      <p className="text-[10px] text-amber-700 mb-1.5 font-medium">{slide.award[lang]}</p>
+                      <p className="text-[10px] text-amber-700 mb-1.5 font-medium">{lang === 'zh' ? slide.award.zh : slide.award.en}</p>
                     )}
                     <p className="text-[11px] text-gray-600 leading-relaxed line-clamp-3">
-                      {slide.desc[lang]}
+                      {lang === 'zh' ? slide.desc.zh : slide.desc.en}
                     </p>
                   </div>
 

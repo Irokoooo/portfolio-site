@@ -352,8 +352,8 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                   <div key={category.key} className="space-y-3">
                     {/* 分类标题（去掉数字） */}
                     <CategoryHeader
-                      label={categoryLabels[category.key]?.[lang] ?? category.label}
-                      description={categoryDescriptions[category.key]?.[lang] ?? categoryDescriptions[category.key]?.zh ?? ""}
+                      label={(lang === 'zh' ? categoryLabels[category.key]?.zh : categoryLabels[category.key]?.en) ?? category.label}
+                      description={(lang === 'zh' ? categoryDescriptions[category.key]?.zh : categoryDescriptions[category.key]?.en) ?? ""}
                       themeKey={themeKey}
                     />
 
@@ -470,14 +470,14 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                               className="text-xs font-medium mb-2"
                               style={{ color: theme.headerColor }}
                             >
-                              {exp.role[lang]}
+                              {lang === 'zh' ? exp.role.zh : exp.role.en}
                             </p>
                             <p className="text-xs text-seed-shadow/55 leading-relaxed line-clamp-2 mb-2.5">
-                              {exp.desc[lang]}
+                              {lang === 'zh' ? exp.desc.zh : exp.desc.en}
                             </p>
                             <div className="flex flex-wrap gap-1.5">
                               {exp.tags.map((tag) => (
-                                <ColorTag key={tag[lang]} tag={tag[lang]} themeKey="fieldExperience" />
+                                <ColorTag key={lang === 'zh' ? tag.zh : tag.en} tag={lang === 'zh' ? tag.zh : tag.en} themeKey="fieldExperience" />
                               ))}
                             </div>
                             <p
@@ -500,7 +500,7 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
               <div className="space-y-3">
                 <CategoryHeader
                   label={lang === 'en' ? "Learning Notes" : "Learning Notes · 自学笔记"}
-                  description={categoryDescriptions["learning"]?.[lang] ?? categoryDescriptions["learning"]?.zh ?? ""}
+                  description={(lang === 'zh' ? categoryDescriptions["learning"]?.zh : categoryDescriptions["learning"]?.en) ?? ""}
                   themeKey="learning"
                 />
 

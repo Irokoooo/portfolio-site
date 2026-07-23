@@ -173,7 +173,7 @@ function MarqueeRow({
                   color: isHovered ? 'rgba(63,46,47,0.85)' : 'rgba(63,46,47,0.5)',
                 }}
               >
-                {item.q[lang]}
+                {lang === 'zh' ? item.q.zh : item.q.en}
               </motion.div>
 
               {/* hover 思考气泡 */}
@@ -192,7 +192,7 @@ function MarqueeRow({
                     <p className="text-[9px] text-seed-shadow/35 uppercase tracking-widest mb-1">
                       {lang === 'en' ? 'My Thoughts' : '我的思考'}
                     </p>
-                    <p className="text-[11px] text-seed-shadow/75 leading-relaxed">{item.thought[lang]}</p>
+                    <p className="text-[11px] text-seed-shadow/75 leading-relaxed">{lang === 'zh' ? item.thought.zh : item.thought.en}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -224,10 +224,10 @@ function AcademicCard({ item, lang }: { item: typeof academicInterests[0]; lang:
         <div className="p-4 flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <p className={`text-sm font-semibold leading-tight ${open ? "text-[#3A5A40]" : "text-seed-shadow"}`}>
-              {item.title[lang]}
+              {lang === 'zh' ? item.title.zh : item.title.en}
             </p>
             {!open && (
-              <p className="text-xs text-seed-shadow/50 leading-relaxed mt-1 line-clamp-1">{item.desc[lang]}</p>
+              <p className="text-xs text-seed-shadow/50 leading-relaxed mt-1 line-clamp-1">{lang === 'zh' ? item.desc.zh : item.desc.en}</p>
             )}
           </div>
           {/* 展开/收起箭头 */}
@@ -827,7 +827,7 @@ function DriftBottle({ hobby, cfg, idx, lang }: {
       {/* 瓶子图片 */}
       <img
         src={`/assets/decorations/${cfg.svg}.svg`}
-        alt={hobby.label[lang]}
+        alt={lang === 'zh' ? hobby.label.zh : hobby.label.en}
         width={bottleW}
         height={bottleH}
         style={{ objectFit: 'contain', width: bottleW, height: bottleH }}
@@ -844,7 +844,7 @@ function DriftBottle({ hobby, cfg, idx, lang }: {
           letterSpacing: '0.02em',
         }}
       >
-        {hobby.label[lang]}
+        {lang === 'zh' ? hobby.label.zh : hobby.label.en}
       </p>
 
       {/* click 展开描述纸条 */}
@@ -863,7 +863,7 @@ function DriftBottle({ hobby, cfg, idx, lang }: {
             }}
           >
             <p className="text-[8px] text-seed-shadow/60 leading-relaxed text-center" style={{ fontFamily: 'serif' }}>
-              {hobby.desc[lang]}
+              {lang === 'zh' ? hobby.desc.zh : hobby.desc.en}
             </p>
           </motion.div>
         )}

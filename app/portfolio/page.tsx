@@ -15,7 +15,6 @@ import { BusinessAnalysisGallery } from "@/components/sections/gallery/BusinessA
 import { AcademicResearchGallery } from "@/components/sections/gallery/AcademicResearchGallery";
 import { SlidesGallery } from "@/components/sections/gallery/SlidesGallery";
 import { AIPracticeGallery } from "@/components/sections/gallery/AIPracticeGallery";
-import { GalaxyAbilitiesSection } from "@/components/sections/gallery/GalaxyAbilitiesSection";
 import { MobileHomePage } from "@/components/mobile/MobileHomePage";
 import { LanguageProvider, useLanguage } from "@/components/i18n/LanguageProvider";
 import { LanguageSwitch } from "@/components/ui/LanguageSwitch";
@@ -25,10 +24,10 @@ import { LanguageSwitch } from "@/components/ui/LanguageSwitch";
 // ───────────────────────────────────────────────
 
 /** 一级导航 key */
-type NavKey = "about" | "interests" | "career" | "projects" | "sideworks" | "nextdest" | "galaxy";
+type NavKey = "about" | "interests" | "career" | "projects" | "sideworks" | "nextdest";
 
-/** 二级子菜单 key（Side Works + Galaxy 共用一套联合类型） */
-type SubNavKey = "business" | "vibe" | "slides" | "abilities" | "growth";
+/** Side Works 二级子菜单 key */
+type SubNavKey = "business" | "vibe" | "slides";
 
 interface NavItem {
   key: NavKey;
@@ -69,62 +68,23 @@ const navItems: NavItem[] = [
   { key: "sideworks", icon: "/assets/icons/sideworks.svg",         label: "Side works",         sublabel: "作品集",     watermark: "CRAFT",   hasDrilldown: true },
   { key: "projects",  icon: "/assets/icons/project-highlights.svg", label: "Academic & Practice", sublabel: "学术与实践", watermark: "RESEARCH" },
   { key: "interests", icon: "/assets/icons/interests.svg",         label: "My interests",       sublabel: "兴趣领域",   watermark: "IDEAS" },
-  { key: "galaxy",    icon: "/assets/icons/galaxy.svg",            label: "Galaxy",             sublabel: "能力星系",   watermark: "GALAXY",  hasDrilldown: true },
   { key: "nextdest",  icon: "/assets/icons/destination.svg",       label: "Next destination",   sublabel: "申请规划",   watermark: "NEXT" },
 ];
 
 // ── 水印文字配置说明 ──
 // 如需修改某个板块的底层水印文字，直接修改上方 navItems 中对应条目的 watermark 字段
 // 二级菜单水印在 subNavItems 中修改
-// ── 二级抽屉注册表 ──
-// 每个可 drill-down 的一级导航项，映射到它的子菜单配置。
-// 新增一个二级抽屉：在此加一条即可，无需改动导航渲染逻辑。
-interface DrilldownConfig {
-  /** 抽屉顶部标题 */
-  title: string;
-  /** 抽屉顶部小图标 */
-  icon: string;
-  /** 子菜单项 */
-  items: SubNavItem[];
-  /** 默认进入的子项 */
-  defaultTab: SubNavKey;
-}
-
-const drilldowns: Partial<Record<NavKey, DrilldownConfig>> = {
-  sideworks: {
-    title: "Side Works",
-    icon: "/assets/icons/sideworks.svg",
-    defaultTab: "vibe",
-    items: [
-      { key: "vibe",     icon: "/assets/icons/about.svg",     label: "Vibe Coding",       sublabel: "Vibe Coding 作品", watermark: "VIBE" },
-      { key: "slides",   icon: "/assets/icons/interests.svg", label: "Slides",            sublabel: "路演作品", watermark: "SLIDES" },
-      { key: "business", icon: "/assets/icons/career.svg",    label: "Business Analysis", sublabel: "商业分析", watermark: "ANALYSIS" },
-    ],
-  },
-  galaxy: {
-    title: "Galaxy",
-    icon: "/assets/icons/galaxy.svg",
-    defaultTab: "abilities",
-    items: [
-      { key: "abilities", icon: "/assets/icons/galaxy.svg",     label: "Ability Constellation", sublabel: "能力星座", watermark: "STARS" },
-      { key: "growth",    icon: "/assets/icons/interests.svg",  label: "Growth Galaxy",         sublabel: "成长星河 · 即将上线", watermark: "GROWTH" },
-    ],
-  },
-};
+const subNavItems: SubNavItem[] = [
+  { key: "vibe",     icon: "/assets/icons/about.svg",     label: "Vibe Coding",       sublabel: "Vibe Coding 作品", watermark: "VIBE" },
+  { key: "slides",   icon: "/assets/icons/interests.svg", label: "Slides",            sublabel: "路演作品", watermark: "SLIDES" },
+  { key: "business", icon: "/assets/icons/career.svg",    label: "Business Analysis", sublabel: "商业分析", watermark: "ANALYSIS" },
+];
 
 // 商业分析板块开关：false 为隐藏入口（保留文件与组件，后续可直接恢复）
 const ENABLE_BUSINESS_ANALYSIS = false;
-
-// 按开关过滤某个抽屉的可见子项
-function getVisibleSubItems(parent: NavKey | null): SubNavItem[] {
-  if (!parent) return [];
-  const cfg = drilldowns[parent];
-  if (!cfg) return [];
-  if (parent === "sideworks" && !ENABLE_BUSINESS_ANALYSIS) {
-    return cfg.items.filter((item) => item.key !== "business");
-  }
-  return cfg.items;
-}
+const visibleSubNavItems = ENABLE_BUSINESS_ANALYSIS
+  ? subNavItems
+  : subNavItems.filter((item) => item.key !== "business");
 
 const sidebarTags: { id: SidebarTagId; label: { zh: string; en: string } }[] = [
   { id: "atyp-biz-student", label: { zh: "非典型商科生", en: "Atypical Biz Student" } },
@@ -236,7 +196,7 @@ function TagBadge({ tag, lang }: { tag: { id: SidebarTagId; label: { zh: string;
     }, 220);
   };
 
-  const displayLabel = tag.label[lang];
+  const displayLabel = lang === 'zh' ? tag.label.zh : tag.label.en;
 
   if (tag.id === "atyp-biz-student") {
     return (
@@ -346,90 +306,14 @@ const sectionMap: Record<NavKey, React.ReactNode> = {
   projects: <AcademicResearchGallery />,
   sideworks: <SideWorksSection />,
   nextdest: <NextDestSection />,
-  // galaxy 为纯 drill-down 项，正常不经 sectionMap 渲染；此处提供兜底
-  galaxy: <GalaxyAbilitiesSection />,
 };
-
-// 成长星河占位组件（第二板块，视觉原型阶段仅占位）
-function GrowthGalaxyPlaceholder() {
-  return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-2xl font-serif text-seed-shadow mb-1">Growth Galaxy</h2>
-        <p className="text-xs text-seed-shadow/40">成长星河 · 碎碎念与近期事件</p>
-      </div>
-      <div
-        className="rounded-2xl border border-seed-shadow/15 shadow-lg flex items-center justify-center"
-        style={{
-          height: "min(60vh, 520px)",
-          background:
-            "radial-gradient(120% 90% at 50% 20%, #241a35 0%, #16112a 45%, #0c0a1c 80%, #070510 100%)",
-        }}
-      >
-        <p className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
-          🌌 按时间生长的成长星河即将上线 · Coming soon
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function renderSubSection(key: SubNavKey): React.ReactNode {
   switch (key) {
-    case "business":  return <BusinessAnalysisGallery />;
-    case "vibe":      return <AIPracticeGallery />;
-    case "slides":    return <SlidesGallery />;
-    case "abilities": return <GalaxyAbilitiesSection />;
-    case "growth":    return <GrowthGalaxyPlaceholder />;
+    case "business": return <BusinessAnalysisGallery />;
+    case "vibe":       return <AIPracticeGallery />;
+    case "slides":   return <SlidesGallery />;
   }
-}
-
-// ───────────────────────────────────────────────
-// 侧边栏底部：版权文字 ⇄ 悬浮切换花体签名
-// 两层叠在同一格子里做交叉淡入，节省纵向空间（免滚动）
-// ───────────────────────────────────────────────
-function SignatureFooter({
-  signatureSrc,
-  onSignatureError,
-}: {
-  signatureSrc: string;
-  onSignatureError: (src: string) => void;
-}) {
-  const [hover, setHover] = useState(false);
-  return (
-    <div
-      className="relative select-none"
-      style={{ height: 40 }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      {/* 版权文字层 */}
-      <div
-        className="absolute inset-0 flex flex-col justify-center transition-opacity duration-500"
-        style={{ opacity: hover ? 0 : 1 }}
-      >
-        <p className="text-xs text-seed-shadow/25 leading-tight">Built with Vibe Coding</p>
-        <p className="text-xs text-seed-shadow/25 mt-0.5 leading-tight">© 2026 Xinyi Shi</p>
-      </div>
-      {/* 花体签名层 */}
-      <img
-        src={signatureSrc}
-        alt="Seraphina signature"
-        aria-hidden="true"
-        className="absolute left-0 top-1/2 -translate-y-1/2 w-44 pointer-events-none transition-opacity duration-500"
-        style={{
-          opacity: hover ? 0.82 : 0,
-          mixBlendMode: "multiply",
-          filter: "contrast(1.08) saturate(0.78)",
-        }}
-        onError={() => {
-          if (signatureSrc !== "/assets/decorations/signature.jpg") {
-            onSignatureError("/assets/decorations/signature.jpg");
-          }
-        }}
-      />
-    </div>
-  );
 }
 
 // ───────────────────────────────────────────────
@@ -439,8 +323,7 @@ function SignatureFooter({
 function HomePageContent() {
   const { lang } = useLanguage();
   const [activeTab, setActiveTab] = useState<NavKey>("about");
-  // 当前打开的二级抽屉对应的一级 key（null = 未打开任何抽屉）
-  const [drillParent, setDrillParent] = useState<NavKey | null>(null);
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   const [subActiveTab, setSubActiveTab] = useState<SubNavKey>("vibe");
   const [signatureSrc, setSignatureSrc] = useState("/assets/decorations/signature.png");
   // 右侧内容区 ref，用于切换页面时滚动回顶部
@@ -455,17 +338,13 @@ function HomePageContent() {
     // 恢复默认（此处不需要 smooth，保持 auto 即可）
   }
 
-  const isSubMenuOpen = drillParent !== null;
-  const visibleSubNavItems = getVisibleSubItems(drillParent);
-
   function handlePrimaryNav(key: NavKey, hasDrilldown?: boolean) {
     scrollToTop();
     if (hasDrilldown) {
-      const cfg = drilldowns[key];
-      setDrillParent(key);
-      setSubActiveTab(cfg?.defaultTab ?? "vibe");
+      setIsSubMenuOpen(true);
+      setSubActiveTab("vibe");
     } else {
-      setDrillParent(null);
+      setIsSubMenuOpen(false);
       setActiveTab(key);
     }
   }
@@ -477,10 +356,8 @@ function HomePageContent() {
 
   function handleBack() {
     scrollToTop();
-    // 返回主菜单，并把当前一级高亮落回抽屉所属的父项
-    const parent = drillParent;
-    setDrillParent(null);
-    if (parent) setActiveTab(parent);
+    setIsSubMenuOpen(false);
+    setActiveTab("projects");
   }
 
   const currentContent = isSubMenuOpen
@@ -506,9 +383,6 @@ function HomePageContent() {
     }
   }, [subActiveTab]);
 
-  // 当前抽屉配置（用于抽屉标题/图标）
-  const currentDrilldown = drillParent ? drilldowns[drillParent] : undefined;
-
   // 当前水印文字：根据激活状态选取
   const currentWatermark = isSubMenuOpen
     ? (visibleSubNavItems.find(i => i.key === subActiveTab)?.watermark ?? "WORKS")
@@ -522,12 +396,7 @@ function HomePageContent() {
 
       <div className="hidden md:flex h-screen bg-transparent overflow-hidden">
       {/* ===== 左侧固定侧边栏 ===== */}
-      {/* Galaxy drilldown 激活时变强毛玻璃(沉浸式全屏银河背景) */}
-      <aside className={`w-64 shrink-0 border-r h-screen overflow-hidden sticky top-0 transition-all duration-500 ${
-        drillParent === 'galaxy'
-          ? 'bg-milk-white/30 backdrop-blur-xl border-seed-shadow/5'
-          : 'bg-milk-white/70 backdrop-blur-sm border-seed-shadow/10'
-      }`}>
+      <aside className="w-64 shrink-0 border-r border-seed-shadow/10 h-screen overflow-hidden bg-milk-white/70 backdrop-blur-sm sticky top-0">
         {/* 金箔纹理叠加层：绝对定位覆盖整个侧边栏，multiply 混合模式 */}
         <img
           src="/assets/decorations/gold-foil.png"
@@ -548,7 +417,7 @@ function HomePageContent() {
           </div>
 
           {/* Profile 卡片（固定在顶部） */}
-          <div className="px-6 pt-5 pb-3 space-y-2.5 shrink-0">
+          <div className="p-6 pb-4 space-y-3 shrink-0">
             <div className="space-y-0.5">
               <h1 className="text-2xl font-serif leading-tight shimmer-name">史心怡</h1>
               <p className="text-sm text-seed-shadow/50 mt-0.5">Xinyi Shi / Seraphina</p>
@@ -595,18 +464,18 @@ function HomePageContent() {
                   animate={primaryMenuVariants.enter}
                   exit={primaryMenuVariants.exit}
                   transition={menuTransition}
-                  className="absolute inset-0 px-6 pt-3 space-y-0.5 overflow-y-auto scrollbar-hide"
+                  className="absolute inset-0 px-6 pt-6 space-y-0.5 overflow-y-auto"
                 >
                   {navItems.map((item) => {
                     const isActive =
                       (!isSubMenuOpen && activeTab === item.key) ||
-                      (isSubMenuOpen && drillParent === item.key);
+                      (!!item.hasDrilldown && isSubMenuOpen);
                     return (
                       <motion.button
                         key={item.key}
                         onClick={() => handlePrimaryNav(item.key, item.hasDrilldown)}
                         whileTap={{ scale: 0.96 }}
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded text-left transition-all duration-150 group ${
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded text-left transition-all duration-150 group ${
                           isActive
                             ? "bg-cream-pour text-seed-shadow"
                             : "text-seed-shadow/50 hover:bg-cream-pour/60 hover:text-seed-shadow"
@@ -647,17 +516,17 @@ function HomePageContent() {
                     </div>
                   </button>
 
-                  {/* 二级标题：根据当前抽屉动态显示 */}
+                  {/* Side Works 二级标题：SVG 图标替代 Emoji */}
                   <div className="px-3 mb-3">
                     <div className="flex items-center gap-2">
                       <img
-                        src={currentDrilldown?.icon ?? "/assets/icons/sideworks.svg"}
+                        src="/assets/icons/sideworks.svg"
                         alt=""
                         aria-hidden="true"
                         className="w-4 h-4 object-contain opacity-60"
                       />
                       <p className="text-xs font-medium text-seed-shadow/30 uppercase tracking-widest">
-                        {currentDrilldown?.title ?? "Side Works"}
+                        Side Works
                       </p>
                     </div>
                   </div>
@@ -694,17 +563,30 @@ function HomePageContent() {
             </AnimatePresence>
           </div>
 
-          {/* 底部：版权文字 ⇄ 悬浮切换为花体签名（省去独立签名块，侧边栏免滚动） */}
-          <div className="px-6 py-4 border-t border-seed-shadow/10 shrink-0">
-            <SignatureFooter signatureSrc={signatureSrc} onSignatureError={setSignatureSrc} />
+          {/* 底部：签名装饰 + 版权 */}
+          <div className="p-6 pt-4 border-t border-seed-shadow/10 shrink-0">
+            {/* 花体签名素材：public/assets/decorations/signature.jpg */}
+            <img
+              src={signatureSrc}
+              alt="Seraphina signature"
+              className="w-48 mb-3 select-none pointer-events-none"
+              aria-hidden="true"
+              style={{ opacity: 0.78, mixBlendMode: 'multiply', filter: 'contrast(1.08) saturate(0.78)' }}
+              onError={() => {
+                if (signatureSrc !== "/assets/decorations/signature.jpg") {
+                  setSignatureSrc("/assets/decorations/signature.jpg");
+                }
+              }}
+            />
+            <p className="text-xs text-seed-shadow/25">Built with Vibe Coding</p>
+            <p className="text-xs text-seed-shadow/25 mt-0.5">© 2026 Xinyi Shi</p>
           </div>
         </div>
       </aside>
 
       {/* ===== 右侧动态内容区 ===== */}
       {/* relative 定位是 <Watermark> 绝对定位的锚点 */}
-      {/* Galaxy 二级页面时全屏无边距(沉浸式银河);其他页面保持白色卡片边距 */}
-      <main ref={mainRef} className={`flex-1 h-screen overflow-y-auto relative ${drillParent === 'galaxy' ? 'bg-[#050209]' : 'bg-transparent'}`}>
+      <main ref={mainRef} className="flex-1 h-screen overflow-y-auto relative bg-transparent">
         {/* vine-right 视差装饰：随滚动轻微上移 */}
         <VineParallax mainRef={mainRef} />
         {/* 动态水印：随页面切换淡入切换文字 */}
@@ -713,24 +595,19 @@ function HomePageContent() {
           <Watermark key={currentWatermark} text={currentWatermark} />
         </AnimatePresence>
 
-        {/* Galaxy 沉浸式全屏：直接渲染 fixed 层，跳过 padding 容器 */}
-        {drillParent === 'galaxy' && subActiveTab === 'abilities' ? (
-          <GalaxyAbilitiesSection />
-        ) : (
-          <div className={`w-full relative z-10 ${drillParent === 'galaxy' ? '' : 'px-8 py-10'}`}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={contentKey}
-                initial={{ opacity: 0, y: 18, filter: 'blur(4px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, y: -10, filter: 'blur(2px)' }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {currentContent}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        )}
+        <div className="w-full px-8 py-10 relative z-10">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={contentKey}
+              initial={{ opacity: 0, y: 18, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -10, filter: 'blur(2px)' }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {currentContent}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </main>
       </div>
     </>

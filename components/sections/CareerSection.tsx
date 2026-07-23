@@ -468,7 +468,7 @@ function ExperienceCard({ exp, isActive, onClick, lang }: ExperienceCardProps) {
             {exp.periodShort}
           </span>
         </div>
-        <p className="text-xs text-seed-shadow/60 leading-snug mb-2 pl-0.5">{exp.role[lang]}</p>
+        <p className="text-xs text-seed-shadow/60 leading-snug mb-2 pl-0.5">{lang === 'zh' ? exp.role.zh : exp.role.en}</p>
         {exp.tag && (
           <span className={[
             'inline-block text-[10px] px-1.5 py-0.5 rounded font-medium',
@@ -476,7 +476,7 @@ function ExperienceCard({ exp, isActive, onClick, lang }: ExperienceCardProps) {
               ? 'bg-leaf-green/10 text-leaf-green'
               : 'bg-strawberry-jam/10 text-strawberry-jam',
           ].join(' ')}>
-            {exp.tag[lang]}
+            {lang === 'zh' ? exp.tag.zh : exp.tag.en}
           </span>
         )}
       </div>
@@ -516,10 +516,10 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
                   const isDecimal = m.value.includes('.');
                   return (
                     <div
-                      key={m.label[lang]}
+                      key={lang === 'zh' ? m.label.zh : m.label.en}
                       className="bg-milk-white/60 backdrop-blur-sm rounded-xl p-3 border border-seed-shadow/6 text-center"
                     >
-                      <p className="text-[10px] text-seed-shadow/50 mb-1 leading-snug">{m.label[lang]}</p>
+                      <p className="text-[10px] text-seed-shadow/50 mb-1 leading-snug">{lang === 'zh' ? m.label.zh : m.label.en}</p>
                       <p className="text-xl font-serif font-bold text-leaf-green leading-none">
                         {m.prefix && (
                           <span className="text-xs font-sans font-normal text-seed-shadow/40 mr-0.5 align-middle">
@@ -549,7 +549,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
                 &ldquo;
               </span>
               <p className="text-sm text-seed-shadow/70 italic leading-relaxed pt-2">
-                <InkReveal text={exp.quote[lang]} />
+                <InkReveal text={lang === 'zh' ? exp.quote.zh : exp.quote.en} />
               </p>
             </div>
           ) : null}
@@ -584,7 +584,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
                   Highlights · 核心职责
                 </p>
                 <ul className="space-y-2.5">
-                  {exp.bullets[lang].map((b, i) => (
+                  {(lang === 'zh' ? exp.bullets.zh : exp.bullets.en).map((b, i) => (
                     <li key={i} className="flex items-start gap-2.5 group/item">
                       <span className="mt-1 shrink-0 w-1.5 h-1.5 rounded-full bg-leaf-green/60 group-hover/item:bg-leaf-green transition-colors duration-200" />
                       <span className="text-xs text-seed-shadow/70 leading-relaxed group-hover/item:text-seed-shadow transition-colors duration-200">{b}</span>
@@ -706,11 +706,11 @@ function TimelineNode({ honor, index, lang }: { honor: HonorItem; index: number;
           {honor.date}
         </span>
       </div>
-      <p className="text-[11px] font-semibold text-seed-shadow leading-snug mb-1">{honor.title[lang]}</p>
-      <p className="text-[10px] text-seed-shadow/45 leading-snug mb-1.5">{honor.issuer[lang]}</p>
+      <p className="text-[11px] font-semibold text-seed-shadow leading-snug mb-1">{lang === 'zh' ? honor.title.zh : honor.title.en}</p>
+      <p className="text-[10px] text-seed-shadow/45 leading-snug mb-1.5">{lang === 'zh' ? honor.issuer.zh : honor.issuer.en}</p>
       {honor.level && (
         <span className="inline-block text-[9px] px-1.5 py-0.5 rounded-full bg-strawberry-jam/8 text-strawberry-jam font-semibold border border-strawberry-jam/15">
-          {honor.level[lang]}
+          {lang === 'zh' ? honor.level.zh : honor.level.en}
         </span>
       )}
     </motion.div>

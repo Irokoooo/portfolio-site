@@ -441,7 +441,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                         border: "1px solid rgba(184,134,11,0.18)",
                       }}
                     >
-                      {(mediaLabel[item.mediaType]?.[lang] ?? mediaLabel[item.mediaType]?.zh) ?? item.mediaType}
+                      {(lang === 'zh' ? mediaLabel[item.mediaType]?.zh : mediaLabel[item.mediaType]?.en) ?? item.mediaType}
                     </span>
                   </div>
 

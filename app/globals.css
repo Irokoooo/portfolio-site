@@ -121,6 +121,29 @@ body::before {
     display: none;
   }
 
+  /* ── 能力星座 · 星空动画 ── */
+  /* 背景星微弱闪烁 */
+  @keyframes star-twinkle {
+    0%, 100% { opacity: 0.25; }
+    50%      { opacity: 0.85; }
+  }
+  /* 能力星光晕呼吸（熟练度越高越缓越亮，具体参数由组件内联覆盖） */
+  @keyframes star-breathe {
+    0%, 100% { transform: scale(1);    opacity: 0.55; }
+    50%      { transform: scale(1.12); opacity: 0.9; }
+  }
+  /* 热爱能力的外环缓慢旋转脉冲 */
+  @keyframes passion-ring {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50%      { opacity: 0.7;  transform: scale(1.08); }
+  }
+  /* 流星偶尔划过 */
+  @keyframes galaxy-meteor {
+    0%   { opacity: 0; transform: translate(0, 0); }
+    10%  { opacity: 0.8; }
+    100% { opacity: 0; transform: translate(-220px, 120px); }
+  }
+
   /* ── Bento 卡片：cream-pour 底色 + 柔和纸张微卷折痕 ── */
   /* 折痕原理：右下角用双层渐变 + box-shadow 模拟真实纸边卷起的立体感 */
   .bento-card {

@@ -3,6 +3,130 @@
 > 本文件保存每一轮开发的完成内容，作为项目历史档案。
 > 当前工作焦点请看 `docs/ACTIVE_CONTEXT.md`。
 
+## 第九十一轮（2026-07-21）— 侧边栏免滚动 + 能力星系升级为真 3D 旋涡银河
+
+### ✅ 侧边栏免滚动 + 签名悬浮切换
+- [x] `app/page.tsx` 新增 `SignatureFooter`：底部版权文字 ⇄ 花体签名交叉淡入（悬浮切换），删除独立签名块
+- [x] 压缩 Profile / 导航间距，7 项导航平铺免滚动（导航加 `scrollbar-hide`）
+
+### ✅ 能力星系升级为真 3D 旋涡银河（移植 galaxy-template.html，零新依赖）
+- [x] `content/galaxy/abilities.ts`：分类配色改为银河家族色（金/蓝/粉/紫），能力星融入星系不突兀
+- [x] 新增 `components/sections/gallery/AbilityGalaxy3D.tsx`：11000 粒子银河盘 + 5000 星尘 + 呼吸 shader + UnrealBloom + 中心紫晕 + 淡金轨道环 + 流星 + OrbitControls 自转
+  - 能力星（大小=作者设定 / 亮度=熟练度 / 颜色=分类），按熟练度沿旋臂布局
+  - 点击 → 该星与相连能力提亮变大 + 星座连线；悬停 DOM 浮标显示名字
+  - ResizeObserver 适配 + 完整 dispose
+- [x] 重写 `GalaxyAbilitiesSection.tsx`：`dynamic(ssr:false)` 加载银河 + 图例 + 详情从底部浮起
+- [x] 依赖复用 `three` / `@react-three/*` / `postprocessing`（做 3D 书房时已装），零新增
+
+### ✅ 验证
+- [x] 项目文件 `tsc --noEmit` 零错误
+- [x] `next build` 编译成功（主页 8.14 kB / First Load 502 kB）
+
+### 📝 待完成 / 已知问题
+- [ ] 本地可视化编辑器（`?edit=1`）：3D 下摆位较难，考虑 2D 摆位→存 x/y→3D 映射 或 表单式
+- [ ] 「成长星河」可复用银河引擎（时间当半径）
+- [ ] Galaxy 移动端适配
+- [ ] ⚠️ 根目录未跟踪的 `Skills/` 文件夹会导致 `next build` 类型检查报错，建议加 `.gitignore`/`tsconfig exclude` 或删除
+
+---
+
+## 第九十轮（2026-07-21）— 数字书房：模型压缩 + 卡片化交互 + 拖拽误触修复
+
+### ✅ 3D 模型体积压缩（加载慢根因修复）
+- [x] 用 `@gltf-transform/cli optimize` 批量处理 `public/models/` 下全部 14 个 `.glb`：几何精简（meshopt）+ 贴图统一压到 1024px 并转 WebP
+- [x] 总体积从 **161MB → 6.8MB**（压缩约 96%），单文件示例：`desk.glb` 48MB→368KB，`potted_plant.glb` 33MB→1.5MB，`bookshelf.glb` 22MB→444KB
+- [x] 压缩产物零报错，仅 10 条 `quantize: Skipping TEXCOORD_0` 良性告警（个别 UV 超范围通道被跳过优化，不影响贴图显示）
+- [x] 原始未压缩模型备份到 `public/models_original_backup/`，并加入 `.gitignore`（本地留档，不进仓库）
+- [x] drei 的 `useGLTF` 默认已支持 Meshopt/Draco 解码器，压缩后模型无需改动任何组件调用方式
+
+### ✅ 数字书房卡片交互改造：全屏弹层 → 原地展开
+- [x] 新增 `components/scene/StudyRoomCard.tsx`：替换原来点击后 `fixed inset-0` 全屏 Modal 的 `StudyRoomModal`
+  - 卡片保持在 About 页左栏「工作理念」与「技能堆栈」卡片之间的位置
+  - 点击后卡片自身用 `motion.div` layout 动画展开到 560px 高，内嵌 3D 场景；再点击收起
+  - hover / focus 时提前 `import()` 预热 `StudyRoomCanvas` 的 JS chunk，降低展开时的等待感
+- [x] `components/sections/AboutSection.tsx`：接入 `<StudyRoomCard />`，移除旧的 `isRoomOpen` 状态与 `<StudyRoomModal>` 调用，清理未使用的 `useState` 导入
+- [x] `components/overlay/ContentPortal.tsx`：不再 `createPortal` 到 `document.body`，改为在卡片自身的 `relative` 容器内用 `absolute inset-0` 定位，点击书房内物件（书架/地图等）弹出的内容只覆盖卡片区域，不再盖住整页
+- [x] `components/scene/StudyRoomCanvas.tsx`：Loading 兜底层由 `fixed inset-0` 改为 `absolute inset-0`，避免 Suspense 兜底时遮住整个视口
+- [x] 原 `components/scene/StudyRoomModal.tsx` 已无引用，保留文件未删除（用户要求不擅自删除未确认文件）
+
+### ✅ 修复：拖拽视角时误触书架等物件
+- **根因**：3D 场景里拖拽旋转视角（OrbitControls）松开鼠标时，若指针正好停在书架/地图等可交互物件上，three.js/r3f 仍会派发一次 `click` 事件，被误判为“点击书架”从而弹出读书笔记内容；书架模型体积最大，命中概率最高
+- **修复**：`lib/useOverlayStore.tsx` 新增拖拽守卫——`window` 级 `pointerdown`/`pointermove` 监听记录本次交互的最大位移，超过 `DRAG_THRESHOLD_PX = 6` 像素即判定为拖拽视角，`openOverlay` 内拦截这次尾随 click，不再弹出内容
+- [x] 只改了 `lib/useOverlayStore.tsx` 一个文件，书架/地图/地球仪等 7 个物件组件无需改动
+- [x] 若阈值感觉过灵敏或不够灵敏，可直接调整该文件里的 `DRAG_THRESHOLD_PX` 常量
+
+### ✅ 验证
+- [x] `npx tsc --noEmit` 对本轮改动文件（`AboutSection.tsx` / `StudyRoomCard.tsx` / `ContentPortal.tsx` / `StudyRoomCanvas.tsx` / `useOverlayStore.tsx`）零错误
+- [x] dev server 编译无报错，`GET /` 200，反复刷新验证正常
+- [x] （注：`app/page.tsx` 当时存在用户自行编辑中的 Galaxy 板块未完成代码报错，与本轮改动无关，用户表示自行处理，未介入）
+
+---
+
+## 第八十九轮（2026-07-21）— 新增 Galaxy 能力星系栏目（能力星座视觉原型）
+
+### ✅ 能力星座（Ability Constellation）只读展示端
+- [x] 新增 `content/galaxy/abilities.ts`：类型定义（`AbilityNode`/`AbilityEdge`/`GalaxyData`）+ 四类分类配色 + 熟练度光晕表 + 示例数据（10 星 / 10 连线）
+- [x] 新增 `components/sections/gallery/GalaxyAbilitiesSection.tsx`：纯 SVG + framer-motion 深空星图（零新依赖）
+  - 背景星尘闪烁、能力星光晕呼吸（熟练度→亮度）、热爱能力外环、分类→星色
+  - 星座连线（激活时显文字标签）、悬停联动高亮、点击聚焦、详情从屏幕底部浮起
+  - 平移（拖动）+ 缩放（滚轮）+ 回正视角按钮
+- [x] `app/globals.css`：新增 `star-twinkle` / `star-breathe` / `passion-ring` / `galaxy-meteor` 关键帧
+- [x] `public/assets/icons/galaxy.svg`：新增导航图标
+
+### ✅ 侧边栏 drill-down 逻辑通用化
+- [x] 把原写死给 Side Works 的二级菜单重构为 `drilldowns` 注册表 + `drillParent` 状态，可承载多个二级抽屉
+- [x] 新增一级导航 `Galaxy`（二级含「能力星座」+「成长星河」占位）
+- [x] 抽屉标题/图标、Back 返回、水印文字均改为按当前抽屉动态取值
+- [x] 保持现有 Side Works 交互与 `ENABLE_BUSINESS_ANALYSIS` 开关行为不变
+
+### ✅ 验证
+- [x] 项目文件 `tsc --noEmit` 零错误
+- [x] `next build` 编译成功（`✓ Compiled successfully`）
+
+### 📝 待完成 / 已知问题
+- [ ] 本地可视化编辑器（`?edit=1`）：加星/拖动/连线/导出 JSON —— 待用户验收视觉后开发
+- [ ] 第二板块「成长星河」目前仅占位
+- [ ] Galaxy 栏目移动端适配（本轮仅桌面端）
+- [ ] ⚠️ 环境问题：根目录未跟踪的 `Skills/` 文件夹（Claude Code 产物）会导致 `next build` 类型检查报错，建议加入 `.gitignore`/`tsconfig exclude` 或删除（本轮未擅自改动）
+
+---
+
+## 第八十七轮（2026-07-15）— 3D 房间场景完整实装 + 国际化渲染修复
+
+### ✅ 3D 房间编辑器与正式场景全面升级
+- [x] 创建房间编辑器 `/room-editor`（过程性工具，不加入主站导航）
+- [x] 房间尺寸优化：从正方形（10×8m）缩窄为长方形（8×8m），减少右侧空间
+- [x] 新增 GLTF 模型组件（15 个）：
+  - Desk 书桌、Bookshelf 书架、Chair 维多利亚木椅
+  - Monstera Plant 龟背竹、Bamboo Plant 文竹盆栽、Bean Bag 懒人沙发
+  - Desk Lamp 台灯（可交互开关）、Floor Lamp 落地灯
+  - Wall Map 古地图、Laptop 笔记本电脑
+  - Globe 地球仪、Book Stack 书堆、Ink & Quill 墨水羽毛笔
+- [x] 窗户改为无边框毛玻璃（后墙顶部，6.25×3.2m，半透明淡蓝色）
+- [x] 墙面颜色改为古典深绿色（`#2d4a3e`）+ 植被系护墙板
+- [x] 地毯改为波西米亚织布风格（带条纹和流苏装饰）
+- [x] 清理多余装饰：移除壁炉、画框、时钟、边桌、烛台、几何体占位等
+- [x] 编辑器功能：TransformControls、数字输入、窗户定位器、JSON 导出
+
+### ✅ 国际化渲染错误修复
+- **根本原因**：多处组件使用 `obj[lang]` 动态访问国际化对象（如 `{zh: string, en: string}`），在 React 渲染时报错 `Objects are not valid as a React child`
+- **修复范围**：
+  - `components/sections/AboutSection.tsx`：修复 `l.detail[lang]` → 三元表达式
+  - `components/sections/NextDestSection.tsx`：修复 3 处 `content.sectionN.xxx[lang]`
+  - `components/sections/ProjectsSection.tsx`：修复 `tab.label[lang]`
+  - `app/portfolio/page.tsx`：修复 `tag.label[lang]`
+- **验证**：TypeScript 编译通过，页面可正常打开，国际化内容正确显示
+
+### ✅ 文档更新
+- [x] 更新 `docs/GLTF_MODEL_RESOURCES.md`：GLTF 模型资源站与搜索关键词
+- [x] 更新 `docs/WINDOW_CURTAIN_RESOURCES.md`：窗户窗帘资源指南
+- [x] 更新 `docs/PROGRESS.md`：本轮完整记录
+
+### 📝 待完成
+- [ ] 点击 3D 场景中的笔记本电脑后，进入个人网站主页（overlay 系统已就绪）
+
+---
+
 ## 第八十五轮（2026-04-20）— 全站中英切换 · md 英文版批量创建
 
 - [x] 梳理 content/academic-research、business-analysis、vibe-coding 目录下所有 md 内容，确认需要英文版的文件清单
@@ -421,8 +545,8 @@
 - [x] 保持现有组件与交互不变，仅替换数据层内容
 - [x] 校验：`content/academic-research/index.ts` 无错误
 
----
 
+---
 ## 第四十八轮（2026-04-13）— Next Destination 省级地图下钻显示修复
 
 - [x] `components/ui/ChinaProvinceMap.tsx`：地图数据加载改为双源兜底（本地 `/geo/china-provinces.json` 优先，Highcharts CDN 兜底）

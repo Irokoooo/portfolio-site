@@ -139,7 +139,7 @@ export function NextDestSection() {
       {/* ── 板块标题 ── */}
       <div>
         <h2 className="text-2xl font-serif text-gray-900 mb-6">
-          {content.title[lang]}
+          {lang === 'zh' ? content.title.zh : content.title.en}
         </h2>
       </div>
 
@@ -154,14 +154,14 @@ export function NextDestSection() {
         {/* 区块标签 */}
         <div className="flex items-center gap-3">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">
-            {content.section1.label[lang]}
+            {lang === 'zh' ? content.section1.label.zh : content.section1.label.en}
           </p>
           <span className="flex-1 border-t border-gray-100" />
         </div>
 
         {/* 引言 */}
         <p className="text-xs text-gray-500 leading-relaxed border-l-2 border-gray-200 pl-3 italic">
-          {content.section1.intro[lang]}
+          {lang === 'zh' ? content.section1.intro.zh : content.section1.intro.en}
         </p>
 
         {/* 志向条目 */}
@@ -176,7 +176,7 @@ export function NextDestSection() {
                 <h3 className="text-sm font-semibold text-gray-900 font-serif">
                   {vision.title}
                 </h3>
-                <span className="text-xs text-gray-400">{vision.subtitle[lang]}</span>
+                <span className="text-xs text-gray-400">{lang === 'zh' ? vision.subtitle.zh : vision.subtitle.en}</span>
                 {vision.tag && (
                   <span
                     className="ml-auto text-xs tracking-wide"
@@ -187,7 +187,7 @@ export function NextDestSection() {
                 )}
               </div>
               <p className="text-xs text-gray-600 leading-relaxed">
-                {vision.description[lang]}
+                {lang === 'zh' ? vision.description.zh : vision.description.en}
               </p>
             </li>
           ))}
@@ -202,14 +202,14 @@ export function NextDestSection() {
         {/* 区块标签 */}
         <div className="flex items-center gap-3">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">
-            {content.section2.label[lang]}
+            {lang === 'zh' ? content.section2.label.zh : content.section2.label.en}
           </p>
           <span className="flex-1 border-t border-gray-100" />
         </div>
 
         {/* 引言 */}
         <p className="text-xs text-gray-500 leading-relaxed border-l-2 border-gray-200 pl-3 italic">
-          {content.section2.intro[lang]}
+          {lang === 'zh' ? content.section2.intro.zh : content.section2.intro.en}
         </p>
 
         {/* 技能路线 */}
@@ -225,10 +225,10 @@ export function NextDestSection() {
                   <h3 className="text-sm font-semibold text-gray-900 font-serif">
                     {skill.title}
                   </h3>
-                  <span className="text-xs text-gray-400">{skill.subtitle[lang]}</span>
+                  <span className="text-xs text-gray-400">{lang === 'zh' ? skill.subtitle.zh : skill.subtitle.en}</span>
                 </div>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  {skill.description[lang]}
+                  {lang === 'zh' ? skill.description.zh : skill.description.en}
                 </p>
               </div>
             </li>
@@ -238,7 +238,7 @@ export function NextDestSection() {
 
       {/* ── 行动按钮 ── */}
       <div className="flex gap-3 flex-wrap">
-        <ExternalLinkButton href="https://www.linkedin.com/in/xinyi-shi1015" label={content.button.label[lang]} />
+        <ExternalLinkButton href="https://www.linkedin.com/in/xinyi-shi1015" label={lang === 'zh' ? content.button.label.zh : content.button.label.en} />
       </div>
 
     </div>

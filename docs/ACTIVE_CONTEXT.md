@@ -1,19 +1,115 @@
 # Active Context — 当前工作焦点
 
-> 最后更新：2026-04-13（第八十四轮）
+> 最后更新：2026-07-21（第九十轮）
 > 历史开发记录请查看 `docs/PROGRESS.md`
+
+---
+
+## 最近完成（第九十轮）
+
+### ✅ 数字书房：模型压缩 + 卡片化交互 + 拖拽误触修复
+
+背景：用户反馈数字书房加载速度很慢，且书房内拖拽视角时容易误触书架弹出内容。同时要求把点击书房卡片的效果从全屏弹层改为原地展开。
+
+排查发现根因：`public/models/` 下 14 个 GLTF 模型总计 **161MB**，均为未压缩的原始 Sketchfab 导出（单个 `desk.glb` 就有 48MB，贴图普遍是未压缩的 4096×4096 PNG）。
+
+本轮落地：
+1. **模型压缩**（核心大招，用户选定）：用 `gltf-transform optimize` 批量跑 meshopt 几何压缩 + 贴图统一压到 1024px WebP，161MB → 6.8MB（压缩 96%）。原始文件备份在 `public/models_original_backup/`（已 `.gitignore`）。
+2. **卡片交互改造**：新增 `components/scene/StudyRoomCard.tsx`，把原来点击后 `fixed inset-0` 全屏弹出的 `StudyRoomModal` 换成卡片原地展开（560px 高，内嵌 3D 场景，可再次点击收起），并在 hover/focus 时预热 3D 场景的 JS chunk。同步把 `ContentPortal.tsx` 从 `createPortal(document.body)` 改为卡片内 `absolute inset-0`，避免点击书房内物件时内容层盖住整页。
+3. **拖拽误触修复**：`lib/useOverlayStore.tsx` 新增位移阈值判定（`DRAG_THRESHOLD_PX = 6`），拖拽视角松手时若位移超过阈值就拦截尾随的 click，不再误触发书架等物件的跳转。
+
+详见 `docs/PROGRESS.md` 第九十轮完整记录。
+
+### 下一步
+- 🎯 用户体验验收拖拽误触修复效果，视需要调整 `DRAG_THRESHOLD_PX` 阈值
+- 🎯 用户自行处理 `app/page.tsx` 中 Galaxy 板块的未完成代码（`visibleSubNavItems` 引用残留、`sectionMap` 缺 `galaxy` 分支）
+- 🎯 考虑是否需要方案 B（分层加载）/ C（展开前预取，已部分实现 hover 预热）进一步优化首次展开体验
+
+---
+
+## 最近完成（第九十轮）
+
+### ✅ 侧边栏免滚动 + 能力星系升级为真 3D 旋涡银河
+
+用户反馈两点：① 侧边栏不该滚动，要平铺；独立签名块占位太多，改为把签名收进底部版权区、鼠标悬浮时版权文字淡出、花体签名淡入。② 第八十九轮的 2D SVG 星图"太丑、太刻意五颜六色、星星 duang 大一个"，要像 `galaxy-template.html` 那种真正的银河，能力星要不突兀地融在星系里。
+
+关键发现：`three` / `@react-three/*` / `postprocessing` 全套已在 `package.json`（做 3D 书房时装的）→ 可**零新依赖**直接移植模板的真银河。
+
+本轮落地：
+1. `app/page.tsx`：
+   - 新增 `SignatureFooter` 组件：版权文字 ⇄ 花体签名，同格交叉淡入（悬浮切换），删掉原独立签名 `<img>` 块
+   - 压缩 Profile 卡与导航间距（`p-6`→`px-6 pt-5 pb-3`、nav `pt-6`→`pt-3`、按钮 `py-2.5`→`py-2`），侧边栏 7 项平铺免滚动；导航加 `scrollbar-hide`
+2. `content/galaxy/abilities.ts`：`CATEGORY_PALETTE` 改用银河家族色——产品=珍贵金 `#ffcf9a`、数据=外圈蓝 `#8fb0ff`、语言=内圈粉 `#ff9ed4`、AI=中段紫 `#c891ff`，融在星系里不突兀
+3. **新增 `components/sections/gallery/AbilityGalaxy3D.tsx`**：真 3D 旋涡银河引擎（移植 `galaxy-template.html`，零新依赖）
+   - 11000 粒子银河盘（内粉→中紫→外蓝渐变 + 6% 稀疏金）+ 5000 星尘景深
+   - 自定义呼吸 shader（P_VERT/P_FRAG）、UnrealBloom 泛光、中心紫柔光晕、4 圈淡金轨道环、流星
+   - OrbitControls 自转 + 阻尼；开场相机推进动画
+   - 能力星=融在银河里的亮星（大小=作者设定 6–14，亮度=熟练度四档，颜色=分类）；按熟练度由内向外沿旋臂布局
+   - 射线拾取点击能力星 → 该星与相连能力（据 edges）一起提亮变大 + 星座连线（HDR + Bloom 发光）；悬停 DOM 浮标显示名字
+   - `ResizeObserver` 适配容器尺寸；完整 dispose 清理
+4. **重写 `components/sections/gallery/GalaxyAbilitiesSection.tsx`**：`dynamic(ssr:false)` 加载银河引擎（避免 SSR 触碰 WebGL）+ 深空分类图例 + 点击详情从底部浮起（模板式渐隐浮现，不用弹窗框）
+5. 验证：项目文件 `tsc --noEmit` 零错误；`next build` 编译成功（主页 8.14 kB / First Load 502 kB）
+
+> ⚠️ 环境问题仍在：根目录未跟踪的 `Skills/` 文件夹会让 `next build` 类型检查报错（非本项目代码）。建议加入 `.gitignore`/`tsconfig exclude` 或删除，本轮仍未擅自改动。
+
+### 下一步（Galaxy）
+- 🎯 用户验收真银河视觉后，做**本地可视化编辑器**（`?edit=1`）：加星/拖动摆位/连线/导出 JSON。注意 3D 下拖拽摆位较难，可能改为"2D 平面摆位编辑 → 存 x/y → 3D 展示映射"或表单式编辑
+- 🎯 第二板块「成长星河」：可直接复用 AbilityGalaxy3D 引擎，改为时间当半径
+- 🎯 Galaxy 移动端适配（本轮仅桌面端）
+
+---
+
+## 最近完成（第八十九轮）
+
+### ✅ 新增「Galaxy 能力星系」侧边栏栏目 — 能力星座视觉原型（已被第九十轮升级为 3D）
+
+背景：用户希望在右侧新增一个「银河」栏目，包含两个板块——① 个人能力组合网络图（Obsidian 式可交互节点网络）；② 成长星河（碎碎念/近期事件，按分类分色）。参考素材为 `D:\BaiduNetdiskDownload\tutorial_memory galaxy`（Three.js 3D 旋涡星系模板）。
+
+经头脑风暴确定的方向：
+- 数据模型：本地可视化编辑器导出 JSON（本轮仅先做**只读展示端**视觉原型）
+- 视觉：白天花园 → 夜晚银河（深空底 + 暖金/植物调星星）
+- 入口：二级抽屉（与 Side Works 一致）
+- 顺序：先做**能力星座网络**
+- 能力星：2D 平面星空；**大小**由作者手动定，**熟练度→光晕亮度**，**分类→颜色**，**热爱→外环标记**
+- 连线：可加文字标签；点击星星 → 富信息档案从屏幕底部浮起
+
+本轮落地：
+1. 新增 `content/galaxy/abilities.ts`：`AbilityNode`/`AbilityEdge`/`GalaxyData` 类型 + 四类分类配色 `CATEGORY_PALETTE` + 熟练度光晕表 `PROFICIENCY_GLOW` + 示例数据 `GALAXY_DATA`（10 星 10 连线）
+2. 新增 `components/sections/gallery/GalaxyAbilitiesSection.tsx`：纯 SVG + framer-motion 的深空星图（零新依赖）。含背景星尘闪烁、能力星光晕呼吸、热爱外环、星座连线（激活时显标签）、悬停联动高亮、点击聚焦、详情从底部浮起、平移(拖动)+缩放(滚轮)+回正视角
+3. `app/globals.css`：新增 `star-twinkle` / `star-breathe` / `passion-ring` / `galaxy-meteor` 关键帧
+4. `public/assets/icons/galaxy.svg`：新增导航图标（星系线稿，深棕蚀刻风）
+5. `app/page.tsx`：**drill-down 逻辑通用化**——把原写死给 Side Works 的二级菜单，改为 `drilldowns` 注册表（`Partial<Record<NavKey, DrilldownConfig>>`）+ `drillParent` 状态，可承载多个二级抽屉。新增一级导航 `Galaxy`，二级含「能力星座」+「成长星河（占位）」。新增 `GrowthGalaxyPlaceholder` 占位组件
+6. 验证：项目文件 `tsc --noEmit` 零错误；`next build` 编译成功（`✓ Compiled successfully`，主页 9.37 kB）
+
+> ⚠️ 已知环境问题（非本项目代码）：项目根目录存在**未被 git 跟踪**的 `Skills/` 文件夹（Claude Code 环境产物），内含 `.ts` 文件使用 `allowImportingTsExtensions` 语法，会导致 `next build` 的类型检查阶段报错。本项目代码本身零错误。建议：把 `Skills/` 加入 `.gitignore` 与 `tsconfig.json` 的 `exclude`，或直接删除该目录。本轮**未擅自修改** tsconfig / gitignore，留待用户确认。
+
+### 下一步（Galaxy）
+- 🎯 用户验收能力星座视觉后，做**本地可视化编辑器**（`?edit=1` 触发）：加星/拖动摆位/连线/填字段/导出 JSON
+- 🎯 第二板块「成长星河」：按时间生长的碎碎念记录（可考虑复用参考模板的 3D 旋涡）
+- 🎯 移动端 `MobileHomePage` 适配 Galaxy 栏目（本轮仅桌面端）
 
 ---
 
 ## 当前状态
 
+**3D 房间场景大幅更新完成**：
+
+1. **物件坐标全面调整** - 按用户在编辑器中调整的结果更新所有物件位置、旋转和缩放
+2. **视觉风格升级** - 墙面改为古典深绿色植被系，地毯改为波西米亚织布风格
+3. **交互台灯** - 桌上台灯可点击开关，控制灯光和发光效果
+4. **新增装饰物件** - 木椅子、龟背竹落地盆栽、文竹小盆栽、懒人沙发
+5. **超大银河窗** - 右墙窗户扩大为 3.6×3.2 的大窗，带窗帘，玻璃显示深蓝银河色
+6. **可交互地球仪** - 桌上新增地球仪，点击跳转完整 Next Destination 页面
+
+**3D 房间编辑器已完成**：新增隐藏的过程性编辑器页面 `/room-editor`，用于可视化调整 3D 书房物件摆放、朝向和大小。该页面不会出现在主站导航中，仅供开发与内容调整使用。
+
 移动端适配已完成：手机端使用底部导航 + 原有完整组件内容，保留所有交互细节与数据。PC 端保持完全不变。
 
 新增全局中英切换能力：桌面与手机端均支持一键切换中文/英文，语言选择会持久化到本地存储。
 
-About Me 区域已按最新要求优化：英语与法语文案改为直接展示“等级 + 分数/考试状态”；左侧 Bento 卡片在小屏改为单列（一行一个），避免并排拥挤；Core Traits 已按用户要求删除。
+About Me 区域已按最新要求优化：英语与法语文案改为直接展示”等级 + 分数/考试状态”；左侧 Bento 卡片在小屏改为单列（一行一个），避免并排拥挤；Core Traits 已按用户要求删除。
 
-移动端交互已继续优化：教育与经历改为“卡片点击进入抽屉，返回回到卡片列表”；底部导航顺序调整为“作品后紧接创作”；About Me 的 Skill Stack 与 SOP 改为上下顺序。
+移动端交互已继续优化：教育与经历改为”卡片点击进入抽屉，返回回到卡片列表”；底部导航顺序调整为”作品后紧接创作”；About Me 的 Skill Stack 与 SOP 改为上下顺序。
 
 移动端 Career 已修复文案回退问题：教育经历与荣誉奖项恢复为中文显示，并继续保持从左向右自动循环播放。
 
@@ -24,6 +120,38 @@ About Me 区域已按最新要求优化：英语与法语文案改为直接展�
 Next Destination 中 Erasmus 条目图标已替换为欧洲旗帜，避免与 Area Studies 条目图标重复。
 
 本轮已临时关闭 About Me 中的 `Download CV` 外链，避免继续下载旧版简历；同时把好未来经历时间截止更新到 2026.05.15，并新增了 `北京字节跳动` 的 Career 骨架条目，logo 已接入官网官方 SVG，等待用户继续补充岗位与成果细节。
+
+---
+
+## 最近完成（第八十七轮）
+
+### ✅ 3D 房间编辑器完整实现
+1. 新增隐藏路由 `app/room-editor/page.tsx`：过程性编辑器入口，动态加载 Canvas 避免 SSR 冲突
+2. 新增 `components/scene/RoomEditorCanvas.tsx`：编辑器状态管理与布局协调
+   - 管理 6 个可编辑物件初始 transform（Desk、Bookshelf、WallMap、Laptop、PhotoFrame、Folder）
+   - 管理文字标注数组与添加标注模式
+   - 协调选中状态、变换模式与面板交互
+3. 新增 `components/scene/RoomEditorScene.tsx`：3D 编辑场景
+   - 复用 RoomScene 的房间外壳（floor/walls/ceiling/beams/灯光）
+   - 使用 `OrbitControls` 支持自由旋转视角
+   - 使用 `@react-three/drei` 的 `TransformControls` 实现物件拖拽/旋转/缩放
+   - 支持 GLTF 模型加载与几何体占位组件（Laptop/PhotoFrame/Folder）
+   - 点击地板添加文字标注（`Html` 组件渲染浮动标注卡片）
+   - 拖拽时自动禁用 OrbitControls，松开后恢复并同步 transform 到 React 状态
+4. 新增 `components/scene/EditorPanel.tsx`：右侧固定控制面板
+   - 物件选择列表（6 个物件）
+   - 变换模式切换按钮（移动/旋转/缩放）
+   - 当前选中物件的 position/rotation/scale 数字输入（精度 0.001，步进 0.05）
+   - 文字标注管理区（添加/编辑文本/调整位置/删除）
+   - 导出 JSON 按钮：一键复制完整 objects + annotations 数据到剪贴板
+5. 交互逻辑完整闭环：
+   - 点击 3D 场景中的物件 → 右侧面板显示该物件信息 → 拖拽轴或输入数值 → 实时反映到 3D 场景
+   - 点击「添加标注」→ 点击地板放置 → 在面板编辑标注文字和位置
+   - 所有改动保存在浏览器内存，最后通过「导出 JSON」按钮获取配置
+6. 验证通过：
+   - `npx tsc --noEmit` 零错误
+   - 不修改主站任何导航或正式 3D 入口，完全隔离为过程工具
+   - 用户访问 `http://localhost:3000/room-editor` 即可进入编辑器
 
 ---
 

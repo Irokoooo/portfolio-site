@@ -297,7 +297,7 @@ export function ProjectsSection() {
                 : "text-seed-shadow/50 border-seed-shadow/20 hover:border-seed-shadow/40 hover:text-seed-shadow"
             }`}
           >
-            {tab.label[lang]}
+            {lang === 'zh' ? tab.label.zh : tab.label.en}
           </button>
         ))}
       </div>
@@ -322,8 +322,8 @@ export function ProjectsSection() {
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">{project.emoji}</span>
                   <div>
-                    <p className="text-sm font-medium text-seed-shadow group-hover:text-seed-shadow/80">{project.title[lang]}</p>
-                    <p className="text-xs text-seed-shadow/40 mt-0.5">{project.subtitle[lang]}</p>
+                    <p className="text-sm font-medium text-seed-shadow group-hover:text-seed-shadow/80">{lang === 'zh' ? project.title.zh : project.title.en}</p>
+                    <p className="text-xs text-seed-shadow/40 mt-0.5">{lang === 'zh' ? project.subtitle.zh : project.subtitle.en}</p>
                   </div>
                 </div>
                 <span
@@ -331,9 +331,9 @@ export function ProjectsSection() {
                   style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif' }}
                 >{project.period}</span>
               </div>
-              <p className="text-xs text-seed-shadow/65 leading-relaxed mb-3">{project.desc[lang]}</p>
+              <p className="text-xs text-seed-shadow/65 leading-relaxed mb-3">{lang === 'zh' ? project.desc.zh : project.desc.en}</p>
               {project.award && (
-                <p className="text-xs text-amber-700/80 mb-3">{project.award[lang].replace('🏆 ', '')}</p>
+                <p className="text-xs text-amber-700/80 mb-3">{(lang === 'zh' ? project.award.zh : project.award.en).replace('🏆 ', '')}</p>
               )}
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-1.5">
@@ -365,11 +365,11 @@ export function ProjectsSection() {
                       style={{ fontFamily: '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif' }}
                     >{project.period}</span>
                   </div>
-                  <p className="text-xs font-medium text-seed-shadow group-hover:text-seed-shadow/80 mb-1">{project.title[lang]}</p>
-                  <p className="text-xs text-seed-shadow/40 mb-2">{project.subtitle[lang]}</p>
-                  <p className="text-xs text-seed-shadow/60 leading-relaxed mb-2">{project.desc[lang]}</p>
+                  <p className="text-xs font-medium text-seed-shadow group-hover:text-seed-shadow/80 mb-1">{lang === 'zh' ? project.title.zh : project.title.en}</p>
+                  <p className="text-xs text-seed-shadow/40 mb-2">{lang === 'zh' ? project.subtitle.zh : project.subtitle.en}</p>
+                  <p className="text-xs text-seed-shadow/60 leading-relaxed mb-2">{lang === 'zh' ? project.desc.zh : project.desc.en}</p>
                   {project.award && (
-                    <p className="text-xs text-amber-700/80 mb-2">{project.award[lang].replace('🏆 ', '')}</p>
+                    <p className="text-xs text-amber-700/80 mb-2">{(lang === 'zh' ? project.award.zh : project.award.en).replace('🏆 ', '')}</p>
                   )}
                   <div className="flex flex-wrap gap-1">
                     {project.tags.map((tag) => (

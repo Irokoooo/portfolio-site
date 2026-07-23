@@ -1,10 +1,11 @@
 'use client';
 // About Me 板块
 // - 照片区：Ken Burns 纪录片效果
-import { useState, useEffect, useRef } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { ExternalLinkButton } from "@/components/ui/ExternalLinkButton";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
+import { StudyRoomCard } from "@/components/scene/StudyRoomCard";
 
 // ── 动画变量 ──
 const containerVariants = {
@@ -61,7 +62,7 @@ function LanguagesCard({ lang }: { lang: 'zh' | 'en' }) {
             <div className="flex-1 min-w-0">
               <p className="text-[11px] font-medium text-seed-shadow/80 leading-none">
                 {l.lang}
-                <span className="text-[9px] font-normal text-seed-shadow/40 ml-1.5">{l.detail[lang]}</span>
+                <span className="text-[9px] font-normal text-seed-shadow/40 ml-1.5">{lang === 'zh' ? l.detail.zh : l.detail.en}</span>
               </p>
             </div>
             <span className="text-[10px] font-medium px-1.5 py-0.5 rounded border flex-shrink-0"
@@ -262,7 +263,7 @@ function SkillStackCard({ lang }: { lang: 'zh' | 'en' }) {
               />
             </div>
             <div className="absolute right-0 -top-8 z-20 px-2 py-1 rounded border border-seed-shadow/15 bg-milk-white text-[11px] text-seed-shadow/70 whitespace-nowrap shadow-sm opacity-0 translate-y-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0">
-              {skill.tip[lang]}
+              {lang === 'zh' ? skill.tip.zh : skill.tip.en}
             </div>
           </div>
         ))}
@@ -300,7 +301,7 @@ function CertificatePanelCard({ lang }: { lang: 'zh' | 'en' }) {
             style={{ border: '1px solid rgba(63,46,47,0.10)' }}
           >
             <span className="text-[8px] text-seed-shadow/30">{cert.icon}</span>
-            <span className="text-xs text-seed-shadow/72">{cert.label[lang]}</span>
+            <span className="text-xs text-seed-shadow/72">{lang === 'zh' ? cert.label.zh : cert.label.en}</span>
           </div>
         ))}
       </div>
@@ -417,7 +418,8 @@ export function AboutSection() {
     : ['International Economics & Trade', 'Vibe Coder / AI Workflow', 'IELTS 8.0 · French B1+', 'End-to-End Ops', 'High-Energy Executor'];
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       {/* 标题 */}
       <motion.div initial={{ opacity: 0, y: 16, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ duration: 0.5, ease: "easeOut" }}>
@@ -449,6 +451,9 @@ export function AboutSection() {
           <PaperCard variant="parchment" colSpan="col-span-2" className="p-4">
             <WorkPrinciplesCard lang={lang} />
           </PaperCard>
+
+          {/* 3D 书房卡片：原地展开交互，逻辑见 components/scene/StudyRoomCard.tsx */}
+          <StudyRoomCard />
 
           <PaperCard variant="parchment" colSpan="col-span-2" className="p-4">
             <SkillStackCard lang={lang} />
@@ -517,10 +522,10 @@ export function AboutSection() {
                   </span>
                 </div>
                 {/* 标题 */}
-                <p className="text-[13px] font-semibold text-seed-shadow/85 leading-snug mb-0.5">{item.title[lang]}</p>
+                <p className="text-[13px] font-semibold text-seed-shadow/85 leading-snug mb-0.5">{lang === 'zh' ? item.title.zh : item.title.en}</p>
                 <p className="text-[10px] font-medium text-seed-shadow/35 tracking-wide mb-3">{item.subtitle}</p>
                 {/* 描述 */}
-                <p className="text-xs text-seed-shadow/60 leading-relaxed">{item.desc[lang]}</p>
+                <p className="text-xs text-seed-shadow/60 leading-relaxed">{lang === 'zh' ? item.desc.zh : item.desc.en}</p>
               </div>
             </motion.div>
           ))}
@@ -528,5 +533,6 @@ export function AboutSection() {
       </motion.div>
 
     </div>
+    </>
   );
 }

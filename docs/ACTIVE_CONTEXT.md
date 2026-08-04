@@ -5,6 +5,20 @@
 
 ---
 
+## 最近完成（第九十一轮）
+
+### ✅ Career 页面崩溃 + 3D 地球仪空白子页面修复
+
+1. 修复 Career API 双语指标单位 `{ zh, en }` 被直接作为 React 子节点渲染导致的整页崩溃；桌面端按当前语言解析单位。
+2. 同步修复移动端 Career 对双语 role、quote、bullets、metric label/unit 的兼容，并恢复历史遗留的教育经历、荣誉奖项乱码。
+3. 为 3D 数字书房 `globe` 交互补上 `OverlayRouter` 内容映射，地球仪现在打开 Next Destination。
+4. 将本地 `Skills/` 参考目录排除出 TypeScript 与 Git，恢复完整生产构建能力。
+5. 浏览器回归通过：桌面 Career 中英文、手机 Career 列表与字节跳动详情均无 Runtime Error。
+
+### 下一步
+- 用户验收线上 Career 与数字书房地球仪交互。
+
+---
 ## 最近完成（第九十轮）
 
 ### ✅ 数字书房：模型压缩 + 卡片化交互 + 拖拽误触修复

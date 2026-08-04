@@ -1,15 +1,18 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useLanguage } from '@/components/i18n/LanguageProvider';
+
+type LocalizedText = { zh: string; en: string };
 
 interface MetricCard {
-  label: string;
+  label: string | LocalizedText;
   value: string;
   prefix?: string;
-  unit?: string;
+  unit?: string | LocalizedText;
   suffix?: string;
 }
 
@@ -18,15 +21,15 @@ interface Experience {
   type: 'internship' | 'education';
   org: string;
   orgEn: string;
-  role: string;
-  direction?: string;
+  role: string | LocalizedText;
+  direction?: string | LocalizedText;
   period: string;
   periodShort: string;
   logoSrc: string;
-  tag?: string;
+  tag?: string | LocalizedText;
   metrics?: MetricCard[];
-  quote?: string;
-  bullets: string[];
+  quote?: string | LocalizedText;
+  bullets: string[] | { zh: string[]; en: string[] };
   skills?: string[];
   markdownContent?: string;
   galleryImages?: string[];
@@ -47,74 +50,72 @@ const educationExperiences: Experience[] = [
   {
     id: 'lingnan',
     type: 'education',
-    org: '������ϴ�ѧ',
+    org: '香港岭南大学',
     orgEn: 'Lingnan University, Hong Kong',
-    role: '������  ��ѧԺ Global Business Focus',
-    period: '2026.01  2026.06',
+    role: '交换生 · 商学院 Global Business Focus',
+    period: '2026.01 — 2026.06',
     periodShort: '2026',
     logoSrc: '/assets/icons/ln.svg',
-    tag: '������Ŀ',
-    quote: '���������˹��������ֻ����׿γ̣��̿���Ұ�� AI ���������ڴ�����ںϡ�',
+    tag: '交换项目',
+    quote: '额外申请人工智能数字化进阶课程，商科视野与 AI 工程能力在此深度融合。',
     bullets: [
-      '��ѧԺ���Ŀγ̣�ȫ����ҵս�ԡ������г�Ӫ�������������������ҵ����ͳ�Ʒ��������ֻ�����·���о���',
-      '���������˹��������ֻ����׿γ̣�̽�� AI ��������ҵ����������ںϡ�',
-      '����ѧ������У�ʽ����������Ļ���ͨ������Ӧ�����õ��Ͽɡ�',
+      '商学院核心课程：全球商业战略、国际市场营销、国际商务分析、商业数据统计分析、数字化经济路径研究。',
+      '额外申请人工智能数字化进阶课程，探索 AI 工具与商业场景的深度融合。',
+      '获评学年优秀校际交换生，跨文化沟通与自适应能力得到认可。',
     ],
-    skills: ['Global Business', '���Ļ���ͨ', 'FinTech', '����'],
+    skills: ['Global Business', '跨文化沟通', 'FinTech', '粤语'],
   },
   {
     id: 'minzu',
     type: 'education',
-    org: '���������ѧ',
+    org: '中央民族大学',
     orgEn: 'Minzu University of China',
-    role: '����ѧ�����ƣ� ���ʾ�����ó��',
-    period: '2024.09  2028.06',
-    periodShort: '2024 ',
+    role: '经济学（本科）· 国际经济与贸易',
+    period: '2024.09 — 2028.06',
+    periodShort: '2024 —',
     logoSrc: '/assets/icons/muc.svg',
-    tag: '��У',
-    quote: '���ʾ�ó��ɫ�����������о���㡣������̤���������Լ��Ĵ�ѧ֮��',
+    tag: '主校',
+    quote: '国际经贸底色，科研量化研究起点。在这里踏上了属于自己的大学之旅。',
     bullets: [
-      '���޹��ʾ�����ó�ס�',
-      '��������ѧУ����������ѧ�����С�����������̽����ͬ�����¶��ڸ���������Ҫ������һ�����',
-      '������������ѧԺרҵһ�Ƚ���ѧ��ǰ 5%����ѧҵ�������졣',
+      '主修国际经济与贸易。',
+      '积极参与学术科研、创赛商赛，探索不同场景下对于个人能力的要求。',
+      '连续获评经济学院专业一等奖学金（前 5%），学业绩点优异。',
     ],
-    skills: ['����ѧ', '����ó��', 'Stata', 'Python', 'ѧ��д��'],
+    skills: ['经济学', '国际贸易', 'Stata', 'Python', '学术写作'],
   },
 ];
-
 const honors: HonorItem[] = [
   {
     date: '2026.04',
-    title: 'ѧ������У�ʽ�����',
-    issuer: '������ϴ�ѧ ��ѧԺ',
-    level: 'У��',
+    title: '学年优秀校际交换生',
+    issuer: '香港岭南大学 商学院',
+    level: '校级',
   },
   {
     date: '2026.04',
-    title: 'ȫ����Դ���ô���  �������о�������һ�Ƚ�',
-    issuer: '�й���Դ�о���',
-    level: '���Ҽ�',
+    title: '全国能源经济大赛 · 本科生研究论文组一等奖',
+    issuer: '中国能源研究会',
+    level: '国家级',
   },
   {
     date: '2026.03',
-    title: '��ʮ����ȫ����ѧ��������  ȫ�����Ƚ�',
-    issuer: 'ȫ����ѧ�����´�ҵ������ί��',
-    level: '���Ҽ�',
+    title: '第十六届全国大学生“三创赛” · 全国二等奖',
+    issuer: '全国大学生创新创业大赛组委会',
+    level: '国家级',
   },
   {
     date: '2025.11',
-    title: 'ȫ�� AI ����˾������������ս��  �������Ƚ�',
-    issuer: '˾����',
-    level: '���Ҽ�',
+    title: '全国 AI 赋能司法行政创新挑战赛 · 国家三等奖',
+    issuer: '司法部',
+    level: '国家级',
   },
   {
     date: '2025.09',
-    title: '����ѧԺרҵһ�Ƚ���ѧ��ǰ 5%��',
-    issuer: '���������ѧ ����ѧԺ',
-    level: 'Ժ��',
+    title: '经济学院专业一等奖学金（前 5%）',
+    issuer: '中央民族大学 经济学院',
+    level: '院级',
   },
 ];
-
 function MobileHonorsMarquee() {
   const loopItems = [...honors, ...honors];
 
@@ -122,9 +123,9 @@ function MobileHonorsMarquee() {
     <div className="space-y-2.5">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest">
-          Honours & Awards  ��������
+          Honours & Awards · 荣誉奖项
         </p>
-        <span className="text-[10px] text-seed-shadow/30">�Զ�ѭ��</span>
+        <span className="text-[10px] text-seed-shadow/30">自动循环</span>
       </div>
 
       <div className="relative overflow-hidden rounded-xl border border-seed-shadow/10 bg-milk-white/55 py-3">
@@ -160,7 +161,7 @@ function MobileHonorsMarquee() {
   );
 }
 
-function ExperienceCard({ exp, onClick }: { exp: Experience; onClick: () => void }) {
+function ExperienceCard({ exp, onClick, lang }: { exp: Experience; onClick: () => void; lang: 'zh' | 'en' }) {
   return (
     <button
       onClick={onClick}
@@ -173,7 +174,7 @@ function ExperienceCard({ exp, onClick }: { exp: Experience; onClick: () => void
             <p className="text-sm font-semibold text-seed-shadow truncate">{exp.org}</p>
             <span className="text-[10px] px-2 py-0.5 rounded-full border border-seed-shadow/15 text-seed-shadow/55 shrink-0">{exp.type === 'internship' ? 'Internship' : 'Education'}</span>
           </div>
-          <p className="text-xs text-seed-shadow/70 mt-1 leading-relaxed">{exp.role}</p>
+          <p className="text-xs text-seed-shadow/70 mt-1 leading-relaxed">{typeof exp.role === 'string' ? exp.role : exp.role[lang]}</p>
           <p className="text-[11px] text-seed-shadow/45 mt-1.5">{exp.period}</p>
         </div>
       </div>
@@ -181,21 +182,26 @@ function ExperienceCard({ exp, onClick }: { exp: Experience; onClick: () => void
   );
 }
 
-function MetricItem({ metric }: { metric: MetricCard }) {
+function MetricItem({ metric, lang }: { metric: MetricCard; lang: 'zh' | 'en' }) {
   return (
     <div className="rounded-lg border border-seed-shadow/10 bg-milk-white/70 px-3 py-2.5">
-      <p className="text-[11px] text-seed-shadow/45 mb-1">{metric.label}</p>
+      <p className="text-[11px] text-seed-shadow/45 mb-1">{typeof metric.label === 'string' ? metric.label : metric.label[lang]}</p>
       <p className="text-lg font-serif text-seed-shadow leading-none">
         {metric.prefix ?? ''}
         {metric.value}
         {metric.suffix ?? ''}
-        {metric.unit ? <span className="ml-1 text-sm text-seed-shadow/60">{metric.unit}</span> : null}
+        {metric.unit ? (
+          <span className="ml-1 text-sm text-seed-shadow/60">
+            {typeof metric.unit === 'string' ? metric.unit : metric.unit[lang]}
+          </span>
+        ) : null}
       </p>
     </div>
   );
 }
 
 export function MobileCareerSection() {
+  const { lang } = useLanguage();
   const [internships, setInternships] = useState<Experience[]>([]);
   const [selectedExp, setSelectedExp] = useState<Experience | null>(null);
 
@@ -231,12 +237,12 @@ export function MobileCareerSection() {
     <div className="space-y-5">
       <div>
         <h2 className="text-2xl font-serif text-seed-shadow mb-1">Career Journey</h2>
-        <p className="text-xs text-seed-shadow/40">�����뾭��</p>
+        <p className="text-xs text-seed-shadow/40">教育与经历</p>
       </div>
 
       <div className="space-y-2.5">
         {cardList.map((exp) => (
-          <ExperienceCard key={exp.id} exp={exp} onClick={() => setSelectedExp(exp)} />
+          <ExperienceCard key={exp.id} exp={exp} lang={lang} onClick={() => setSelectedExp(exp)} />
         ))}
       </div>
 
@@ -265,7 +271,7 @@ export function MobileCareerSection() {
                   onClick={() => setSelectedExp(null)}
                   className="text-sm text-seed-shadow/75 hover:text-seed-shadow"
                 >
-                   ���ؿ�Ƭ
+                  ← 返回卡片
                 </button>
                 <span className="text-[11px] text-seed-shadow/45 uppercase tracking-widest">
                   {selectedExp.type === 'internship' ? 'Internship' : 'Education'}
@@ -277,21 +283,21 @@ export function MobileCareerSection() {
                   <img src={selectedExp.logoSrc} alt="" aria-hidden="true" className="w-10 h-10 object-contain mt-0.5" />
                   <div>
                     <h3 className="text-lg font-serif text-seed-shadow leading-snug">{selectedExp.org}</h3>
-                    <p className="text-xs text-seed-shadow/65 mt-1">{selectedExp.role}</p>
+                    <p className="text-xs text-seed-shadow/65 mt-1">{typeof selectedExp.role === 'string' ? selectedExp.role : selectedExp.role[lang]}</p>
                     <p className="text-[11px] text-seed-shadow/45 mt-1.5">{selectedExp.period}</p>
                   </div>
                 </div>
 
                 {selectedExp.quote ? (
                   <div className="rounded-lg border border-seed-shadow/10 bg-cream-pour/40 px-3.5 py-3">
-                    <p className="text-sm text-seed-shadow/75 leading-relaxed">{selectedExp.quote}</p>
+                    <p className="text-sm text-seed-shadow/75 leading-relaxed">{typeof selectedExp.quote === 'string' ? selectedExp.quote : selectedExp.quote[lang]}</p>
                   </div>
                 ) : null}
 
                 {selectedExp.metrics && selectedExp.metrics.length > 0 ? (
                   <div className="grid grid-cols-2 gap-2.5">
                     {selectedExp.metrics.map((metric) => (
-                      <MetricItem key={metric.label} metric={metric} />
+                      <MetricItem key={typeof metric.label === 'string' ? metric.label : metric.label[lang]} metric={metric} lang={lang} />
                     ))}
                   </div>
                 ) : null}
@@ -302,7 +308,7 @@ export function MobileCareerSection() {
                   </div>
                 ) : (
                   <div className="space-y-2.5">
-                    {selectedExp.bullets.map((bullet, idx) => (
+                    {(Array.isArray(selectedExp.bullets) ? selectedExp.bullets : selectedExp.bullets[lang]).map((bullet, idx) => (
                       <div key={idx} className="rounded-lg border border-seed-shadow/8 bg-milk-white/70 px-3 py-2.5">
                         <p className="text-sm text-seed-shadow/75 leading-relaxed">{bullet}</p>
                       </div>

@@ -14,11 +14,13 @@ import { useLanguage } from '@/components/i18n/LanguageProvider';
 // 类型定义
 // ─────────────────────────────────────────
 
+type LocalizedText = { zh: string; en: string };
+
 interface MetricCard {
   label: { zh: string; en: string };
   value: string;    // 数字部分（如 "500", "33.3"）
   prefix?: string;
-  unit?: string;
+  unit?: string | LocalizedText;
   suffix?: string;  // 数字后缀（如 "+", "%"）
 }
 
@@ -534,7 +536,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
                         />
                         {m.unit && (
                           <span className="text-xs font-sans font-normal text-seed-shadow/40 ml-0.5">
-                            {m.unit}
+                            {typeof m.unit === 'string' ? m.unit : m.unit[lang]}
                           </span>
                         )}
                       </p>

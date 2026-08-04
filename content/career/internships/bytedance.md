@@ -4,8 +4,8 @@ type: internship
 order: 0
 org: 北京字节跳动
 orgEn: ByteDance, Beijing
-roleZh: 众包中台管理
-roleEn: Crowdsourcing Platform Management
+roleZh: 岗位待补充
+roleEn: Role TBD
 directionZh: AI数据与安全 · 中国大模型数据服务中心（CQC）· Seedance 业务链
 directionEn: AI Data & Security · China LLM Data Service Center (CQC) · Seedance Business
 period: 2026.05.18 — 2026.09.10

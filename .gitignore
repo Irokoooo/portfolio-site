@@ -38,6 +38,11 @@ portfolio-temp/
 
 # 3D 模型原始未压缩备份（体积巨大，仅本地留档，不上传）
 public/models_original_backup/
+public/models-backup/
+compress-log.txt
+
+# 本地 Agent 技能资料，不属于作品集源码
+Skills/
 
 # 导入的嵌套仓库，保留原始文件但不纳入当前仓库
 个人资料/

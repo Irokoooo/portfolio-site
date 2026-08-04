@@ -22,6 +22,7 @@ export function OverlayRouter({ activeKey }: Props) {
         {activeKey === 'photoframe' && <PaddedSection><AboutSection /></PaddedSection>}
         {activeKey === 'wallmap'    && <PaddedSection><NextDestSection /></PaddedSection>}
         {activeKey === 'folder'     && <PaddedSection><AcademicResearchGallery /></PaddedSection>}
+        {activeKey === 'globe'      && <PaddedSection><NextDestSection /></PaddedSection>}
       </div>
     </LanguageProvider>
   );

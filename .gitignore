@@ -53,3 +53,4 @@ public/works/covers/vibe/Luma-Flow/
 .claude/
 CLAUDE.md
 .vscode/
+.env*.local

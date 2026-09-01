@@ -11,10 +11,34 @@ export interface VibeCodingPost {
   sourceFiles: string[];
   contentFile: string;
   githubUrl?: string;
+  demoUrl?: string;
+  galleryImages?: string[];
   content?: string;
 }
 
 export const vibeCodingPosts: VibeCodingPost[] = [
+  {
+    slug: "zenow-ai-health-game",
+    title: "Zenow（之诺）AI 健康陪伴游戏",
+    description: "以“心流时间”为命题，把真实健康任务变成掷骰探索、成长反馈与 AI 陪伴体验；在她来创造 Coding Lady 女性 AI 创造者黑客松中获得创意奖。",
+    date: "2026-07",
+    tags: ["AI Companion", "Gamified Health", "Multi-Agent Workflow", "Three.js", "Supabase"],
+    type: "Hackathon Product",
+    mediaType: "image",
+    sourceFiles: [
+      "zenow-coding-lady-01.jpg",
+      "zenow-coding-lady-02.jpg",
+      "zenow-coding-lady-03.jpg",
+    ],
+    contentFile: "zenow-ai-health-game.md",
+    githubUrl: "https://github.com/Irokoooo/Zenow",
+    demoUrl: "https://zen0w.me/?ui=20260725-2",
+    galleryImages: [
+      "/works/vibe/zenow-coding-lady-01.jpg",
+      "/works/vibe/zenow-coding-lady-02.jpg",
+      "/works/vibe/zenow-coding-lady-03.jpg",
+    ],
+  },
   {
     slug: "lawflaw-ai-assistant",
     title: "LawFlaw AI 智能合规系统",

@@ -31,6 +31,65 @@ function DrawerCover({ src, alt }: { src?: string; alt: string }) {
   );
 }
 
+function CaseMediaCarousel({ items, title }: { items: { src: string; label: string }[]; title: string }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeItem = items[activeIndex];
+
+  return (
+    <section className="mb-7 overflow-hidden rounded-xl border border-seed-shadow/10 bg-cream-pour/20">
+      <div className="flex items-center justify-between gap-3 border-b border-seed-shadow/8 px-4 py-3">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.18em] text-seed-shadow/35">Workflow Demo</p>
+          <p className="mt-0.5 text-xs text-seed-shadow/65">{activeItem.label}</p>
+        </div>
+        <span className="shrink-0 font-mono text-[10px] text-seed-shadow/35">
+          {String(activeIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
+        </span>
+      </div>
+
+      <div className="relative aspect-video overflow-hidden bg-[#171b18]">
+        <img
+          key={activeItem.src}
+          src={activeItem.src}
+          alt={`${title}：${activeItem.label}`}
+          className="h-full w-full object-contain"
+        />
+      </div>
+
+      <div className="flex items-center justify-between gap-3 px-4 py-3">
+        <div className="flex gap-1.5" aria-label="演示选择">
+          {items.map((item, index) => (
+            <button
+              key={item.src}
+              type="button"
+              onClick={() => setActiveIndex(index)}
+              aria-label={`查看演示 ${index + 1}：${item.label}`}
+              aria-pressed={activeIndex === index}
+              className={`h-1.5 rounded-full transition-all ${activeIndex === index ? "w-7 bg-leaf-green/75" : "w-2.5 bg-seed-shadow/15 hover:bg-seed-shadow/30"}`}
+            />
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveIndex((activeIndex - 1 + items.length) % items.length)}
+            className="rounded border border-seed-shadow/12 px-2.5 py-1 text-[11px] text-seed-shadow/55 transition-colors hover:bg-seed-shadow/5"
+          >
+            上一个
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveIndex((activeIndex + 1) % items.length)}
+            className="rounded border border-seed-shadow/12 px-2.5 py-1 text-[11px] text-seed-shadow/55 transition-colors hover:bg-seed-shadow/5"
+          >
+            下一个
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function BusinessAnalysisClient({ posts }: BusinessAnalysisClientProps) {
   // 当前打开的文章（null 表示 Drawer 关闭）
   const [selectedPost, setSelectedPost] = useState<MarkdownPost | null>(null);
@@ -50,8 +109,8 @@ export function BusinessAnalysisClient({ posts }: BusinessAnalysisClientProps) {
         className="space-y-8"
       >
         <div>
-          <h2 className="text-2xl font-serif text-seed-shadow mb-1">Business Analysis</h2>
-          <p className="text-xs text-seed-shadow/40 mb-6">商业分析 — 数据驱动的洞察与决策</p>
+          <h2 className="text-2xl font-serif text-seed-shadow mb-1">Work Systems</h2>
+          <p className="text-xs text-seed-shadow/40 mb-6">工作系统 — 把复杂业务流程重构为可运行、可验证、可规模化的产品</p>
         </div>
 
         {/* ── 文章卡片列表 ── */}
@@ -82,6 +141,18 @@ export function BusinessAnalysisClient({ posts }: BusinessAnalysisClientProps) {
                     <p className="text-xs text-seed-shadow/55 mt-1.5 leading-relaxed line-clamp-2">
                       {post.description}
                     </p>
+                    {post.highlights && (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 mt-3">
+                        {post.highlights.map((highlight) => (
+                          <span
+                            key={highlight}
+                            className="text-[10px] leading-snug text-leaf-green/85 bg-leaf-green/[0.06] border border-leaf-green/15 px-2 py-1.5 rounded"
+                          >
+                            {highlight}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {post.tags.map((tag) => (
                         <span key={tag} className="text-xs bg-seed-shadow/5 text-seed-shadow/50 px-2 py-0.5 border border-seed-shadow/8 rounded">
@@ -161,7 +232,7 @@ export function BusinessAnalysisClient({ posts }: BusinessAnalysisClientProps) {
               </button>
 
               <div className="flex-1 overflow-y-auto overscroll-contain">
-                <div className={`relative overflow-hidden ${selectedPost.coverImage ? "" : "h-64"}`}>
+                <div className="relative h-64 overflow-hidden">
                   {/* key prop 确保切换卡片时 DrawerCover 重新挂载，防止 loadError 状态复用 */}
                   <DrawerCover key={selectedPost.coverImage ?? selectedPost.slug} src={selectedPost.coverImage} alt={selectedPost.title} />
                   <div
@@ -211,6 +282,21 @@ export function BusinessAnalysisClient({ posts }: BusinessAnalysisClientProps) {
                       {selectedPost.description}
                     </p>
                   </div>
+
+                  {selectedPost.highlights && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6">
+                      {selectedPost.highlights.map((highlight, index) => (
+                        <div key={highlight} className="relative overflow-hidden rounded-lg border border-leaf-green/15 bg-leaf-green/[0.05] px-3 py-3">
+                          <span className="absolute right-2 top-1 text-2xl font-serif text-leaf-green/[0.08]">0{index + 1}</span>
+                          <p className="relative text-xs font-medium leading-snug text-leaf-green/90">{highlight}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {selectedPost.mediaItems && selectedPost.mediaItems.length > 0 && (
+                    <CaseMediaCarousel key={selectedPost.slug} items={selectedPost.mediaItems} title={selectedPost.title} />
+                  )}
 
                   <div className="prose prose-sm max-w-none
                     prose-headings:font-serif prose-headings:text-seed-shadow

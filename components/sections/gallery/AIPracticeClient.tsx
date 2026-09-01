@@ -53,6 +53,10 @@ function getCoverCandidates(slug: string) {
       "/works/covers/vibe/challenge-cup-website.png",
       "/works/covers/vibe/challenge-cup-website.jpg",
     ],
+    "zenow-ai-health-game": [
+      "/works/vibe/zenow-coding-lady-02.jpg",
+      "/works/vibe/zenow-coding-lady-01.jpg",
+    ],
   };
 
   if (exactMap[slug]) {
@@ -211,12 +215,45 @@ const mediaLabel: Record<string, { zh: string; en: string }> = {
 
 // ── 项目类型色标 ──
 const typeColor: Record<string, { bg: string; text: string; border: string }> = {
+  "Hackathon Product":  { bg: "rgba(140,75,166,0.09)", text: "#704080", border: "rgba(140,75,166,0.24)" },
   "Product Prototype": { bg: "rgba(198,49,74,0.08)", text: "#9a1f33", border: "rgba(198,49,74,0.22)" },
   "UI Prototype":       { bg: "rgba(74,127,165,0.08)", text: "#2d5878", border: "rgba(74,127,165,0.22)" },
   "System Prototype":   { bg: "rgba(74,87,64,0.08)",  text: "#3a4532", border: "rgba(74,87,64,0.22)"  },
   "Website Prototype":  { bg: "rgba(184,134,11,0.08)", text: "#7a5800", border: "rgba(184,134,11,0.22)" },
   "Platform Demo":      { bg: "rgba(94,84,142,0.08)",  text: "#4a3d8a", border: "rgba(94,84,142,0.22)" },
 };
+
+function ProjectImageTicker({ images, title }: { images: string[]; title: string }) {
+  const trackImages = [...images, ...images];
+
+  return (
+    <div className="mb-6 overflow-hidden rounded-xl" style={{ border: "1px solid rgba(63,46,47,0.1)" }}>
+      <div className="px-4 py-2.5" style={{ background: "rgba(63,46,47,0.04)", borderBottom: "1px solid rgba(63,46,47,0.08)" }}>
+        <p className="text-[10px] uppercase tracking-widest text-seed-shadow/40">On-site Gallery</p>
+      </div>
+      <div className="relative overflow-hidden bg-seed-shadow/[0.03] py-3">
+        <div className="absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#faf8f4] to-transparent" />
+        <div className="absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#faf8f4] to-transparent" />
+        <motion.div
+          className="flex w-max gap-3 px-3"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ duration: 30, ease: "linear", repeat: Infinity }}
+        >
+          {trackImages.map((src, index) => (
+            <figure key={`${src}-${index}`} className="h-48 w-72 shrink-0 overflow-hidden rounded-lg border border-seed-shadow/10 bg-milk-white sm:w-80">
+              <img
+                src={encodePublicFilePath(src)}
+                alt={`${title} 现场记录 ${(index % images.length) + 1}`}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
+            </figure>
+          ))}
+        </motion.div>
+      </div>
+    </div>
+  );
+}
 
 const defaultTypeColor = { bg: "rgba(63,46,47,0.07)", text: "#3F2E2F", border: "rgba(63,46,47,0.18)" };
 
@@ -597,6 +634,21 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                           GitHub Repo
                         </a>
                       )}
+                      {selectedPost.demoUrl && (
+                        <a
+                          href={selectedPost.demoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
+                          style={{
+                            background: "rgba(140,75,166,0.09)",
+                            color: "#704080",
+                            border: "1px solid rgba(140,75,166,0.24)",
+                          }}
+                        >
+                          Live Demo
+                        </a>
+                      )}
                     </div>
 
                     {/* Project Overview 信息框 */}
@@ -607,6 +659,10 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                       <p className="text-[10px] uppercase tracking-widest text-seed-shadow/35 mb-1.5">Project Overview</p>
                       <p className="text-sm text-seed-shadow/70 leading-relaxed">{selectedPost.description}</p>
                     </div>
+
+                    {selectedPost.galleryImages && selectedPost.galleryImages.length > 0 && (
+                      <ProjectImageTicker images={selectedPost.galleryImages} title={selectedPost.title} />
+                    )}
 
                     {/* 演示视频（仅 video / mixed 类型） */}
                     {(selectedPost.mediaType === "video" || selectedPost.mediaType === "mixed") && (

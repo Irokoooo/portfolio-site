@@ -98,7 +98,7 @@ const drilldowns: Partial<Record<NavKey, DrilldownConfig>> = {
     items: [
       { key: "vibe",     icon: "/assets/icons/about.svg",     label: "Vibe Coding",       sublabel: "Vibe Coding 作品", watermark: "VIBE" },
       { key: "slides",   icon: "/assets/icons/interests.svg", label: "Slides",            sublabel: "路演作品", watermark: "SLIDES" },
-      { key: "business", icon: "/assets/icons/career.svg",    label: "Business Analysis", sublabel: "商业分析", watermark: "ANALYSIS" },
+      { key: "business", icon: "/assets/icons/career.svg",    label: "Work Systems", sublabel: "工作系统", watermark: "SYSTEMS" },
     ],
   },
   galaxy: {
@@ -113,7 +113,7 @@ const drilldowns: Partial<Record<NavKey, DrilldownConfig>> = {
 };
 
 // 商业分析板块开关：false 为隐藏入口（保留文件与组件，后续可直接恢复）
-const ENABLE_BUSINESS_ANALYSIS = false;
+const ENABLE_BUSINESS_ANALYSIS = true;
 
 // 按开关过滤某个抽屉的可见子项
 function getVisibleSubItems(parent: NavKey | null): SubNavItem[] {

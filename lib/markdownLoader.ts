@@ -12,4 +12,6 @@ export interface MarkdownPost {
   content: string; // Markdown 正文字符串
   pdfUrl?: string; // 可选：原始 PDF 文件链接
   coverImage?: string; // 可选：Drawer 顶部封面图路径
+  highlights?: string[]; // 可选：卡片与详情页展示的关键结果
+  mediaItems?: { src: string; label: string }[]; // 可选：按需加载的流程演示
 }

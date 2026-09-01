@@ -41,10 +41,10 @@ const tabs: MobileTabItem[] = [
 const subTabs: MobileSubTabItem[] = [
   { key: "vibe", label: "Vibe" },
   { key: "slides", label: "Slides" },
-  { key: "business", label: "Analysis" },
+  { key: "business", label: "Work" },
 ];
 
-const ENABLE_BUSINESS_ANALYSIS = false;
+const ENABLE_BUSINESS_ANALYSIS = true;
 const visibleSubTabs = ENABLE_BUSINESS_ANALYSIS
   ? subTabs
   : subTabs.filter((tab) => tab.key !== "business");

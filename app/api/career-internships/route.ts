@@ -31,6 +31,7 @@ interface InternshipFrontmatter {
   metrics?: InternshipMetric[];
   skills?: string[];
   galleryImages?: string[];
+  portfolioLinks?: { slug: string; labelZh: string; labelEn: string }[];
 }
 
 function isInternshipFrontmatter(data: unknown): data is InternshipFrontmatter {
@@ -135,6 +136,7 @@ export async function GET() {
           bullets,
           skills: Array.isArray(data.skills) ? data.skills : [],
           galleryImages: Array.isArray(data.galleryImages) ? data.galleryImages : [],
+          portfolioLinks: Array.isArray(data.portfolioLinks) ? data.portfolioLinks : [],
           markdownContent: parsed.content.trim(),
         };
       })

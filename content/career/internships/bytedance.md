@@ -23,6 +23,13 @@ metrics:
 skills:
   - TBD 1
   - TBD 2
+portfolioLinks:
+  - slug: ai-evaluation-workbench
+    labelZh: 查看 AI Evaluation Workbench
+    labelEn: View AI Evaluation Workbench
+  - slug: lightflow-qc-workspace
+    labelZh: 查看多语种质检工作台
+    labelEn: View Multilingual QC Workspace
 ---
 ## 工作重点（Highlights）
 

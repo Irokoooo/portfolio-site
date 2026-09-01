@@ -113,7 +113,7 @@ const drilldowns: Partial<Record<NavKey, DrilldownConfig>> = {
 };
 
 // 商业分析板块开关：false 为隐藏入口（保留文件与组件，后续可直接恢复）
-const ENABLE_BUSINESS_ANALYSIS = true;
+const ENABLE_BUSINESS_ANALYSIS = false;
 
 // 按开关过滤某个抽屉的可见子项
 function getVisibleSubItems(parent: NavKey | null): SubNavItem[] {
@@ -442,6 +442,14 @@ function HomePageContent() {
   // 当前打开的二级抽屉对应的一级 key（null = 未打开任何抽屉）
   const [drillParent, setDrillParent] = useState<NavKey | null>(null);
   const [subActiveTab, setSubActiveTab] = useState<SubNavKey>("vibe");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("section") !== "sideworks") return;
+    setActiveTab("sideworks");
+    setDrillParent("sideworks");
+    setSubActiveTab("vibe");
+  }, []);
   const [signatureSrc, setSignatureSrc] = useState("/assets/decorations/signature.png");
   // 右侧内容区 ref，用于切换页面时滚动回顶部
   const mainRef = useRef<HTMLElement>(null);

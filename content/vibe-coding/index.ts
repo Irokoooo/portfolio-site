@@ -14,6 +14,10 @@ export interface VibeCodingPost {
   demoUrl?: string;
   galleryImages?: string[];
   content?: string;
+  category?: "personal" | "work";
+  coverImage?: string;
+  highlights?: string[];
+  mediaItems?: { src: string; label: string }[];
 }
 
 export const vibeCodingPosts: VibeCodingPost[] = [
@@ -38,6 +42,22 @@ export const vibeCodingPosts: VibeCodingPost[] = [
       "/works/vibe/zenow-coding-lady-02.jpg",
       "/works/vibe/zenow-coding-lady-03.jpg",
     ],
+    category: "personal",
+    coverImage: "/works/covers/vibe/zenow-ai-health-game.png",
+  },
+  {
+    slug: "spellbook-openclaw",
+    title: "SpellBook｜OpenClaw 智能工作台",
+    description: "用网页聊天替代传统终端操作的 AI Agent 可视化管理平台，通过 Web 与本地 Agent 双端架构降低 OpenClaw 的使用门槛。",
+    date: "2026-06",
+    tags: ["OpenClaw", "Agent Architecture", "Next.js", "FastAPI", "Supabase Realtime"],
+    type: "Product Prototype",
+    mediaType: "image",
+    sourceFiles: [],
+    contentFile: "spellbook-openclaw.md",
+    githubUrl: "https://github.com/Irokoooo/spellbook-openclaw",
+    demoUrl: "https://www.spellb00k.me",
+    category: "personal",
   },
   {
     slug: "lawflaw-ai-assistant",

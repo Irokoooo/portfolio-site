@@ -79,8 +79,9 @@ function parseYearMonth(dateText: string) {
   return Number.isNaN(ts) ? 0 : ts;
 }
 
-function VibeCoverThumb({ slug, className = "" }: { slug: string; className?: string }) {
-  const candidates = getCoverCandidates(slug);
+function VibeCoverThumb({ post, className = "" }: { post: VibeCodingPost; className?: string }) {
+  const { slug } = post;
+  const candidates = post.coverImage ? [post.coverImage] : getCoverCandidates(slug);
   const [idx, setIdx] = useState(0);
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -193,7 +194,7 @@ function VerticalCoverTicker({ posts }: { posts: VibeCodingPost[] }) {
                 animate={{ x: [0, 5, 0, -4, 0], y: [0, -2, 0, 1, 0], scale: [1, 1.012, 1] }}
                 transition={{ duration: 7.4, repeat: Infinity, ease: "easeInOut", delay: (i % posts.length) * 0.28 }}
               >
-                <VibeCoverThumb slug={item.slug} />
+                <VibeCoverThumb post={item} />
                 <div className="absolute inset-x-0 bottom-0 px-2 py-1" style={{ background: "linear-gradient(to top, rgba(20,16,13,0.55), transparent)" }}>
                   <p className="text-[10px] text-white/95 truncate">{item.title}</p>
                 </div>
@@ -255,11 +256,55 @@ function ProjectImageTicker({ images, title }: { images: string[]; title: string
   );
 }
 
+function ProjectMediaCarousel({ items, title }: { items: NonNullable<VibeCodingPost["mediaItems"]>; title: string }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeItem = items[activeIndex];
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [items]);
+
+  return (
+    <div className="mb-6 overflow-hidden rounded-xl border border-seed-shadow/10 bg-black/90">
+      <figure>
+        <img
+          key={activeItem.src}
+          src={encodePublicFilePath(activeItem.src)}
+          alt={`${title}：${activeItem.label}`}
+          className="aspect-video w-full object-contain"
+          loading="lazy"
+        />
+        <figcaption className="flex items-center justify-between gap-3 bg-milk-white px-4 py-2 text-xs text-seed-shadow/55">
+          <span>{activeItem.label}</span>
+          <span>{activeIndex + 1} / {items.length}</span>
+        </figcaption>
+      </figure>
+      {items.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto border-t border-seed-shadow/10 bg-milk-white p-2">
+          {items.map((item, index) => (
+            <button
+              key={item.src}
+              type="button"
+              onClick={() => setActiveIndex(index)}
+              className={`shrink-0 rounded-md px-3 py-1.5 text-[11px] transition-colors ${activeIndex === index ? "bg-seed-shadow text-milk-white" : "bg-seed-shadow/[0.05] text-seed-shadow/55 hover:bg-seed-shadow/10"}`}
+              aria-label={`查看 ${item.label}`}
+              aria-pressed={activeIndex === index}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const defaultTypeColor = { bg: "rgba(63,46,47,0.07)", text: "#3F2E2F", border: "rgba(63,46,47,0.18)" };
 
 // ── 封面图组件（带 onError fallback）──
-function DrawerCoverImg({ slug }: { slug: string }) {
-  const covers = getCoverCandidates(slug);
+function DrawerCoverImg({ post }: { post: VibeCodingPost }) {
+  const { slug } = post;
+  const covers = post.coverImage ? [post.coverImage] : getCoverCandidates(slug);
   const [idx, setIdx] = useState(0);
   const [failed, setFailed] = useState(false);
 
@@ -302,9 +347,22 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
   const [showLawflawManualPreview, setShowLawflawManualPreview] = useState(false);
   const [videoUnavailable, setVideoUnavailable] = useState(false);
   const [burst, setBurst] = useState<{ key: number; x: number; y: number } | null>(null);
+  const [activeCategory, setActiveCategory] = useState<"personal" | "work">("personal");
 
   const orderedPosts = useMemo(() => {
-    return [...posts].sort((a, b) => parseYearMonth(b.date) - parseYearMonth(a.date));
+    return posts
+      .filter((post) => (post.category ?? "personal") === activeCategory)
+      .sort((a, b) => parseYearMonth(b.date) - parseYearMonth(a.date));
+  }, [posts, activeCategory]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const projectSlug = params.get("project");
+    if (!projectSlug) return;
+    const target = posts.find((post) => post.slug === projectSlug);
+    if (!target) return;
+    setActiveCategory(target.category ?? "personal");
+    setSelectedPost(target);
   }, [posts]);
 
   // 内容加载（语言切换时重新拉取）
@@ -372,6 +430,23 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
       <div className="relative z-10">
         <h2 className="text-2xl font-serif text-seed-shadow mb-1">Vibe Coding</h2>
         <p className="text-xs text-seed-shadow/40 mb-6">{lang === 'en' ? 'AI-powered product prototypes built from scratch — click a card to expand' : '用 AI 工具链从零构建产品原型 — 点击卡片展开详情'}</p>
+        <div className="inline-flex rounded-xl border border-seed-shadow/10 bg-milk-white/55 p-1 mb-1" role="tablist" aria-label="Vibe Coding 项目分类">
+          {([
+            { key: "personal" as const, zh: "日常项目", en: "Personal Builds" },
+            { key: "work" as const, zh: "工作项目", en: "Work Projects" },
+          ]).map((category) => (
+            <button
+              key={category.key}
+              type="button"
+              role="tab"
+              aria-selected={activeCategory === category.key}
+              onClick={() => setActiveCategory(category.key)}
+              className={`rounded-lg px-4 py-2 text-xs font-medium transition-all ${activeCategory === category.key ? "bg-seed-shadow text-milk-white shadow-sm" : "text-seed-shadow/50 hover:text-seed-shadow"}`}
+            >
+              {lang === "zh" ? category.zh : category.en}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -555,7 +630,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                   {/* ── 封面区 ── */}
                   <div className="relative h-56 overflow-hidden">
                     {/* key 确保切换项目时封面组件重新挂载 */}
-                    <DrawerCoverImg key={selectedPost.slug} slug={selectedPost.slug} />
+                    <DrawerCoverImg key={selectedPost.slug} post={selectedPost} />
 
                     {/* 渐变遮罩层 */}
                     <div
@@ -659,6 +734,20 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                       <p className="text-[10px] uppercase tracking-widest text-seed-shadow/35 mb-1.5">Project Overview</p>
                       <p className="text-sm text-seed-shadow/70 leading-relaxed">{selectedPost.description}</p>
                     </div>
+
+                    {selectedPost.highlights && selectedPost.highlights.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6">
+                        {selectedPost.highlights.map((highlight) => (
+                          <div key={highlight} className="rounded-lg border border-leaf-green/15 bg-leaf-green/[0.05] px-3 py-3 text-xs font-medium text-leaf-green/90">
+                            {highlight}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {selectedPost.mediaItems && selectedPost.mediaItems.length > 0 && (
+                      <ProjectMediaCarousel items={selectedPost.mediaItems} title={selectedPost.title} />
+                    )}
 
                     {selectedPost.galleryImages && selectedPost.galleryImages.length > 0 && (
                       <ProjectImageTicker images={selectedPost.galleryImages} title={selectedPost.title} />

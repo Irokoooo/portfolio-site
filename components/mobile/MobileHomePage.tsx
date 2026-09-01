@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { InterestsSection } from "@/components/sections/InterestsSection";
@@ -44,7 +44,7 @@ const subTabs: MobileSubTabItem[] = [
   { key: "business", label: "Work" },
 ];
 
-const ENABLE_BUSINESS_ANALYSIS = true;
+const ENABLE_BUSINESS_ANALYSIS = false;
 const visibleSubTabs = ENABLE_BUSINESS_ANALYSIS
   ? subTabs
   : subTabs.filter((tab) => tab.key !== "business");
@@ -80,6 +80,13 @@ function renderSubContent(tab: MobileSubTabKey): React.ReactNode {
 export function MobileHomePage() {
   const [activeTab, setActiveTab] = useState<MobileTabKey>("about");
   const [activeSubTab, setActiveSubTab] = useState<MobileSubTabKey>("vibe");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("section") !== "sideworks") return;
+    setActiveTab("works");
+    setActiveSubTab("vibe");
+  }, []);
 
   const showSubTabs = activeTab === "works";
 

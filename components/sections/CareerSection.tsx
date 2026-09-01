@@ -42,6 +42,7 @@ interface Experience {
   skills?: string[];
   markdownContent?: string;
   galleryImages?: string[];
+  portfolioLinks?: { slug: string; labelZh: string; labelEn: string }[];
 }
 
 interface HonorItem {
@@ -608,6 +609,26 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
                   <span key={s} className="text-[10px] bg-seed-shadow/5 text-seed-shadow/60 px-2 py-0.5 rounded-full border border-seed-shadow/8 font-medium">
                     {s}
                   </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {exp.portfolioLinks && exp.portfolioLinks.length > 0 && (
+            <div className="pt-3 border-t border-seed-shadow/6">
+              <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2">
+                Proof of Work · 对应作品
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {exp.portfolioLinks.map((link) => (
+                  <a
+                    key={link.slug}
+                    href={`/?section=sideworks&project=${encodeURIComponent(link.slug)}`}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-leaf-green/20 bg-leaf-green/[0.07] px-3 py-2 text-xs font-medium text-leaf-green transition-colors hover:bg-leaf-green/[0.12]"
+                  >
+                    {lang === 'zh' ? link.labelZh : link.labelEn}
+                    <span aria-hidden="true">↗</span>
+                  </a>
                 ))}
               </div>
             </div>

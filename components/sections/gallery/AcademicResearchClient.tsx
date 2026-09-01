@@ -92,6 +92,18 @@ const categoryTheme = {
     dotColor: '#B8860B',
     patternId: 'dot-pattern-field',
   },
+  hackathon: {
+    accent: '#704080',
+    bgGradient: 'linear-gradient(135deg, rgba(140,75,166,0.07) 0%, rgba(140,75,166,0.02) 100%)',
+    border: 'rgba(140,75,166,0.22)',
+    borderLeft: '#704080',
+    tagBg: 'rgba(140,75,166,0.1)',
+    tagColor: '#704080',
+    tagBorder: 'rgba(140,75,166,0.26)',
+    headerColor: '#704080',
+    dotColor: '#704080',
+    patternId: 'dot-pattern-field',
+  },
   learning: {
     // 靛蓝系：自学笔记
     accent: '#4A7FA5',
@@ -237,16 +249,24 @@ const fieldExperiences: FieldExperience[] = [
     desc: { zh: "统筹现场执行与国际文化交流，负责双语媒体宣传，展现跨文化沟通与媒体统筹能力。", en: "Coordinated on-site execution and international cultural exchange, managed bilingual media outreach, and demonstrated cross-cultural communication and media coordination skills." },
     period: "2025.10 — 2025.12",
   },
+];
+
+const hackathonExperiences = [
   {
-    title: "SheNicest 深圳黑客松 (Hackathon)",
-    role: { zh: "统筹志愿者 & 软件组参与者", en: "Event Coordinator & Software Track Participant" },
+    title: "她来创造 · Coding Lady",
+    role: { zh: "Zenow 技术负责人 · 产品全栈落地", en: "Zenow Technical Lead · End-to-end Product Delivery" },
     tags: [
-      { zh: "GenAI 赋能", en: "GenAI Empowerment" },
-      { zh: "Prompt 调优", en: "Prompt Tuning" },
-      { zh: "跨界参与", en: "Cross-domain Participation" },
+      { zh: "心流时间", en: "Flow Time" },
+      { zh: "多 Agent 协作", en: "Multi-agent Orchestration" },
+      { zh: "创意奖", en: "Creativity Award" },
+      { zh: "50+ 试玩社群", en: "50+ Playtest Community" },
     ],
-    desc: { zh: "统筹赛事现场执行与流程推进，同时作为参赛团队外部伙伴提供 AI Prompt 调优与应用建议指导。", en: "Coordinated event execution and workflow, while also serving as an external AI advisor, providing Prompt tuning and application guidance to competing teams." },
-    period: "2026.03",
+    desc: {
+      zh: "围绕比赛“五种时间”命题选择心流时间方向；以一个 Agent 为中台，协调 Codex 与 Claude Code 多 Agent 并行开发，在紧张赛程内独立完成全部技术落地并交付可试玩产品。",
+      en: "Built around the hackathon's Five Forms of Time theme, choosing flow time. Orchestrated Codex and Claude Code agents through a central agent, independently delivering the complete playable product under a tight deadline.",
+    },
+    period: "2026.07",
+    projectHref: "/?section=sideworks&project=zenow-ai-health-game",
   },
 ];
 
@@ -490,6 +510,56 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                         </div>
                       </div>
                     </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <CategoryHeader
+                label={lang === 'en' ? "Hackathon Projects" : "Hackathon Projects · 黑客松项目"}
+                description={lang === 'en' ? "Competition concepts turned into working products through rapid collaboration and end-to-end delivery." : "从竞赛命题到可运行产品——快速协作、完整落地与现场验证"}
+                themeKey="hackathon"
+              />
+
+              <div className="space-y-3">
+                {hackathonExperiences.map((exp) => {
+                  const theme = categoryTheme.hackathon;
+                  return (
+                    <a
+                      key={exp.title}
+                      href={exp.projectHref}
+                      className="group block overflow-hidden rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                      style={{
+                        background: theme.bgGradient,
+                        border: `1px solid ${theme.border}`,
+                        borderLeft: `3px solid ${theme.borderLeft}`,
+                        boxShadow: '0 1px 4px rgba(63,46,47,0.04)',
+                      }}
+                    >
+                      <div className="relative p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-1 flex items-start justify-between gap-3">
+                              <p className="text-sm font-semibold text-seed-shadow">{exp.title}</p>
+                              <span className="text-sm transition-transform group-hover:translate-x-0.5" style={{ color: theme.accent }}>→</span>
+                            </div>
+                            <p className="mb-2 text-xs font-medium" style={{ color: theme.headerColor }}>
+                              {lang === 'zh' ? exp.role.zh : exp.role.en}
+                            </p>
+                            <p className="mb-2.5 text-xs leading-relaxed text-seed-shadow/55">
+                              {lang === 'zh' ? exp.desc.zh : exp.desc.en}
+                            </p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {exp.tags.map((tag) => (
+                                <ColorTag key={lang === 'zh' ? tag.zh : tag.en} tag={lang === 'zh' ? tag.zh : tag.en} themeKey="hackathon" />
+                              ))}
+                            </div>
+                            <p className="mt-2 text-[11px] font-medium" style={{ color: `${theme.accent}99` }}>{exp.period}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
                   );
                 })}
               </div>

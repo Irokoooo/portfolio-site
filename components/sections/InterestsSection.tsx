@@ -43,10 +43,10 @@ const academicInterests = [
   },
   {
     id: "digital",
-    title: { zh: "人工智能发展与 Agent 前沿", en: "AI Frontiers & Agentic Systems" },
+    title: { zh: "人工智能前沿：Agent Harness 与具身智能", en: "AI Frontiers: Agent Harnesses & Embodied Intelligence" },
     desc: {
-      zh: "关注 Agent 架构、多智能体协作、记忆与上下文机制，以及人工智能从工具走向可协作系统的演进。",
-      en: "Exploring agent architectures, multi-agent collaboration, memory and context systems, and the evolution of AI from tools into collaborative systems.",
+      zh: "关注 Agent Harness、多智能体协作、记忆与上下文机制、具身智能，以及人工智能从软件工具走向可行动、可协作系统的演进。",
+      en: "Exploring agent harnesses, multi-agent collaboration, memory and context systems, embodied intelligence, and the evolution of AI from software tools into systems that can act and collaborate.",
     },
     questions: [
       [
@@ -59,12 +59,12 @@ const academicInterests = [
         { q: { zh: "上下文窗口变大后，记忆架构还重要吗？", en: "Does memory architecture still matter as context windows grow?" }, thought: { zh: "更重要，因为真正的问题会从容量转向检索、筛选与遗忘。", en: "More than ever, as the problem shifts from capacity to retrieval, selection, and forgetting." } },
         { q: { zh: "Agent 应该在什么时候主动停下来问人？", en: "When should an agent stop and ask a human?" }, thought: { zh: "当目标含糊、风险不可逆或价值判断不可代理时。", en: "When goals are ambiguous, risks irreversible, or value judgments cannot be delegated." } },
         { q: { zh: "开放协议会催生怎样的 Agent 生态？", en: "What kind of agent ecosystem will open protocols create?" }, thought: { zh: "可能像早期 Web 一样，让能力跨工具组合，而不是被单个平台锁定。", en: "Perhaps like the early web: composable capabilities instead of platform lock-in." } },
-        { q: { zh: "模型能力与系统工程，哪个更决定 Agent 上限？", en: "What limits agents more: model capability or system engineering?" }, thought: { zh: "短期看系统工程，长期看二者能否共同演化。", en: "System engineering in the short term; their co-evolution in the long term." } },
+        { q: { zh: "Agent Harness 会不会比底层模型更决定产品体验？", en: "Could the agent harness matter more to product experience than the base model?" }, thought: { zh: "调度、记忆、权限、观测与恢复机制，正在成为模型能力能否落地的关键。", en: "Orchestration, memory, permissions, observability, and recovery increasingly determine whether model capability becomes useful." } },
       ],
       [
         { q: { zh: "人类在 Agent 工作流中的主体性如何保留？", en: "How do humans retain agency in agentic workflows?" }, thought: { zh: "人应该拥有目标、权限边界和最终评价权。", en: "Humans should own goals, permission boundaries, and final evaluation." } },
         { q: { zh: "自治程度越高，产品价值就越大吗？", en: "Does greater autonomy always mean greater product value?" }, thought: { zh: "未必；可控、可预测、真正减少负担往往更重要。", en: "Not necessarily; control, predictability, and genuine workload reduction often matter more." } },
-        { q: { zh: "Agent 会怎样改变软件界面的形态？", en: "How will agents reshape software interfaces?" }, thought: { zh: "界面会从功能入口变成意图表达、过程监督与结果校验。", en: "Interfaces may shift from feature entry points to intent, supervision, and verification." } },
+        { q: { zh: "具身智能怎样从演示走向真实世界的稳定行动？", en: "How can embodied intelligence move from demos to reliable real-world action?" }, thought: { zh: "感知与控制只是起点，真正困难的是长期任务、环境泛化、安全边界和失败恢复。", en: "Perception and control are only the start; long-horizon tasks, generalization, safety, and recovery are the harder problems." } },
         { q: { zh: "下一阶段 AI 产品最稀缺的能力是什么？", en: "What will be the scarcest capability in the next wave of AI products?" }, thought: { zh: "不是接入模型，而是建立可信闭环与清晰的人机分工。", en: "Not model access, but trustworthy loops and clear human–AI division of labor." } },
       ],
     ],

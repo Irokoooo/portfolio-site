@@ -3,6 +3,7 @@ export type VibeMediaType = "image" | "video" | "mixed";
 export interface VibeCodingPost {
   slug: string;
   title: string;
+  titleEn?: string;
   description: string;
   date: string;
   tags: string[];

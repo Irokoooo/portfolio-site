@@ -407,12 +407,31 @@ function VineDecoration() {
 // ── 主组件 ──
 export function AboutSection() {
   const { lang } = useLanguage();
-  const whoIAmText = lang === 'zh'
-    ? '与其坐以待毙寻找“为何而活”，我选择推开门，走向更大的世界。在探索中定义生命，而非在围城里自怨自艾。'
-    : 'Instead of waiting for meaning to appear, I choose to push the door open and step into a larger world.';
-  const whoIAmText2 = lang === 'zh'
-    ? '在自学成本近乎为零的 AI 时代，我热衷于以极高的好奇心探索陌生领域，打破学科间的知识壁垒，探索跨领域结合的可能性。我享受高压下的多线程并发作业，并始终践行「开始做了，就做到最好」的准则，希望能够成为一个强悍的一体机。对我而言，探索本身就是对虚无最有力的回应，而高效、高质量的交付，则是对自己生命精力输出的最基本负责。'
-    : 'In the AI era where self-learning cost is near zero, I explore unfamiliar domains with strong curiosity, break disciplinary silos, and turn ideas into high-quality execution under pressure.';
+  const aboutParagraphs = lang === 'zh'
+    ? [
+        '嗨，我是心怡，一个正在努力探索世界的人类！👋',
+        '虽然读的是商科，但我想学的东西很多很多。AI、脑神经科学、人类行为学、语言学……看起来东一块西一块，说到底，我大概只是一直很好奇：',
+        '碳基生物和硅基生物的边界，到底在哪里？',
+        '人类是怎么理解、学习和创造的？模型又能学会多少？那些看起来越来越相似的能力背后，到底发生了什么？',
+        '我还不知道答案。所以现在还在到处乱逛、乱学，也乱做一些东西。职业上好像也是这样。',
+        '我依然没有一个特别明确的标签，也不太着急现在就给自己一个答案。我想多试一点、多学一点，在真正做事情的过程中，慢慢找到自己愿意一直走下去的方向。',
+        '但至少现在，我已经知道一件事：我很喜欢做自己的产品。',
+        '而驱动我的理由其实很简单——希望它真的能帮到某个人。可能是让同事早一点下班；可能是让一个原本晦涩难懂的东西变得平易近人；也可能只是让一个原本很难用的东西，变得好用一点。',
+        '对我来说，技术和产品最有意思的地方，大概就在这里：把复杂留给系统，把简单留给人。',
+        '这里是我探索世界时，留下的一些痕迹。',
+      ]
+    : [
+        "Hi, I'm Xinyi — a human being trying to explore the world. 👋",
+        'I study business, but the things I want to learn have never really stayed within the boundaries of my major. AI, neuroscience, human behavior, linguistics... They may seem a little all over the place, but I think they all come back to one question I am endlessly curious about:',
+        'Where is the boundary between carbon-based and silicon-based intelligence?',
+        "How do humans understand, learn, and create? How much of that can models learn to do? And as their capabilities begin to look increasingly similar, what's actually happening underneath?",
+        "I don't know the answers yet. So for now, I'm wandering around, learning whatever catches my curiosity, and building things along the way. My career feels a bit like that, too.",
+        "I still don't have a perfectly defined label for what I want to be, and I'm not in a hurry to give myself one. I'd rather keep trying, keep learning, and figure out what I want to pursue by actually doing things.",
+        'But there is one thing I already know: I love building products of my own.',
+        'And what drives me is actually pretty simple — I want what I build to genuinely help someone. Maybe it helps a colleague finish work a little earlier. Maybe it turns something intimidating and complicated into something approachable and accessible. Or maybe it simply makes something frustrating a little easier to use.',
+        'To me, that is what makes technology and product-building so interesting: leave the complexity to the system, and simplicity to the people.',
+        "This is where I keep some of the traces I've left while exploring the world.",
+      ];
   const whoTags = lang === 'zh'
     ? ['国际经济与贸易', 'Vibe Coder / AI Workflow', 'IELTS 8.0 · 法语 B1+', '全链路中台运营', '高精力奋战人']
     : ['International Economics & Trade', 'Vibe Coder / AI Workflow', 'IELTS 8.0 · French B1+', 'End-to-End Ops', 'High-Energy Executor'];
@@ -435,12 +454,17 @@ export function AboutSection() {
         <motion.div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-3" variants={containerVariants} initial="hidden" animate="visible">
           <PaperCard variant="warm" colSpan="col-span-2" className="p-5 relative overflow-hidden">
             <VineDecoration />
-            <p className="text-xs font-medium text-seed-shadow/40 uppercase tracking-widest mb-3">Who I Am</p>
-            <p className="text-sm text-seed-shadow leading-relaxed">
-              {whoIAmText}
-              <br className="hidden sm:block" />
-              {whoIAmText2}
-            </p>
+            <p className="text-xs font-medium text-seed-shadow/40 uppercase tracking-widest mb-3">{lang === 'zh' ? '关于我' : 'Who I Am'}</p>
+            <div className="space-y-3 text-sm text-seed-shadow leading-relaxed">
+              {aboutParagraphs.map((paragraph, index) => (
+                <p
+                  key={paragraph}
+                  className={index === 0 || index === 2 || index === 6 || index === 8 || index === 9 ? 'font-semibold text-seed-shadow' : undefined}
+                >
+                  {paragraph}
+                </p>
+              ))}
+            </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {whoTags.map(tag => (
                 <span key={tag} className="text-xs bg-milk-white border border-seed-shadow/15 text-seed-shadow/70 px-2 py-0.5 rounded">{tag}</span>

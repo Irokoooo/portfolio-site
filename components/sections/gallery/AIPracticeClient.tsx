@@ -163,8 +163,38 @@ function SectionGoldFoil() {
   );
 }
 
-function VerticalCoverTicker({ posts }: { posts: VibeCodingPost[] }) {
-  const trackPosts = [...posts, ...posts];
+const supplementalCoverItems: VibeCodingPost[] = [
+  {
+    slug: "bead-grid-tool-cover",
+    title: "为了自己拼的轻松拼豆工具",
+    titleEn: "A relaxed bead-pattern tool I built for myself",
+    description: "",
+    date: "2026-09",
+    tags: [],
+    type: "Personal Tool",
+    mediaType: "image",
+    sourceFiles: [],
+    contentFile: "",
+    coverImage: "/works/covers/vibe/bead-grid-tool.png",
+  },
+  {
+    slug: "personal-learning-network-demo-cover",
+    title: "一个个人学习网络系统的 Demo",
+    titleEn: "A personal learning network system demo",
+    description: "",
+    date: "2026-09",
+    tags: [],
+    type: "Learning System Demo",
+    mediaType: "image",
+    sourceFiles: [],
+    contentFile: "",
+    coverImage: "/works/covers/vibe/personal-learning-network-demo.jpg",
+  },
+];
+
+function VerticalCoverTicker({ posts, lang }: { posts: VibeCodingPost[]; lang: 'zh' | 'en' }) {
+  const coverPosts = [...supplementalCoverItems, ...posts];
+  const trackPosts = [...coverPosts, ...coverPosts];
 
   return (
     <div className="rounded-xl overflow-hidden border border-seed-shadow/12 bg-milk-white/40 p-2.5">
@@ -192,11 +222,11 @@ function VerticalCoverTicker({ posts }: { posts: VibeCodingPost[] }) {
                 key={`${item.slug}-${i}`}
                 className={`relative overflow-hidden rounded-md border border-seed-shadow/10 ${sizeClass}`}
                 animate={{ x: [0, 5, 0, -4, 0], y: [0, -2, 0, 1, 0], scale: [1, 1.012, 1] }}
-                transition={{ duration: 7.4, repeat: Infinity, ease: "easeInOut", delay: (i % posts.length) * 0.28 }}
+                transition={{ duration: 7.4, repeat: Infinity, ease: "easeInOut", delay: (i % coverPosts.length) * 0.28 }}
               >
                 <VibeCoverThumb post={item} />
                 <div className="absolute inset-x-0 bottom-0 px-2 py-1" style={{ background: "linear-gradient(to top, rgba(20,16,13,0.55), transparent)" }}>
-                  <p className="text-[10px] text-white/95 truncate">{item.title}</p>
+                  <p className="text-[10px] text-white/95 truncate">{lang === 'en' && item.titleEn ? item.titleEn : item.title}</p>
                 </div>
               </motion.div>
             );
@@ -592,7 +622,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
 
         {/* ── 右列：竖向循环封面流 ── */}
         <div className="lg:col-span-4 lg:sticky lg:top-4">
-          <VerticalCoverTicker posts={orderedPosts} />
+          <VerticalCoverTicker posts={orderedPosts} lang={lang} />
         </div>
       </div>
 

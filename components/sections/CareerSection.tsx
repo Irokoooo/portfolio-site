@@ -99,6 +99,11 @@ const educationExperiences: Experience[] = [
       ],
     },
     skills: ['Global Business', '跨文化沟通 Cross-cultural', 'FinTech', '粤语 Cantonese'],
+    galleryImages: [
+      '/works/education/lingnan/lingnan-campus-01.jpg',
+      '/works/education/lingnan/lingnan-business-school-02.jpg',
+      '/works/education/lingnan/lingnan-campus-portrait-03.png',
+    ],
   },
   {
     id: 'minzu',
@@ -141,7 +146,21 @@ interface InternshipsApiResponse {
 // iconSrc 按 HONOR_ICONS 循环分配：award → medal → star → award → ...
 const honors: HonorItem[] = [
   {
-    date: '2026.4',
+    date: '2026.07',
+    yearLabel: '2026',
+    title: {
+      zh: '全国高校商业精英挑战赛品牌策划竞赛全国总决赛二等奖 · 主答辩手、撰稿者',
+      en: 'National College Business Elite Challenge, Brand Planning National Finals · Second Prize · Lead Presenter & Writer'
+    },
+    issuer: {
+      zh: '全国高校商业精英挑战赛组委会',
+      en: 'National College Business Elite Challenge Committee'
+    },
+    level: { zh: '国家级', en: 'National-level' },
+    iconSrc: HONOR_ICONS[0],
+  },
+  {
+    date: '2026.04',
     yearLabel: '2026',
     title: {
       zh: '学年优秀校际交换生',
@@ -169,11 +188,11 @@ const honors: HonorItem[] = [
     iconSrc: HONOR_ICONS[1],
   },
   {
-    date: '2026.03',
+    date: '2026.06',
     yearLabel: '2026',
     title: {
-      zh: '第十六届全国大学生"三创赛" · 全国二等奖',
-      en: '16th National "San Chuang" Competition · Second Prize'
+      zh: '第十六届全国大学生电子商务“三创赛” · 烽智安新队',
+      en: '16th National E-commerce Innovation, Creativity & Entrepreneurship Challenge · Fengzhi Anxin Team'
     },
     issuer: {
       zh: '全国大学生创新创业大赛组委会',
@@ -183,17 +202,17 @@ const honors: HonorItem[] = [
     iconSrc: HONOR_ICONS[2],
   },
   {
-    date: '2026.03',
+    date: '2026.05',
     yearLabel: '2026',
     title: {
-      zh: '全国品牌策划竞赛（农里鸿项目）· 主撰稿人',
-      en: 'National Brand Planning Competition (Nonglihong Project) · Lead Writer'
+      zh: '全国大学生数字媒体科技作品及创意竞赛 · 北京赛区三等奖',
+      en: 'National College Digital Media Technology Works & Creativity Competition · Beijing Third Prize'
     },
     issuer: {
-      zh: '全国品牌策划竞赛组委会',
-      en: 'National Brand Planning Competition Committee'
+      zh: '全国大学生数字媒体科技作品及创意竞赛组委会',
+      en: 'National College Digital Media Technology Competition Committee'
     },
-    level: { zh: '国家级', en: 'National-level' },
+    level: { zh: '北京市级', en: 'Beijing-level' },
     iconSrc: HONOR_ICONS[0],
   },
   {
@@ -667,7 +686,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
           )}
 
           {/* 可选：自动滚动成果图（仅当 md frontmatter 配置 galleryImages 时显示） */}
-          {exp.type === 'internship' && exp.galleryImages && exp.galleryImages.length > 0 && (
+          {exp.galleryImages && exp.galleryImages.length > 0 && (
             <div className="pt-3 border-t border-seed-shadow/6">
               <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2">
                 {lang === 'zh' ? '成果展示' : 'Work Showcase'}
@@ -1038,7 +1057,7 @@ export function CareerSection() {
                 }}
               />
               <div className="flex items-start gap-4 px-8 py-2" style={{ alignItems: 'flex-start' }}>
-                {honors.map((honor, i) => (
+                {[...honors].sort((a, b) => b.date.localeCompare(a.date)).map((honor, i) => (
                   <TimelineNode key={i} honor={honor} index={i} lang={lang} />
                 ))}
               </div>

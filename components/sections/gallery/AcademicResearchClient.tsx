@@ -249,6 +249,26 @@ const fieldExperiences: FieldExperience[] = [
     desc: { zh: "统筹现场执行与国际文化交流，负责双语媒体宣传，展现跨文化沟通与媒体统筹能力。", en: "Coordinated on-site execution and international cultural exchange, managed bilingual media outreach, and demonstrated cross-cultural communication and media coordination skills." },
     period: "2025.10 — 2025.12",
   },
+  {
+    title: "EAZO 数字艺术黑客松",
+    role: { zh: "最佳世界观奖", en: "Best Worldbuilding Award" },
+    tags: [
+      { zh: "数字艺术", en: "Digital Art" },
+      { zh: "世界观设计", en: "Worldbuilding" },
+    ],
+    desc: { zh: "参与数字艺术主题黑客松，并获得最佳世界观奖。", en: "Participated in a digital art hackathon and received the Best Worldbuilding Award." },
+    period: "2026.09.05 — 09.06",
+  },
+  {
+    title: "欧莱雅黑客松 · Beauty Copilot",
+    role: { zh: "进行时", en: "In Progress" },
+    tags: [
+      { zh: "Beauty Tech", en: "Beauty Tech" },
+      { zh: "AI Copilot", en: "AI Copilot" },
+    ],
+    desc: { zh: "围绕 Beauty Copilot 项目参与欧莱雅黑客松，当前仍在推进中。", en: "Currently developing Beauty Copilot as part of the L'Oréal hackathon." },
+    period: "进行时 · In Progress",
+  },
 ];
 
 const hackathonExperiences = [
@@ -528,7 +548,7 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                   return (
                     <a
                       key={exp.title}
-                      href={exp.projectHref}
+                      href={exp.projectHref ?? undefined}
                       className="group block overflow-hidden rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                       style={{
                         background: theme.bgGradient,
@@ -542,7 +562,7 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                           <div className="min-w-0 flex-1">
                             <div className="mb-1 flex items-start justify-between gap-3">
                               <p className="text-sm font-semibold text-seed-shadow">{exp.title}</p>
-                              <span className="text-sm transition-transform group-hover:translate-x-0.5" style={{ color: theme.accent }}>→</span>
+                              {exp.projectHref && <span className="text-sm transition-transform group-hover:translate-x-0.5" style={{ color: theme.accent }}>→</span>}
                             </div>
                             <p className="mb-2 text-xs font-medium" style={{ color: theme.headerColor }}>
                               {lang === 'zh' ? exp.role.zh : exp.role.en}

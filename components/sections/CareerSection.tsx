@@ -30,7 +30,7 @@ interface Experience {
   org: string;
   orgEn: string;
   role: { zh: string; en: string };
-  direction?: string;
+  direction?: string | LocalizedText;
   period: string;
   periodShort: string;
   /** 机构 Logo SVG 路径（public/assets/icons/），替代原 Emoji */
@@ -457,9 +457,13 @@ function ExperienceCard({ exp, isActive, onClick, lang }: ExperienceCardProps) {
                 'text-sm font-semibold leading-snug truncate transition-colors duration-200',
                 isActive ? 'text-seed-shadow' : 'text-seed-shadow/80 group-hover:text-seed-shadow',
               ].join(' ')}>
-                {exp.org}
+                {lang === 'zh' ? exp.org : exp.orgEn}
               </p>
-              <p className="text-[10px] text-seed-shadow/40 truncate">{exp.orgEn}</p>
+              {exp.direction && (
+                <p className="text-[10px] text-seed-shadow/40 truncate">
+                  {typeof exp.direction === 'string' ? exp.direction : exp.direction[lang]}
+                </p>
+              )}
             </div>
           </div>
           <span className={[
@@ -487,12 +491,40 @@ function ExperienceCard({ exp, isActive, onClick, lang }: ExperienceCardProps) {
   );
 }
 
+function localizeMarkdown(content: string, lang: 'zh' | 'en') {
+  const lines = content.split('\n');
+  const localized: string[] = [];
+  let activeLanguage: 'zh' | 'en' | null = null;
+
+  for (const line of lines) {
+    if (/^###\s+中文\s*$/.test(line)) {
+      activeLanguage = 'zh';
+      continue;
+    }
+    if (/^###\s+English\s*$/.test(line)) {
+      activeLanguage = 'en';
+      continue;
+    }
+    if (/^##\s+/.test(line)) {
+      activeLanguage = null;
+      const title = line.replace(/^##\s+/, '').trim();
+      const bilingualMatch = title.match(/^(.*?)（(.+?)）$/);
+      localized.push(`## ${bilingualMatch ? (lang === 'zh' ? bilingualMatch[1].trim() : bilingualMatch[2].trim()) : title}`);
+      continue;
+    }
+    if (activeLanguage === null || activeLanguage === lang) localized.push(line);
+  }
+
+  return localized.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 // ─────────────────────────────────────────
 // 右侧详情面板（含 Odometer + Ink Reveal）
 // ─────────────────────────────────────────
 
 function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
   const hasMarkdown = typeof exp.markdownContent === 'string' && exp.markdownContent.length > 0;
+  const localizedMarkdown = hasMarkdown ? localizeMarkdown(exp.markdownContent!, lang) : '';
 
   return (
     <AnimatePresence mode="wait">
@@ -511,7 +543,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
           {exp.metrics && exp.metrics.length > 0 ? (
             <div>
               <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2.5">
-                Key Metrics · 核心数据
+                {lang === 'zh' ? '核心数据' : 'Key Metrics'}
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {exp.metrics.map((m) => {
@@ -562,7 +594,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
             {hasMarkdown ? (
               <div>
                 <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2.5">
-                  Experience Notes · 经历正文
+                  {lang === 'zh' ? '经历正文' : 'Experience Notes'}
                 </p>
                 <div className="prose prose-sm max-w-none
                   prose-headings:font-serif prose-headings:text-seed-shadow
@@ -578,13 +610,13 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
                   prose-li:text-seed-shadow/70 prose-li:leading-relaxed
                   prose-hr:border-seed-shadow/8"
                 >
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{exp.markdownContent}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{localizedMarkdown}</ReactMarkdown>
                 </div>
               </div>
             ) : (
               <>
                 <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2.5">
-                  Highlights · 核心职责
+                  {lang === 'zh' ? '核心职责' : 'Highlights'}
                 </p>
                 <ul className="space-y-2.5">
                   {(lang === 'zh' ? exp.bullets.zh : exp.bullets.en).map((b, i) => (
@@ -602,7 +634,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
           {exp.skills && exp.skills.length > 0 && (
             <div className="pt-3 border-t border-seed-shadow/6">
               <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2">
-                Skills · 相关技能
+                {lang === 'zh' ? '相关技能' : 'Skills'}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {exp.skills.map((s) => (
@@ -617,7 +649,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
           {exp.portfolioLinks && exp.portfolioLinks.length > 0 && (
             <div className="pt-3 border-t border-seed-shadow/6">
               <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2">
-                Proof of Work · 对应作品
+                {lang === 'zh' ? '对应作品' : 'Proof of Work'}
               </p>
               <div className="flex flex-wrap gap-2">
                 {exp.portfolioLinks.map((link) => (
@@ -638,7 +670,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
           {exp.type === 'internship' && exp.galleryImages && exp.galleryImages.length > 0 && (
             <div className="pt-3 border-t border-seed-shadow/6">
               <p className="text-[10px] font-medium text-seed-shadow/40 uppercase tracking-widest mb-2">
-                Work Showcase · 成果图片滚动栏
+                {lang === 'zh' ? '成果展示' : 'Work Showcase'}
               </p>
               <div className="relative overflow-hidden rounded-lg border border-seed-shadow/10 bg-milk-white/45 py-4">
                 <motion.div
@@ -924,7 +956,7 @@ export function CareerSection() {
           {lang === 'zh' ? '教育与经历' : 'Career Journey'}
         </h2>
         <p className="text-xs text-seed-shadow/40">
-          {lang === 'zh' ? 'Career Journey' : '教育与经历'}
+          {lang === 'zh' ? '职业、项目与学习路径' : 'Work, projects, and learning path'}
         </p>
       </motion.div>
 
@@ -934,14 +966,14 @@ export function CareerSection() {
         {/* 左侧导航（col-span-5） */}
         <motion.div variants={containerVariants} className="lg:col-span-5 flex flex-col gap-2.5">
           <motion.p variants={itemVariants} className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest px-1 mb-0.5">
-            {lang === 'zh' ? 'Internships · 核心实习' : 'Internships · 核心实习'}
+            {lang === 'zh' ? '核心实习' : 'Internships'}
           </motion.p>
           {internshipExperiences.map(exp => (
             <ExperienceCard key={exp.id} exp={exp} isActive={activeExp?.id === exp.id} onClick={() => handleExperienceSelect(exp)} lang={lang} />
           ))}
 
           <motion.p variants={itemVariants} className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest px-1 mt-2 mb-0.5">
-            {lang === 'zh' ? 'Education · 教育背景' : 'Education · 教育背景'}
+            {lang === 'zh' ? '教育背景' : 'Education'}
           </motion.p>
           {educationExperiences.map(exp => (
             <ExperienceCard key={exp.id} exp={exp} isActive={activeExp?.id === exp.id} onClick={() => handleExperienceSelect(exp)} lang={lang} />
@@ -968,7 +1000,7 @@ export function CareerSection() {
       <motion.div ref={honorsSectionRef} variants={itemVariants} className="pt-4">
         <div className="flex items-center gap-3 mb-6">
           <p className="text-[10px] font-semibold text-seed-shadow/40 uppercase tracking-widest shrink-0">
-            {lang === 'zh' ? 'Honours & Awards · 荣誉奖项' : 'Honours & Awards · 荣誉奖项'}
+            {lang === 'zh' ? '荣誉奖项' : 'Honours & Awards'}
           </p>
           <div className="flex-1 h-px bg-seed-shadow/8" />
           <p className="text-[10px] text-seed-shadow/30 shrink-0 flex items-center gap-1">

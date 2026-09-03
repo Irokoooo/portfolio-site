@@ -15,6 +15,7 @@ export interface VibeCodingPost {
   demoUrl?: string;
   galleryImages?: string[];
   content?: string;
+  contentEn?: string;
   category?: "personal" | "work";
   coverImage?: string;
   highlights?: string[];
@@ -92,6 +93,7 @@ export const vibeCodingPosts: VibeCodingPost[] = [
     type: "UI Prototype",
     mediaType: "image",
     sourceFiles: ["个人作品集一开始.png"],
+    galleryImages: ["/works/vibe/portfolio-early-version-01.png"],
     contentFile: "portfolio-early-version.md",
   },
   {
@@ -103,6 +105,7 @@ export const vibeCodingPosts: VibeCodingPost[] = [
     type: "System Prototype",
     mediaType: "image",
     sourceFiles: ["大学生综测系统设计.png"],
+    galleryImages: ["/works/vibe/student-evaluation-system-01.png"],
     contentFile: "student-evaluation-system.md",
   },
   {
@@ -114,6 +117,7 @@ export const vibeCodingPosts: VibeCodingPost[] = [
     type: "Website Prototype",
     mediaType: "image",
     sourceFiles: ["挑战杯网站的图片.png"],
+    galleryImages: ["/works/vibe/challenge-cup-website-01.png"],
     contentFile: "challenge-cup-website.md",
   },
   {

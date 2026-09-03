@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView, type Variants } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Image from 'next/image';
 import { useLanguage } from '@/components/i18n/LanguageProvider';
 
 // ─────────────────────────────────────────
@@ -698,8 +699,15 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
                   transition={{ duration: 36, ease: 'linear', repeat: Infinity }}
                 >
                   {[...exp.galleryImages, ...exp.galleryImages].map((src, i) => (
-                    <div key={`${src}-${i}`} className="w-64 h-40 shrink-0 rounded-md overflow-hidden border border-seed-shadow/10 bg-cream-pour/40">
-                      <img src={src} alt="工作成果图" className="w-full h-full object-cover" />
+                    <div key={`${src}-${i}`} className="relative w-64 h-40 shrink-0 rounded-md overflow-hidden border border-seed-shadow/10 bg-cream-pour/40">
+                      <Image
+                        src={src}
+                        alt={lang === 'zh' ? '经历相关图片' : 'Experience gallery'}
+                        fill
+                        sizes="256px"
+                        quality={72}
+                        className="object-cover"
+                      />
                     </div>
                   ))}
                 </motion.div>

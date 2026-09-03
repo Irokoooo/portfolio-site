@@ -4,7 +4,7 @@
 // 抽屉：Notion 风格封面 + 彩色标签 + 清晰排版
 
 import { createPortal } from "react-dom";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -377,13 +377,12 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
   const [showLawflawManualPreview, setShowLawflawManualPreview] = useState(false);
   const [videoUnavailable, setVideoUnavailable] = useState(false);
   const [burst, setBurst] = useState<{ key: number; x: number; y: number } | null>(null);
-  const [activeCategory, setActiveCategory] = useState<"personal" | "work">("personal");
-
   const orderedPosts = useMemo(() => {
-    return posts
-      .filter((post) => (post.category ?? "personal") === activeCategory)
-      .sort((a, b) => parseYearMonth(b.date) - parseYearMonth(a.date));
-  }, [posts, activeCategory]);
+    const byNewest = (a: VibeCodingPost, b: VibeCodingPost) => parseYearMonth(b.date) - parseYearMonth(a.date);
+    const work = posts.filter((post) => post.category === "work").sort(byNewest);
+    const personal = posts.filter((post) => (post.category ?? "personal") === "personal").sort(byNewest);
+    return [...work, ...personal];
+  }, [posts]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -391,7 +390,6 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
     if (!projectSlug) return;
     const target = posts.find((post) => post.slug === projectSlug);
     if (!target) return;
-    setActiveCategory(target.category ?? "personal");
     setSelectedPost(target);
   }, [posts]);
 
@@ -408,8 +406,11 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
     setShowLawflawManualPreview(false);
     setVideoUnavailable(false);
 
-    if (selectedPost.content && selectedPost.content.trim().length > 0) {
-      setSelectedContent(selectedPost.content);
+    const embeddedContent = lang === 'en' && selectedPost.contentEn?.trim()
+      ? selectedPost.contentEn
+      : selectedPost.content;
+    if (embeddedContent && embeddedContent.trim().length > 0) {
+      setSelectedContent(embeddedContent);
       setIsLoadingContent(false);
       return;
     }
@@ -424,20 +425,20 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
       try {
         // try EN file first when lang === 'en'
         if (lang === 'en') {
-          const enRes = await fetch(`/api/vibe-coding-content?file=${encodeURIComponent(enFile)}`);
+          const enRes = await fetch(`/works/content/vibe/${encodeURIComponent(enFile)}`, { cache: 'force-cache' });
           if (enRes.ok) {
-            const enData = (await enRes.json()) as { content?: string };
+            const enText = await enRes.text();
             if (!cancelled) {
-              setSelectedContent(enData.content ?? "");
+              setSelectedContent(enText);
               return;
             }
           }
         }
-        const res = await fetch(`/api/vibe-coding-content?file=${encodeURIComponent(contentFile)}`);
+        const res = await fetch(`/works/content/vibe/${encodeURIComponent(contentFile)}`, { cache: 'force-cache' });
         if (!res.ok) throw new Error("failed");
-        const data = (await res.json()) as { content?: string };
+        const contentText = await res.text();
         if (!cancelled) {
-          setSelectedContent(data.content ?? (lang === 'en' ? "Content coming soon." : "正文暂未同步，请检查对应 md 文件。"));
+          setSelectedContent(contentText);
         }
       } catch {
         if (!cancelled) {
@@ -460,23 +461,6 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
       <div className="relative z-10">
         <h2 className="text-2xl font-serif text-seed-shadow mb-1">Vibe Coding</h2>
         <p className="text-xs text-seed-shadow/40 mb-6">{lang === 'en' ? 'AI-powered product prototypes built from scratch — click a card to expand' : '用 AI 工具链从零构建产品原型 — 点击卡片展开详情'}</p>
-        <div className="inline-flex rounded-xl border border-seed-shadow/10 bg-milk-white/55 p-1 mb-1" role="tablist" aria-label="Vibe Coding 项目分类">
-          {([
-            { key: "personal" as const, zh: "日常项目", en: "Personal Builds" },
-            { key: "work" as const, zh: "工作项目", en: "Work Projects" },
-          ]).map((category) => (
-            <button
-              key={category.key}
-              type="button"
-              role="tab"
-              aria-selected={activeCategory === category.key}
-              onClick={() => setActiveCategory(category.key)}
-              className={`rounded-lg px-4 py-2 text-xs font-medium transition-all ${activeCategory === category.key ? "bg-seed-shadow text-milk-white shadow-sm" : "text-seed-shadow/50 hover:text-seed-shadow"}`}
-            >
-              {lang === "zh" ? category.zh : category.en}
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -516,9 +500,23 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
 
         {orderedPosts.map((item, i) => {
           const tc = typeColor[item.type] ?? defaultTypeColor;
+          const category = item.category ?? "personal";
+          const previousCategory = i > 0 ? (orderedPosts[i - 1].category ?? "personal") : null;
           return (
+            <Fragment key={item.slug}>
+            {category !== previousCategory && (
+              <div className={`${i > 0 ? 'pt-7' : ''} pb-1`}>
+                <div className="flex items-center gap-3">
+                  <p className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-seed-shadow/55">
+                    {category === 'work'
+                      ? (lang === 'zh' ? '工作项目' : 'Work Projects')
+                      : (lang === 'zh' ? '日常项目' : 'Personal Builds')}
+                  </p>
+                  <div className="h-px flex-1 bg-seed-shadow/10" />
+                </div>
+              </div>
+            )}
             <motion.button
-              key={item.slug}
               onClick={(event) => {
                 const container = listContainerRef.current;
                 if (container) {
@@ -616,6 +614,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                 </div>
               </div>
             </motion.button>
+            </Fragment>
           );
         })}
         </div>

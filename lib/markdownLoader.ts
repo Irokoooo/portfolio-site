@@ -5,13 +5,19 @@
 export interface MarkdownPost {
   slug: string;
   title: string;
+  titleEn?: string;
   description: string;
+  descriptionEn?: string;
   date: string;
   tags: string[];
+  tagsEn?: string[];
   type: string;
+  typeEn?: string;
   content: string; // Markdown 正文字符串
+  contentEn?: string;
   pdfUrl?: string; // 可选：原始 PDF 文件链接
   coverImage?: string; // 可选：Drawer 顶部封面图路径
   highlights?: string[]; // 可选：卡片与详情页展示的关键结果
-  mediaItems?: { src: string; label: string }[]; // 可选：按需加载的流程演示
+  highlightsEn?: string[];
+  mediaItems?: { src: string; label: string; labelEn?: string }[]; // 可选：按需加载的流程演示
 }

@@ -5,18 +5,44 @@ export const businessAnalysisPosts: MarkdownPost[] = [
   {
     slug: "ai-evaluation-workbench",
     title: "AI Evaluation Workbench｜可信评测基础设施",
+    titleEn: "AI Evaluation Workbench | Trusted Evaluation Infrastructure",
     description: "把“寻找真正的高价值难题”从抽象业务要求，重构为可执行、可验证、可恢复并能规模化运行的 AI Evaluation Pipeline。",
+    descriptionEn: "A configurable and recoverable evaluation pipeline that turns the search for genuinely high-value hard cases into an executable, verifiable workflow.",
     date: "2026",
     tags: ["Evaluation Pipeline", "Agent Orchestration", "Human-in-the-loop", "Internal Tool"],
     type: "Work System",
+    typeEn: "Work System",
     highlights: ["50% → 80% 抽检一致率", "500 / 1,000 题级运行", "3 个团队复用"],
-    coverImage: "/works/work-systems/evaluation-full-pipeline.webp",
+    highlightsEn: ["50% → 80% spot-check agreement", "500 / 1,000-question workloads", "Reused by 3 teams"],
+    coverImage: "/works/work-systems/thumbs/evaluation-full-pipeline.jpg",
     mediaItems: [
-      { src: "/works/work-systems/evaluation-full-pipeline.webp", label: "一张表启动完整评测链路" },
-      { src: "/works/work-systems/evaluation-judge-runner.webp", label: "通用节点操作与 Judger Runner" },
-      { src: "/works/work-systems/evaluation-control-center.webp", label: "中控台与运行配置" },
-      { src: "/works/work-systems/evaluation-monitor.webp", label: "长期监控与任务投递" },
+      { src: "/works/work-systems/evaluation-full-pipeline.webp", label: "一张表启动完整评测链路", labelEn: "Launch the full evaluation pipeline from one table" },
+      { src: "/works/work-systems/evaluation-judge-runner.webp", label: "通用节点操作与 Judger Runner", labelEn: "Configurable nodes and Judger Runner" },
+      { src: "/works/work-systems/evaluation-control-center.webp", label: "中控台与运行配置", labelEn: "Control center and runtime configuration" },
+      { src: "/works/work-systems/evaluation-monitor.webp", label: "长期监控与任务投递", labelEn: "Persistent monitoring and task dispatch" },
     ],
+    contentEn: `## Project Overview
+
+**Role:** Execution Owner / Evaluation Pipeline Design / Vibe Coding
+
+I transformed an abstract goal—finding truly high-value hard cases—into an evidence-driven evaluation pipeline. The workbench connects completeness checks, AI-trace detection, value and scenario screening, rubric generation, SOTA response collection, three independent judges, disagreement review, trace analysis, and final acceptance.
+
+## What I Built
+
+- A configurable workbench for full-pipeline, single-node, and partial reruns
+- Batch and streaming runners that simulate real user calls
+- State tracking, failure recovery, attachment fallbacks, OCR/TTS parsing, and automated result write-back
+- Human-in-the-loop gates for low-confidence cases and judge disagreement
+
+## Outcomes
+
+- Improved manual spot-check agreement from approximately **50% to 80%**
+- Supported **500-question batch** and **1,000-question streaming** workloads
+- Reused by **3 teams** and designed toward a **3,000-question** production target
+
+## Product Judgment
+
+A judge score is a signal, not a conclusion. Trusted evaluation requires explicit evidence boundaries, observable failure states, recovery paths, and clear rules for when judgment must return to a human.`,
     content: `## 项目概览
 
 **角色：** Execution Owner / Evaluation Pipeline Design / Vibe Coding
@@ -82,17 +108,43 @@ Judge Score 只是信号，不是结论。可信 AI Evaluation 的关键不在�
   {
     slug: "lightflow-qc-workspace",
     title: "多语种质检工作台－飞书边栏插件",
+    titleEn: "Multilingual QC Workspace | Feishu Sidebar Plugin",
     description: "把分散在字段、附件和翻译工具中的质检动作收进飞书侧边栏，让 QC 在一个决策界面完成阅读、对比、翻译、填写与任务导航。",
+    descriptionEn: "A Feishu-native decision workspace that brings response comparison, translation, attachments, form filling, and task navigation into one sidebar.",
     date: "2026",
     tags: ["Product Design", "Feishu Plugin", "Multilingual QC", "Workflow Optimization"],
     type: "Internal Tool",
+    typeEn: "Internal Tool",
     highlights: ["10 min → 3–5 min / 条", "约 12 名内部 QC", "2 期真实生产任务"],
-    coverImage: "/works/work-systems/lightflow-qc-form.webp",
+    highlightsEn: ["10 min → 3–5 min per record", "Around 12 internal reviewers", "2 production batches"],
+    coverImage: "/works/work-systems/thumbs/lightflow-qc-form.jpg",
     mediaItems: [
-      { src: "/works/work-systems/lightflow-qc-form.webp", label: "QC 字段集中填写与翻译" },
-      { src: "/works/work-systems/lightflow-translation.webp", label: "多语种内容翻译与质检阅读" },
-      { src: "/works/work-systems/lightflow-layout.webp", label: "Reviewer 工作区与自定义布局" },
+      { src: "/works/work-systems/lightflow-qc-form.webp", label: "QC 字段集中填写与翻译", labelEn: "Centralized QC fields and translation" },
+      { src: "/works/work-systems/lightflow-translation.webp", label: "多语种内容翻译与质检阅读", labelEn: "Multilingual translation and review" },
+      { src: "/works/work-systems/lightflow-layout.webp", label: "Reviewer 工作区与自定义布局", labelEn: "Reviewer workspace and custom layout" },
     ],
+    contentEn: `## Project Overview
+
+**Role:** Product Design / Vibe Coding / Internal Tool
+
+LightFlow is a Feishu-native sidebar plugin for multilingual data quality control. It places prompts, multiple contributor responses, reviewer output, attachments, translation, editable QC fields, and next-task navigation in one decision surface.
+
+## Product Decisions
+
+- Kept the tool inside the Feishu Base where reviewers already worked
+- Replaced repeated field-hunting and context switching with side-by-side comparison
+- Added internal-first translation routing, cached results, and manual fallback
+- Evolved a fixed three-column view into a configurable personal review workspace
+
+## Outcomes
+
+- Reduced average review time from about **10 minutes to 3–5 minutes per record**
+- Used by around **12 internal reviewers**
+- Ran for approximately **1.5 months across 2 production batches**
+
+## Product Judgment
+
+An AI capability is not production-ready merely because its API returns an answer. Productization also requires prompt boundaries, data compliance, latency control, caching, fallbacks, and human correction.`,
     content: `## 项目概览
 
 **角色：** Product Design / Vibe Coding / Internal Tool

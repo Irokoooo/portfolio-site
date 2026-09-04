@@ -8,18 +8,18 @@ roleZh: AI 数据与安全 · 中台运营管理实习生
 roleEn: AI Data & Safety · Operations Management Intern
 directionZh: Seed 多模型 · AI 数据生产与模型评测
 directionEn: Seed Multi-model AI Data Production & Evaluation
-period: 2026.05.18 — 2026.09.10
-periodShort: 2026.05 — 2026.09
-logoSrc: /assets/icons/bytedance.svg
+period: 2026.05.18 — 至今
+periodShort: 2026.05 — 至今
+logoSrc: /assets/icons/bytedance-mark.svg
 tagZh: AI 数据与评测
 tagEn: AI Data & Evaluation
 metrics:
   - labelZh: AI 数据交付
     labelEn: AI Data Records
-    value: "50"
-    suffix: K+
+    value: "50000"
+    suffix: "+"
     unitZh: 条
-    unitEn: 10K+
+    unitEn: records
   - labelZh: 专家运营支持
     labelEn: Experts Supported
     value: "2000"

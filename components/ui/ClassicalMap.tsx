@@ -28,11 +28,12 @@ const GEO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 // ── 已访问国家（ISO 3166-1 numeric）────────────────────────────────────
-// 仅：中国 156 · 土耳其 792 · 日本 392
+// 中国 156 · 土耳其 792 · 日本 392 · 匈牙利 348
 const VISITED_COUNTRY_IDS = new Set([
   "156", // 中国 China      ← 可点击下钻
   "792", // 土耳其 Turkey
   "392", // 日本 Japan
+  "348", // 匈牙利 Hungary
 ]);
 
 // 中国的 ID，用于点击判断

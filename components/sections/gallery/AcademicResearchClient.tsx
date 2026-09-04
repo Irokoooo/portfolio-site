@@ -249,31 +249,18 @@ const fieldExperiences: FieldExperience[] = [
     desc: { zh: "统筹现场执行与国际文化交流，负责双语媒体宣传，展现跨文化沟通与媒体统筹能力。", en: "Coordinated on-site execution and international cultural exchange, managed bilingual media outreach, and demonstrated cross-cultural communication and media coordination skills." },
     period: "2025.10 — 2025.12",
   },
-  {
-    title: "EAZO 数字艺术黑客松",
-    role: { zh: "最佳世界观奖", en: "Best Worldbuilding Award" },
-    tags: [
-      { zh: "数字艺术", en: "Digital Art" },
-      { zh: "世界观设计", en: "Worldbuilding" },
-    ],
-    desc: { zh: "参与数字艺术主题黑客松，并获得最佳世界观奖。", en: "Participated in a digital art hackathon and received the Best Worldbuilding Award." },
-    period: "2026.09.05 — 09.06",
-  },
-  {
-    title: "欧莱雅黑客松 · Beauty Copilot",
-    role: { zh: "进行时", en: "In Progress" },
-    tags: [
-      { zh: "Beauty Tech", en: "Beauty Tech" },
-      { zh: "AI Copilot", en: "AI Copilot" },
-    ],
-    desc: { zh: "围绕 Beauty Copilot 项目参与欧莱雅黑客松，当前仍在推进中。", en: "Currently developing Beauty Copilot as part of the L'Oréal hackathon." },
-    period: "进行时 · In Progress",
-  },
 ];
 
-const hackathonExperiences = [
+interface HackathonExperience extends FieldExperience {
+  titleEn: string;
+  galleryImages?: string[];
+  projectHref?: string;
+}
+
+const hackathonExperiences: HackathonExperience[] = [
   {
     title: "她来创造 · Coding Lady",
+    titleEn: "Coding Lady AI Creator Hackathon",
     role: { zh: "Zenow 技术负责人 · 产品全栈落地", en: "Zenow Technical Lead · End-to-end Product Delivery" },
     tags: [
       { zh: "心流时间", en: "Flow Time" },
@@ -286,16 +273,59 @@ const hackathonExperiences = [
       en: "Built around the hackathon's Five Forms of Time theme, choosing flow time. Orchestrated Codex and Claude Code agents through a central agent, independently delivering the complete playable product under a tight deadline.",
     },
     period: "2026.07",
+    galleryImages: [
+      "/works/vibe/zenow-coding-lady-01.jpg",
+      "/works/vibe/zenow-coding-lady-02.jpg",
+      "/works/vibe/zenow-coding-lady-03.jpg",
+    ],
     projectHref: "/?section=sideworks&project=zenow-ai-health-game",
+  },
+  {
+    title: "SheNicest 千人黑客松",
+    titleEn: "SheNicest 1,000-person Hackathon",
+    role: { zh: "卡洛奇境队 · 智能硬件赛道", en: "Kalo Wonderland Team · Smart Hardware Track" },
+    tags: [
+      { zh: "运动健康", en: "Health & Fitness" },
+      { zh: "智能硬件", en: "Smart Hardware" },
+      { zh: "实体交互", en: "Physical Interaction" },
+    ],
+    desc: {
+      zh: "参与设计与机器人动态结合的魔法冒险交互游戏，让机器人随游戏内容与玩家互动，探索运动激励、叙事与实体交互相结合的健康管理体验。",
+      en: "Co-designed a magic-adventure experience in which a robot reacts to the game and the player, combining movement motivation, narrative, and physical interaction.",
+    },
+    period: "2026.08.26 — 08.30",
+  },
+  {
+    title: "EAZO 数字艺术黑客松",
+    titleEn: "EAZO Digital Art Hackathon",
+    role: { zh: "最佳世界观奖", en: "Best Worldbuilding Award" },
+    tags: [
+      { zh: "数字艺术", en: "Digital Art" },
+      { zh: "世界观设计", en: "Worldbuilding" },
+    ],
+    desc: { zh: "参与数字艺术主题黑客松，并获得最佳世界观奖。", en: "Participated in a digital art hackathon and received the Best Worldbuilding Award." },
+    period: "2026.09.05 — 09.06",
+  },
+  {
+    title: "欧莱雅黑客松 · Beauty Copilot",
+    titleEn: "L'Oréal Hackathon · Beauty Copilot",
+    role: { zh: "进行时", en: "In Progress" },
+    tags: [
+      { zh: "Beauty Tech", en: "Beauty Tech" },
+      { zh: "AI Copilot", en: "AI Copilot" },
+    ],
+    desc: { zh: "围绕 Beauty Copilot 项目参与欧莱雅黑客松，当前仍在推进中。", en: "Currently developing Beauty Copilot as part of the L'Oréal hackathon." },
+    period: "进行时 · In Progress",
   },
 ];
 
 export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
   const { lang } = useLanguage();
   const [selectedPost, setSelectedPost] = useState<AcademicResearchPost | null>(null);
+  const [selectedHackathon, setSelectedHackathon] = useState<HackathonExperience | null>(null);
   const [selectedContent, setSelectedContent] = useState("");
   const [isLoadingContent, setIsLoadingContent] = useState(false);
-  const isDrawerOpen = selectedPost !== null;
+  const isDrawerOpen = selectedPost !== null || selectedHackathon !== null;
 
   // 分离科研/调研与自学笔记
   const researchAndFieldwork = posts.filter((p) => p.category === "research" || p.category === "fieldwork");
@@ -467,6 +497,42 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                   </div>
                 );
               })}
+
+            <div className="space-y-3">
+              <CategoryHeader
+                label={lang === 'en' ? "Hackathon Projects" : "Hackathon Projects · 黑客松项目"}
+                description={lang === 'en' ? "Competition concepts turned into working products through rapid collaboration and end-to-end delivery." : "从竞赛命题到可运行产品——快速协作、完整落地与现场验证"}
+                themeKey="hackathon"
+              />
+              <div className="space-y-3">
+                {hackathonExperiences.map((exp) => {
+                  const theme = categoryTheme.hackathon;
+                  return (
+                    <motion.button
+                      type="button"
+                      key={exp.title}
+                      onClick={() => setSelectedHackathon(exp)}
+                      whileHover={{ y: -2, scale: 1.005 }}
+                      className="group block w-full overflow-hidden rounded-xl text-left transition-all duration-200 hover:shadow-md"
+                      style={{ background: theme.bgGradient, border: `1px solid ${theme.border}`, borderLeft: `3px solid ${theme.borderLeft}`, boxShadow: '0 1px 4px rgba(63,46,47,0.04)' }}
+                    >
+                      <div className="relative p-4">
+                        <div className="mb-1 flex items-start justify-between gap-3">
+                          <p className="text-sm font-semibold text-seed-shadow">{lang === 'en' ? exp.titleEn : exp.title}</p>
+                          <span className="text-sm transition-transform group-hover:translate-x-0.5" style={{ color: theme.accent }}>→</span>
+                        </div>
+                        <p className="mb-2 text-xs font-medium" style={{ color: theme.headerColor }}>{exp.role[lang]}</p>
+                        <p className="mb-2.5 line-clamp-2 text-xs leading-relaxed text-seed-shadow/55">{exp.desc[lang]}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {exp.tags.map((tag) => <ColorTag key={tag[lang]} tag={tag[lang]} themeKey="hackathon" />)}
+                        </div>
+                        <p className="mt-2 text-[11px] font-medium" style={{ color: `${theme.accent}99` }}>{exp.period}</p>
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* ═════ 右列：社会实践 + 自学笔记 ═════ */}
@@ -530,56 +596,6 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <CategoryHeader
-                label={lang === 'en' ? "Hackathon Projects" : "Hackathon Projects · 黑客松项目"}
-                description={lang === 'en' ? "Competition concepts turned into working products through rapid collaboration and end-to-end delivery." : "从竞赛命题到可运行产品——快速协作、完整落地与现场验证"}
-                themeKey="hackathon"
-              />
-
-              <div className="space-y-3">
-                {hackathonExperiences.map((exp) => {
-                  const theme = categoryTheme.hackathon;
-                  return (
-                    <a
-                      key={exp.title}
-                      href={exp.projectHref ?? undefined}
-                      className="group block overflow-hidden rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                      style={{
-                        background: theme.bgGradient,
-                        border: `1px solid ${theme.border}`,
-                        borderLeft: `3px solid ${theme.borderLeft}`,
-                        boxShadow: '0 1px 4px rgba(63,46,47,0.04)',
-                      }}
-                    >
-                      <div className="relative p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex items-start justify-between gap-3">
-                              <p className="text-sm font-semibold text-seed-shadow">{exp.title}</p>
-                              {exp.projectHref && <span className="text-sm transition-transform group-hover:translate-x-0.5" style={{ color: theme.accent }}>→</span>}
-                            </div>
-                            <p className="mb-2 text-xs font-medium" style={{ color: theme.headerColor }}>
-                              {lang === 'zh' ? exp.role.zh : exp.role.en}
-                            </p>
-                            <p className="mb-2.5 text-xs leading-relaxed text-seed-shadow/55">
-                              {lang === 'zh' ? exp.desc.zh : exp.desc.en}
-                            </p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {exp.tags.map((tag) => (
-                                <ColorTag key={lang === 'zh' ? tag.zh : tag.en} tag={lang === 'zh' ? tag.zh : tag.en} themeKey="hackathon" />
-                              ))}
-                            </div>
-                            <p className="mt-2 text-[11px] font-medium" style={{ color: `${theme.accent}99` }}>{exp.period}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </a>
                   );
                 })}
               </div>
@@ -664,6 +680,58 @@ export function AcademicResearchClient({ posts }: AcademicResearchClientProps) {
           </div>
         </div>
       </motion.div>
+
+      {typeof document !== "undefined" && selectedHackathon && createPortal(
+        <AnimatePresence>
+          <>
+            <motion.button
+              type="button"
+              aria-label={lang === 'en' ? 'Close hackathon details' : '关闭黑客松详情'}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[90] bg-seed-shadow/30 backdrop-blur-sm"
+              onClick={() => setSelectedHackathon(null)}
+            />
+            <motion.aside
+              initial={{ x: '100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0 }}
+              transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed right-0 top-0 z-[100] flex h-screen w-[min(44rem,92vw)] flex-col border-l border-seed-shadow/10 bg-[#faf8f4] shadow-2xl"
+            >
+              <div className="flex-1 overflow-y-auto p-7 sm:p-9">
+                <div className="mb-8 flex items-start justify-between gap-5">
+                  <div>
+                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8a5a1f]">Hackathon Field Note</p>
+                    <h3 className="font-serif text-2xl leading-tight text-seed-shadow">{lang === 'en' ? selectedHackathon.titleEn : selectedHackathon.title}</h3>
+                    <p className="mt-2 text-sm font-medium text-[#8a5a1f]">{selectedHackathon.role[lang]}</p>
+                    <p className="mt-1 text-xs text-seed-shadow/40">{selectedHackathon.period}</p>
+                  </div>
+                  <button type="button" onClick={() => setSelectedHackathon(null)} className="rounded-full border border-seed-shadow/10 px-3 py-2 text-sm text-seed-shadow/55 hover:bg-seed-shadow/5" aria-label={lang === 'en' ? 'Close' : '关闭'}>×</button>
+                </div>
+                <div className="rounded-2xl border border-[#c7a85a]/25 bg-[#f5ead1]/45 p-5">
+                  <p className="text-sm leading-7 text-seed-shadow/72">{selectedHackathon.desc[lang]}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {selectedHackathon.tags.map((tag) => <ColorTag key={tag[lang]} tag={tag[lang]} themeKey="hackathon" />)}
+                  </div>
+                </div>
+                {selectedHackathon.galleryImages && selectedHackathon.galleryImages.length > 0 && (
+                  <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {selectedHackathon.galleryImages.map((src, index) => (
+                      <figure key={src} className={`${index === 0 ? 'sm:col-span-2 aspect-[16/8]' : 'aspect-[4/3]'} overflow-hidden rounded-xl border border-seed-shadow/10 bg-cream-pour/40`}>
+                        <img src={src} alt={`${lang === 'en' ? selectedHackathon.titleEn : selectedHackathon.title} ${index + 1}`} loading="lazy" className="h-full w-full object-cover" />
+                      </figure>
+                    ))}
+                  </div>
+                )}
+                {selectedHackathon.projectHref && (
+                  <a href={selectedHackathon.projectHref} className="mt-7 inline-flex rounded-full border border-leaf-green/25 bg-leaf-green/[0.07] px-4 py-2 text-xs font-medium text-leaf-green hover:bg-leaf-green/[0.12]">
+                    {lang === 'en' ? 'Open the full Zenow case study →' : '查看 Zenow 完整作品案例 →'}
+                  </a>
+                )}
+              </div>
+            </motion.aside>
+          </>
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* ── Drawer：右侧滑入（Portal 到 body，避免被主内容 transform 影响） ── */}
       {typeof document !== "undefined" && selectedPost && createPortal(

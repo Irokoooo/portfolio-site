@@ -14,20 +14,20 @@ tagEn: Product Design
 metrics:
   - labelZh: 结构化 PRD
     labelEn: Structured PRDs
-    value: “20”
-    suffix: “+”
+    value: "20"
+    suffix: "+"
     unitZh: 条
     unitEn: items
   - labelZh: 原始用户评价
     labelEn: User Feedbacks
-    value: “1000”
-    suffix: “+”
+    value: "1000"
+    suffix: "+"
     unitZh: 条
     unitEn: items
   - labelZh: 高保真落地
     labelEn: Hi-Fi Implementation
-    value: “100”
-    suffix: “%”
+    value: "100"
+    suffix: "%"
 skills:
   - SQL
   - Python

@@ -123,6 +123,8 @@ function VibeCoverThumb({ post, className = "" }: { post: VibeCodingPost; classN
         key={`${slug}-${idx}`}
         src={encodePublicFilePath(candidates[idx])}
         alt=""
+        loading="lazy"
+        decoding="async"
         className={`w-full h-full object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"} ${className}`}
         onLoad={() => setLoaded(true)}
         onError={handleError}
@@ -286,7 +288,7 @@ function ProjectImageTicker({ images, title }: { images: string[]; title: string
   );
 }
 
-function ProjectMediaCarousel({ items, title }: { items: NonNullable<VibeCodingPost["mediaItems"]>; title: string }) {
+function ProjectMediaCarousel({ items, title, lang }: { items: NonNullable<VibeCodingPost["mediaItems"]>; title: string; lang: 'zh' | 'en' }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeItem = items[activeIndex];
 
@@ -300,12 +302,13 @@ function ProjectMediaCarousel({ items, title }: { items: NonNullable<VibeCodingP
         <img
           key={activeItem.src}
           src={encodePublicFilePath(activeItem.src)}
-          alt={`${title}：${activeItem.label}`}
+          alt={`${title}: ${lang === 'en' ? (activeItem.labelEn ?? activeItem.label) : activeItem.label}`}
           className="aspect-video w-full object-contain"
           loading="lazy"
+          decoding="async"
         />
         <figcaption className="flex items-center justify-between gap-3 bg-milk-white px-4 py-2 text-xs text-seed-shadow/55">
-          <span>{activeItem.label}</span>
+          <span>{lang === 'en' ? (activeItem.labelEn ?? activeItem.label) : activeItem.label}</span>
           <span>{activeIndex + 1} / {items.length}</span>
         </figcaption>
       </figure>
@@ -317,10 +320,10 @@ function ProjectMediaCarousel({ items, title }: { items: NonNullable<VibeCodingP
               type="button"
               onClick={() => setActiveIndex(index)}
               className={`shrink-0 rounded-md px-3 py-1.5 text-[11px] transition-colors ${activeIndex === index ? "bg-seed-shadow text-milk-white" : "bg-seed-shadow/[0.05] text-seed-shadow/55 hover:bg-seed-shadow/10"}`}
-              aria-label={`查看 ${item.label}`}
+              aria-label={lang === 'en' ? `View ${item.labelEn ?? item.label}` : `查看 ${item.label}`}
               aria-pressed={activeIndex === index}
             >
-              {item.label}
+              {lang === 'en' ? (item.labelEn ?? item.label) : item.label}
             </button>
           ))}
         </div>
@@ -361,6 +364,7 @@ function DrawerCoverImg({ post }: { post: VibeCodingPost }) {
       key={idx}
       src={encodePublicFilePath(covers[idx])}
       alt=""
+      decoding="async"
       className="absolute inset-0 w-full h-full object-cover"
       onError={handleError}
     />
@@ -383,6 +387,10 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
     const personal = posts.filter((post) => (post.category ?? "personal") === "personal").sort(byNewest);
     return [...work, ...personal];
   }, [posts]);
+  const localizedTitle = (post: VibeCodingPost) => lang === 'en' ? (post.titleEn ?? post.title) : post.title;
+  const localizedDescription = (post: VibeCodingPost) => lang === 'en' ? (post.descriptionEn ?? post.description) : post.description;
+  const localizedTags = (post: VibeCodingPost) => lang === 'en' ? (post.tagsEn ?? post.tags) : post.tags;
+  const localizedType = (post: VibeCodingPost) => lang === 'en' ? (post.typeEn ?? post.type) : post.type;
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -560,7 +568,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-[15px] font-semibold text-seed-shadow leading-snug group-hover:text-seed-shadow/80">
-                      {item.title}
+                      {localizedTitle(item)}
                     </p>
                     <span className="text-[11px] text-seed-shadow/35 whitespace-nowrap shrink-0 pt-0.5 font-mono">
                       {item.date}
@@ -572,7 +580,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                       className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-sm"
                       style={{ background: tc.bg, color: tc.text, border: `1px solid ${tc.border}` }}
                     >
-                      {item.type}
+                      {localizedType(item)}
                     </span>
                     <span className="inline-block text-[10px] px-2 py-0.5 rounded-sm"
                       style={{
@@ -586,11 +594,11 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                   </div>
 
                   <p className="text-xs text-seed-shadow/55 mt-2 leading-relaxed line-clamp-2">
-                    {item.description}
+                    {localizedDescription(item)}
                   </p>
 
                   <div className="flex flex-wrap gap-1 mt-2.5">
-                    {item.tags.map((tag) => (
+                    {localizedTags(item).map((tag) => (
                       <span
                         key={tag}
                         className="text-[10px] px-1.5 py-0.5 rounded"
@@ -675,7 +683,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                     {/* 左上：类型标签 + 日期 */}
                     <div className="absolute left-7 top-5 z-10">
                       <span className="text-xs text-white/95 bg-black/30 px-2.5 py-1 border border-white/20 rounded-full backdrop-blur-sm font-medium tracking-wide">
-                        {selectedPost.type}
+                        {localizedType(selectedPost)}
                       </span>
                       <p className="text-[11px] text-white/75 mt-1.5 font-medium">{selectedPost.date}</p>
                     </div>
@@ -699,7 +707,7 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                             className="rounded-lg px-4 py-3 shadow-sm"
                             style={{ background: "rgba(250,248,244,0.90)", border: "1px solid rgba(250,248,244,0.7)" }}
                           >
-                            <h3 className="text-xl font-serif text-seed-shadow leading-snug">{selectedPost.title}</h3>
+                            <h3 className="text-xl font-serif text-seed-shadow leading-snug">{localizedTitle(selectedPost)}</h3>
                           </div>
                         </div>
                       </div>
@@ -709,9 +717,25 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                   {/* ── 正文区 ── */}
                   <div className="px-7 pb-10 pt-4">
 
+                    {/* 重要入口优先于正文与标签，访客打开项目即可试玩 */}
+                    {(selectedPost.demoUrl || selectedPost.githubUrl) && (
+                      <div className="mb-5 flex flex-wrap gap-2 rounded-xl border border-leaf-green/15 bg-leaf-green/[0.04] p-3">
+                        {selectedPost.demoUrl && (
+                          <a href={selectedPost.demoUrl} target="_blank" rel="noreferrer" className="rounded-full bg-leaf-green px-4 py-2 text-xs font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5">
+                            {lang === 'en' ? 'Open live product ↗' : '立即体验产品 ↗'}
+                          </a>
+                        )}
+                        {selectedPost.githubUrl && (
+                          <a href={selectedPost.githubUrl} target="_blank" rel="noreferrer" className="rounded-full border border-seed-shadow/15 bg-white/65 px-4 py-2 text-xs font-medium text-seed-shadow/70 hover:bg-white">
+                            {lang === 'en' ? 'View source code ↗' : '查看源代码 ↗'}
+                          </a>
+                        )}
+                      </div>
+                    )}
+
                     {/* 标签行 */}
                     <div className="flex flex-wrap gap-1.5 mb-5">
-                      {selectedPost.tags.map((tag) => {
+                      {localizedTags(selectedPost).map((tag) => {
                         const tc = typeColor[selectedPost.type] ?? defaultTypeColor;
                         return (
                           <span
@@ -723,36 +747,6 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                           </span>
                         );
                       })}
-                      {selectedPost.githubUrl && (
-                        <a
-                          href={selectedPost.githubUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
-                          style={{
-                            background: "rgba(58,90,64,0.09)",
-                            color: "rgba(38,74,52,0.95)",
-                            border: "1px solid rgba(58,90,64,0.26)",
-                          }}
-                        >
-                          GitHub Repo
-                        </a>
-                      )}
-                      {selectedPost.demoUrl && (
-                        <a
-                          href={selectedPost.demoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-[11px] font-medium px-2.5 py-0.5 rounded-full"
-                          style={{
-                            background: "rgba(140,75,166,0.09)",
-                            color: "#704080",
-                            border: "1px solid rgba(140,75,166,0.24)",
-                          }}
-                        >
-                          Live Demo
-                        </a>
-                      )}
                     </div>
 
                     {/* Project Overview 信息框 */}
@@ -761,12 +755,12 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                       style={{ background: "rgba(63,46,47,0.04)", border: "1px solid rgba(63,46,47,0.1)" }}
                     >
                       <p className="text-[10px] uppercase tracking-widest text-seed-shadow/35 mb-1.5">Project Overview</p>
-                      <p className="text-sm text-seed-shadow/70 leading-relaxed">{selectedPost.description}</p>
+                      <p className="text-sm text-seed-shadow/70 leading-relaxed">{localizedDescription(selectedPost)}</p>
                     </div>
 
                     {selectedPost.highlights && selectedPost.highlights.length > 0 && (
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-6">
-                        {selectedPost.highlights.map((highlight) => (
+                        {(lang === 'en' ? (selectedPost.highlightsEn ?? selectedPost.highlights) : selectedPost.highlights).map((highlight) => (
                           <div key={highlight} className="rounded-lg border border-leaf-green/15 bg-leaf-green/[0.05] px-3 py-3 text-xs font-medium text-leaf-green/90">
                             {highlight}
                           </div>
@@ -775,11 +769,11 @@ export function AIPracticeClient({ posts }: AIPracticeClientProps) {
                     )}
 
                     {selectedPost.mediaItems && selectedPost.mediaItems.length > 0 && (
-                      <ProjectMediaCarousel items={selectedPost.mediaItems} title={selectedPost.title} />
+                      <ProjectMediaCarousel items={selectedPost.mediaItems} title={localizedTitle(selectedPost)} lang={lang} />
                     )}
 
                     {selectedPost.galleryImages && selectedPost.galleryImages.length > 0 && (
-                      <ProjectImageTicker images={selectedPost.galleryImages} title={selectedPost.title} />
+                      <ProjectImageTicker images={selectedPost.galleryImages} title={localizedTitle(selectedPost)} />
                     )}
 
                     {/* 演示视频（仅 video / mixed 类型） */}

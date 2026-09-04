@@ -48,6 +48,17 @@ interface HonorItem {
 
 const educationExperiences: Experience[] = [
   {
+    id: 'corvinus', type: 'education', org: '考文纽斯大学', orgEn: 'Corvinus University of Budapest',
+    role: { zh: '布达佩斯暑期项目 · 神经营销学 × 脑神经科学', en: 'Budapest Summer Programme · Neuromarketing × Neuroscience' },
+    period: '2026.07.06 — 2026.07.15', periodShort: '2026.07', logoSrc: '/assets/icons/comenius.svg',
+    tag: { zh: '暑期项目', en: 'Summer Programme' },
+    bullets: {
+      zh: ['在神经营销实验室使用 Tobii 桌面式眼动仪开展实验设计与数据采集。', '量化注视轨迹与视觉注意力分布，分析奢侈品品牌 Logo 对认知决策的影响。'],
+      en: ['Designed experiments and collected data with a Tobii desktop eye tracker in a neuromarketing lab.', 'Quantified gaze paths and visual attention to study how luxury-brand logos influence cognition and decisions.'],
+    },
+    skills: ['Neuromarketing', 'Eye Tracking', 'Tobii'],
+  },
+  {
     id: 'lingnan',
     type: 'education',
     org: '香港岭南大学',
@@ -171,11 +182,11 @@ function ExperienceCard({ exp, onClick, lang }: { exp: Experience; onClick: () =
         <img src={exp.logoSrc} alt="" aria-hidden="true" className="w-7 h-7 object-contain mt-0.5" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-seed-shadow truncate">{exp.org}</p>
+            <p className="text-sm font-semibold text-seed-shadow truncate">{lang === 'en' ? exp.orgEn : exp.org}</p>
             <span className="text-[10px] px-2 py-0.5 rounded-full border border-seed-shadow/15 text-seed-shadow/55 shrink-0">{exp.type === 'internship' ? 'Internship' : 'Education'}</span>
           </div>
           <p className="text-xs text-seed-shadow/70 mt-1 leading-relaxed">{typeof exp.role === 'string' ? exp.role : exp.role[lang]}</p>
-          <p className="text-[11px] text-seed-shadow/45 mt-1.5">{exp.period}</p>
+          <p className="text-[11px] text-seed-shadow/45 mt-1.5">{lang === 'en' ? exp.period.replace('至今', 'Present') : exp.period}</p>
         </div>
       </div>
     </button>

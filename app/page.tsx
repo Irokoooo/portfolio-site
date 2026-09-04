@@ -438,6 +438,14 @@ function SignatureFooter({
 
 function HomePageContent() {
   const { lang } = useLanguage();
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsMobile(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
   const [activeTab, setActiveTab] = useState<NavKey>("about");
   // 当前打开的二级抽屉对应的一级 key（null = 未打开任何抽屉）
   const [drillParent, setDrillParent] = useState<NavKey | null>(null);
@@ -522,13 +530,12 @@ function HomePageContent() {
     ? (visibleSubNavItems.find(i => i.key === subActiveTab)?.watermark ?? "WORKS")
     : (navItems.find(i => i.key === activeTab)?.watermark ?? "XY");
 
+  if (isMobile === null) return <div className="min-h-screen bg-milk-white" />;
+  if (isMobile) return <MobileHomePage />;
+
   return (
     <>
-      <div className="md:hidden min-h-screen">
-        <MobileHomePage />
-      </div>
-
-      <div className="hidden md:flex h-screen bg-transparent overflow-hidden">
+      <div className="flex h-screen bg-transparent overflow-hidden">
       {/* ===== 左侧固定侧边栏 ===== */}
       {/* Galaxy drilldown 激活时变强毛玻璃(沉浸式全屏银河背景) */}
       <aside className={`w-64 shrink-0 border-r h-screen overflow-hidden sticky top-0 transition-all duration-500 ${

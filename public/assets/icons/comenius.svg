@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Comenius University">
+  <rect width="64" height="64" rx="13" fill="#7b2431"/>
+  <path d="M15 19h34v5H15zm4 9h26v20H19z" fill="#f7efe3"/>
+  <path d="M25 33h14v4H25zm0 8h14v4H25z" fill="#7b2431"/>
+  <circle cx="32" cy="15" r="6" fill="#d4af55"/>
+</svg>

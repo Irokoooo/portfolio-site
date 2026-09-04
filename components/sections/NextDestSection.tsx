@@ -55,8 +55,8 @@ const content = {
         },
         tag: null,
         description: {
-          zh: "伴海而生，以此为志。我的人生终极目标是投身太平洋塑料治理，清除海洋生态污染，还生灵一片纯净海域。",
-          en: "Born by the sea, devoted to its cause. My ultimate life goal is to engage in Pacific plastic governance, remove marine pollution, and restore a pristine ocean for all living beings."
+          zh: "我的人生终极目标是投身太平洋塑料治理，清除海洋生态污染，还生灵一片纯净海域。",
+          en: "My ultimate life goal is to engage in Pacific plastic governance, remove marine pollution, and restore a pristine ocean for all living beings."
         }
       },
       {

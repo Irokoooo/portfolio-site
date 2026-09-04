@@ -1,7 +1,7 @@
 'use client';
 // About Me 板块
 // - 照片区：Ken Burns 纪录片效果
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { ExternalLinkButton } from "@/components/ui/ExternalLinkButton";
 import { useLanguage } from "@/components/i18n/LanguageProvider";
@@ -340,6 +340,20 @@ function ContactPanelCard({ lang }: { lang: 'zh' | 'en' }) {
 }
 
 function PhotoPanel({ lang }: { lang: 'zh' | 'en' }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.currentTime = 0;
+    void video.play().catch(() => {
+      // Muted autoplay can still be blocked by a browser preference.
+    });
+
+    return () => video.pause();
+  }, []);
+
   return (
     <div className="rounded-2xl overflow-hidden border border-seed-shadow/8 shadow-sm">
       {/* 固定宽高比，防止视频加载导致布局跳动 */}
@@ -351,9 +365,8 @@ function PhotoPanel({ lang }: { lang: 'zh' | 'en' }) {
       >
         {/* 视频层：正常渲染，白底视频 */}
         <video
+          ref={videoRef}
           src="/assets/tree-growth.mp4"
-          autoPlay
-          loop
           muted
           playsInline
           className="w-full h-full object-cover scale-[1.22] origin-center"

@@ -16,20 +16,20 @@ tagEn: Startup
 metrics:
   - labelZh: 校园渗透率
     labelEn: Campus Penetration
-    value: “30”
-    suffix: “+”
-    unitZh: “%”
-    unitEn: “%”
+    value: "30"
+    suffix: "+"
+    unitZh: "%"
+    unitEn: "%"
   - labelZh: 需求转化数
     labelEn: Requirement Conversions
-    value: “50”
-    suffix: “+”
+    value: "50"
+    suffix: "+"
     unitZh: 条
     unitEn: items
   - labelZh: 运营闭环效率
     labelEn: Operation Cycle
-    value: “24”
-    prefix: “<”
+    value: "24"
+    prefix: "<"
     unitZh: h
     unitEn: h
 skills:

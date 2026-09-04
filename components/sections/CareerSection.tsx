@@ -71,6 +71,37 @@ const HONOR_ICONS = [
 
 const educationExperiences: Experience[] = [
   {
+    id: 'comenius',
+    type: 'education',
+    org: '考文纽斯大学',
+    orgEn: 'Corvinus University of Budapest',
+    role: {
+      zh: '匈牙利 · 布达佩斯暑期项目 · 神经营销学 × 脑神经科学',
+      en: 'Budapest Summer Program · Neuromarketing × Neuroscience'
+    },
+    period: '2026.07.06 — 2026.07.15',
+    periodShort: '2026.07',
+    logoSrc: '/assets/icons/comenius.svg',
+    tag: { zh: '暑期项目', en: 'Summer Program' },
+    quote: {
+      zh: '从眼动数据出发，观察品牌视觉线索如何进入注意力与认知决策。',
+      en: 'Explored how brand visual cues shape attention and cognitive decision-making through eye-tracking data.'
+    },
+    bullets: {
+      zh: [
+        '在神经营销实验室使用 Tobii 桌面式眼动仪开展实验设计与数据采集。',
+        '量化注视轨迹与视觉注意力分布，分析奢侈品品牌 Logo 对认知决策的影响。',
+        '将商科问题转译为可观察、可度量的脑神经科学与行为实验问题。',
+      ],
+      en: [
+        'Designed experiments and collected data with a Tobii desktop eye tracker in a neuromarketing lab.',
+        'Quantified gaze paths and visual attention to study how luxury-brand logos influence cognition and decisions.',
+        'Translated a business question into observable, measurable neuroscience and behavioral research questions.',
+      ],
+    },
+    skills: ['Neuromarketing', 'Eye Tracking', 'Tobii', 'Behavioral Research'],
+  },
+  {
     id: 'lingnan',
     type: 'education',
     org: '香港岭南大学',
@@ -413,13 +444,11 @@ interface OrgLogoProps {
 
 function OrgLogo({ src, size = 'md' }: OrgLogoProps) {
   const sizeClass = size === 'sm' ? 'w-5 h-5' : size === 'lg' ? 'w-8 h-8' : 'w-6 h-6';
+  const isByteDance = src.includes('bytedance');
   return (
-    <img
-      src={src}
-      alt=""
-      aria-hidden="true"
-      className={`${sizeClass} object-contain shrink-0`}
-    />
+    <span className={`${sizeClass} ${isByteDance ? 'bg-[#161823] p-1 rounded' : ''} inline-flex shrink-0 items-center justify-center`}>
+      <img src={src} alt="" aria-hidden="true" className="h-full w-full object-contain" />
+    </span>
   );
 }
 
@@ -492,7 +521,7 @@ function ExperienceCard({ exp, isActive, onClick, lang }: ExperienceCardProps) {
               ? 'bg-strawberry-jam/10 text-strawberry-jam'
               : 'bg-seed-shadow/6 text-seed-shadow/50',
           ].join(' ')}>
-            {exp.periodShort}
+            {lang === 'en' ? exp.periodShort.replace('至今', 'Present') : exp.periodShort}
           </span>
         </div>
         <p className="text-xs text-seed-shadow/60 leading-snug mb-2 pl-0.5">{lang === 'zh' ? exp.role.zh : exp.role.en}</p>
@@ -567,7 +596,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {exp.metrics.map((m) => {
-                  const numVal = parseFloat(m.value);
+                  const numVal = Number.parseFloat(String(m.value).replace(/[^\d.-]/g, ''));
                   const isDecimal = m.value.includes('.');
                   return (
                     <div
@@ -582,7 +611,7 @@ function DetailPanel({ exp, lang }: { exp: Experience; lang: 'zh' | 'en' }) {
                           </span>
                         )}
                         <Odometer
-                          target={numVal}
+                          target={Number.isFinite(numVal) ? numVal : 0}
                           decimals={isDecimal ? 1 : 0}
                           duration={1000}
                           suffix={m.suffix ?? ''}
@@ -875,9 +904,6 @@ export function CareerSection() {
     }
 
     loadInternships();
-
-    // 预热接口缓存，减少用户首次点开时的等待感
-    void fetch('/api/career-internships', { cache: 'force-cache' }).catch(() => {});
 
     return () => {
       mounted = false;
